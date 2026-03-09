@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HANDLER_ODT_H
+#define HANDLER_ODT_H
 
 #include <QTextDocument>
 #include <QTextCursor>
@@ -146,3 +147,5 @@ void CreateOdtWithTable() {
     // Очистка
     delete doc;
 }
+
+#endif // HANDLER_ODT_H

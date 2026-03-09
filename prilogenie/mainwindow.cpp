@@ -5,9 +5,10 @@
 #include "handler_pdf.h"
 #include "handler_docx.h"
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(std::shared_ptr<app::App> app, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , app_(app)
 {
     ui->setupUi(this);
 }

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HANDLER_PDF_H
+#define HANDLER_PDF_H
 
 #include <QTextDocument>
 #include <QTextCursor>
@@ -36,3 +37,5 @@ void CreatePdfReport() {
 
     delete doc;
 }
+
+#endif // HANDLER_PDF_H

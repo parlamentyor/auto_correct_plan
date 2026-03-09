@@ -1,4 +1,5 @@
-#pragma once
+#ifndef HANDLER_DOCX_H
+#define HANDLER_DOCX_H
 
 #include <QAxObject>
 #include <QDir>
@@ -39,3 +40,5 @@ void CreateDocxWithWord() {
 
     delete wordApp;
 }
+
+#endif // HANDLER_DOCX_H
