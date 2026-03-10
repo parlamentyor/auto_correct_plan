@@ -5,6 +5,8 @@
 #include "handler_pdf.h"
 #include "handler_docx.h"
 
+#include <QFileDialog>
+
 MainWindow::MainWindow(std::shared_ptr<app::App> app, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -36,5 +38,18 @@ void MainWindow::on_pb_pdf_clicked()
 void MainWindow::on_pb_docx_clicked()
 {
     CreateDocxWithWord();
+}
+
+
+void MainWindow::on_pb_open_plan_month_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(
+        this,
+        QString("Открыть файл с планом на месяц"),
+        QDir::currentPath(), // QDir::currentPath — текущая папка.
+        "*.doc;*.docx;*.odt"
+        );
+
+    ui->le_plan_month->setText(fileName);
 }
 

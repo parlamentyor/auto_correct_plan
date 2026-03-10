@@ -9,6 +9,7 @@ Authorization::Authorization(std::shared_ptr<app::App> app, QWidget *parent)
     , app_(app)
 {
     ui->setupUi(this);
+    setWindowTitle("Менеджер работ БИТ");
 }
 
 Authorization::~Authorization()
@@ -34,7 +35,6 @@ void Authorization::on_pb_authorization_clicked()
         close();
     }
 }
-
 
 void Authorization::on_pb_create_user_clicked()
 {

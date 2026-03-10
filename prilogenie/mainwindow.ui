@@ -7,14 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>600</height>
+    <height>669</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QLabel" name="lb_authorization">
       <property name="text">
@@ -24,6 +24,118 @@
        <set>Qt::AlignCenter</set>
       </property>
      </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_13">
+      <item>
+       <widget class="QGroupBox" name="gb_plan_month">
+        <property name="title">
+         <string>План на месяц</string>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_17">
+         <item>
+          <widget class="QPushButton" name="pb_open_plan_month">
+           <property name="text">
+            <string>Открыть</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pb_create_plan_month">
+           <property name="text">
+            <string>Создать</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_plan_month"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="gb_budget">
+        <property name="title">
+         <string>Бюджет</string>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_18">
+         <item>
+          <widget class="QPushButton" name="pb_open_budget">
+           <property name="text">
+            <string>Открыть</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pb_create_budget">
+           <property name="text">
+            <string>Создать</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_budget"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_14">
+      <item>
+       <widget class="QGroupBox" name="gb_contract_end">
+        <property name="title">
+         <string>Ближайшие закрытия</string>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_19">
+         <item>
+          <widget class="QPushButton" name="pb_open_contract_end">
+           <property name="text">
+            <string>Открыть</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pb_create_contract_end">
+           <property name="text">
+            <string>Создать</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_contract_end"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="gb_plan_week">
+        <property name="title">
+         <string>План на неделю</string>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_20">
+         <item>
+          <widget class="QPushButton" name="pb_open_plan_week">
+           <property name="text">
+            <string>Открыть</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pb_create_plan_week">
+           <property name="text">
+            <string>Создать</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="le_plan_week"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -46,14 +158,14 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="lb_name_short">
         <property name="text">
          <string>Краткое наименование работы</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit">
+       <widget class="QLineEdit" name="le_name_short">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -64,14 +176,14 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="lb_name_full">
         <property name="text">
          <string>Полное наименование работы</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit_2">
+       <widget class="QLineEdit" name="le_name_full">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -82,14 +194,14 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="lb_number">
         <property name="text">
          <string>Номер договора</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit_3">
+       <widget class="QLineEdit" name="le_number">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -100,14 +212,14 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_6">
       <item>
-       <widget class="QLabel" name="label_5">
+       <widget class="QLabel" name="lb_contract_data">
         <property name="text">
          <string>Дата договора</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox">
+       <widget class="QSpinBox" name="sb_contract_dd">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -121,7 +233,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_2">
+       <widget class="QSpinBox" name="sb_contract_mm">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -135,7 +247,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_3">
+       <widget class="QSpinBox" name="sb_contract_yyyy">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -159,14 +271,14 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_7">
       <item>
-       <widget class="QLabel" name="label_8">
+       <widget class="QLabel" name="lb_deadline_data">
         <property name="text">
          <string>Дата исполнения по договору</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_4">
+       <widget class="QSpinBox" name="sb_deadline_dd">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -180,7 +292,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_5">
+       <widget class="QSpinBox" name="sb_deadline_mm">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -194,7 +306,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_6">
+       <widget class="QSpinBox" name="sb_deadline_yyyy">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -218,14 +330,14 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_8">
       <item>
-       <widget class="QLabel" name="label_11">
+       <widget class="QLabel" name="lb_responsible_employee">
         <property name="text">
          <string>Ответственный за договор</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit_5">
+       <widget class="QLineEdit" name="le_responsible_employee">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -236,14 +348,14 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_10">
       <item>
-       <widget class="QLabel" name="label_13">
+       <widget class="QLabel" name="lb_price">
         <property name="text">
          <string>Стоимость договора</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_7">
+       <widget class="QSpinBox" name="sb_price_ruble">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -257,7 +369,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_8">
+       <widget class="QSpinBox" name="sb_price_kop">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -288,14 +400,14 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_11">
       <item>
-       <widget class="QLabel" name="label_16">
+       <widget class="QLabel" name="lb_price_other_department">
         <property name="text">
          <string>Внутренне распределение</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_9">
+       <widget class="QSpinBox" name="sb_price_other_department_ruble">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -309,7 +421,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_10">
+       <widget class="QSpinBox" name="sb_price_other_department_kop">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -340,7 +452,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_12">
       <item>
-       <widget class="QCheckBox" name="checkBox_2">
+       <widget class="QCheckBox" name="chb_nds">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -357,7 +469,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_11">
+       <widget class="QSpinBox" name="sb_stavka_nds">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -388,23 +500,53 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_9">
       <item>
-       <widget class="QLabel" name="label_12">
+       <widget class="QLabel" name="lb_type_contract">
         <property name="text">
          <string>Относимось к видам работ</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit_6">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
+       <widget class="QComboBox" name="cob_type_contract">
+        <item>
+         <property name="text">
+          <string>ГОЗ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Атт</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>БЭК</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>СИ</string>
+         </property>
+        </item>
        </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_6">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </item>
     <item>
-     <widget class="QCheckBox" name="checkBox">
+     <widget class="QCheckBox" name="chb_stage">
       <property name="enabled">
        <bool>true</bool>
       </property>
@@ -428,6 +570,19 @@
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <spacer name="horizontalSpacer_7">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
       <item>
        <widget class="QPushButton" name="pb_pdf">
         <property name="enabled">
@@ -457,6 +612,19 @@
          <string>docx</string>
         </property>
        </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_8">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </item>
