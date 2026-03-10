@@ -17,6 +17,9 @@ public:
     explicit Authorization(std::shared_ptr<app::App> app, QWidget *parent = nullptr);
     ~Authorization();
 
+signals:
+    void loginSuccess();
+
 private slots:
     void on_pb_authorization_clicked();
 

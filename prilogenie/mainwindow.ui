@@ -16,16 +16,30 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
+     <widget class="QLabel" name="lb_authorization">
+      <property name="text">
+       <string>Вы не авторизировались!!!</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item>
      <layout class="QHBoxLayout" name="horizontalLayout_5">
       <item>
-       <widget class="QLabel" name="label_4">
+       <widget class="QLabel" name="lb_name_organization">
         <property name="text">
          <string>Наименование организации</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit_4"/>
+       <widget class="QLineEdit" name="le_name_organization">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -39,7 +53,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit"/>
+       <widget class="QLineEdit" name="lineEdit">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -53,7 +71,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit_2"/>
+       <widget class="QLineEdit" name="lineEdit_2">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -67,7 +89,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit_3"/>
+       <widget class="QLineEdit" name="lineEdit_3">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -81,7 +107,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox"/>
+       <widget class="QSpinBox" name="spinBox">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="label_7">
@@ -91,7 +121,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_2"/>
+       <widget class="QSpinBox" name="spinBox_2">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="label_6">
@@ -101,7 +135,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_3"/>
+       <widget class="QSpinBox" name="spinBox_3">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <spacer name="horizontalSpacer_2">
@@ -128,7 +166,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_4"/>
+       <widget class="QSpinBox" name="spinBox_4">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="label_9">
@@ -138,7 +180,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_5"/>
+       <widget class="QSpinBox" name="spinBox_5">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="label_10">
@@ -148,7 +194,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_6"/>
+       <widget class="QSpinBox" name="spinBox_6">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <spacer name="horizontalSpacer">
@@ -175,7 +225,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit_5"/>
+       <widget class="QLineEdit" name="lineEdit_5">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -189,7 +243,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_7"/>
+       <widget class="QSpinBox" name="spinBox_7">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="label_14">
@@ -199,7 +257,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_8"/>
+       <widget class="QSpinBox" name="spinBox_8">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="label_15">
@@ -233,7 +295,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_9"/>
+       <widget class="QSpinBox" name="spinBox_9">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="label_17">
@@ -243,7 +309,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_10"/>
+       <widget class="QSpinBox" name="spinBox_10">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="label_18">
@@ -271,6 +341,9 @@
      <layout class="QHBoxLayout" name="horizontalLayout_12">
       <item>
        <widget class="QCheckBox" name="checkBox_2">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="text">
          <string>Договор с НДС</string>
         </property>
@@ -284,7 +357,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_11"/>
+       <widget class="QSpinBox" name="spinBox_11">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="label_20">
@@ -318,12 +395,19 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit_6"/>
+       <widget class="QLineEdit" name="lineEdit_6">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
     <item>
      <widget class="QCheckBox" name="checkBox">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="text">
        <string>Наличие этапов</string>
       </property>
@@ -346,6 +430,9 @@
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
        <widget class="QPushButton" name="pb_pdf">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="text">
          <string>pdf</string>
         </property>
@@ -353,6 +440,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="pb_odt">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="text">
          <string>odt</string>
         </property>
@@ -360,6 +450,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="pb_docx">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="text">
          <string>docx</string>
         </property>

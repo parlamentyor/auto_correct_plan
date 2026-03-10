@@ -28,10 +28,10 @@ void Authorization::on_pb_authorization_clicked()
         QMessageBox::critical(this, "Ошибка", "Некорректный пароль");
     }
     else {
-        app_->SetActivUserId(ui->le_login->text().toStdString());
+        app_->SetActivUserName(ui->le_login->text().toStdString());
         QMessageBox::information(this, "Успех", "Авторизация прошла успешно"); // добавить в вывод имя пользователя
+        emit loginSuccess();
         close();
-        //нужно допилить - закрыть окно с кодом 0
     }
 }
 

@@ -10,10 +10,21 @@ int main(int argc, char *argv[])
     std::shared_ptr<app::App> app = std::make_shared<app::App>();
 
     QApplication a(argc, argv);
+
+    // потом возможно запилить менеджер окон
+
     Authorization authoriz(app);
     authoriz.show();
 
-    MainWindow w(app);
-    w.show();
+    // Создаем указатель на главное окно (пока nullptr)
+    MainWindow *mainWindow = nullptr;
+
+    // Подключаем сигнал успешного входа к созданию главного окна
+    QObject::connect(&authoriz, &Authorization::loginSuccess,
+                    [&mainWindow, app]() {
+                        mainWindow = new MainWindow(app);
+                        mainWindow->show();
+                    });
+
     return a.exec();
 }

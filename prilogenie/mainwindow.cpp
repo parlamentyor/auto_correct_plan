@@ -11,6 +11,8 @@ MainWindow::MainWindow(std::shared_ptr<app::App> app, QWidget *parent)
     , app_(app)
 {
     ui->setupUi(this);
+    ui->lb_authorization->setText(QString("Добро пожаловать, вы авторизовались как %1!").arg(QString::fromStdString(app->GetActivUserName())));
+    setWindowTitle("Менеджер работ БИТ");
 }
 
 MainWindow::~MainWindow()

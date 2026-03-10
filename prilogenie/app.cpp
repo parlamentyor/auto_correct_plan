@@ -8,8 +8,13 @@ bool app::App::IsCorrectPass(const std::string &login, const std::string &pass) 
     return users_.find(login)->second.GetPass() == pass;
 }
 
-void app::App::SetActivUserId(const std::string &login) {
-    active_user_id_ = users_.find(login)->second.GetId();
+void app::App::SetActivUserName(const std::string &login) {
+    active_user_name_ = login;
+}
+
+const std::string& app::App::GetActivUserName() const
+{
+    return active_user_name_;
 }
 
 void app::App::AddUser(const std::string &login, const std::string &pass)
