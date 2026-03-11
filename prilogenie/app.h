@@ -17,6 +17,7 @@ namespace app {
 
     private:
         std::map<std::string, model::User> users_; // ключ имя; потом перейти на unordered_map; потом поменять на указатель на User; потом подтянуть базу данных с уже созданными users
+
         model::DocumentPlanMonth doc_plan_month_;
         std::string active_user_name_;
     };

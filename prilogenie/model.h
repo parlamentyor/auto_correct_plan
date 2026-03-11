@@ -75,6 +75,7 @@ namespace model {
         bool AddContract(Contract entered_data_contract);
         bool EreseContract (std::string name_contract_);
 
+
     private:
         fs::path path; // нужно протестировать как он работатет с путями win, русскими буквами, пробелами в имени
     };

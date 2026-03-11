@@ -51,5 +51,23 @@ void MainWindow::on_pb_open_plan_month_clicked()
         );
 
     ui->le_plan_month->setText(fileName);
+
+    // Дальше нужен актион
+
+}
+
+
+void MainWindow::on_pb_create_plan_month_clicked()
+{
+    QString selectedFilter;
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    QString("Создать файл"),
+                                                    QDir::currentPath(),
+                                                    "Файл Microsoft Office (*.docx);;Файл Open Office (*.odt);;PDF файлы (*.pdf)",
+                                                    &selectedFilter);              // сюда запишется выбранный фильтр
+    ui->le_plan_month->setText(fileName);
+
+    // Подумать как разделять какой документ создавать
+    CreateOdtWithTable(fileName);
 }
 

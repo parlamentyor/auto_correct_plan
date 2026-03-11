@@ -26,6 +26,8 @@ private slots:
 
     void on_pb_open_plan_month_clicked();
 
+    void on_pb_create_plan_month_clicked();
+
 private:
     Ui::MainWindow *ui;
     std::shared_ptr<app::App> app_;

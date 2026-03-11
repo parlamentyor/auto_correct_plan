@@ -20,7 +20,7 @@
 // Для работы с файловой информацией
 #include <QFileInfo>    // QFileInfo - информация о файлах
 
-void CreateOdtWithTable() {
+void CreateOdtWithTable(const QString& fileName = "output_document.odt") {
     // Создаем документ
     QTextDocument *doc = new QTextDocument;
     QTextCursor cursor(doc);
@@ -129,7 +129,6 @@ void CreateOdtWithTable() {
                       QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm"));
 
     // 9. СОХРАНЯЕМ ДОКУМЕНТ В ФОРМАТЕ ODT
-    QString fileName = "output_document.odt";
 
     QTextDocumentWriter writer;
     writer.setFormat("ODF"); // OpenDocument Format
