@@ -6,6 +6,7 @@
 #include "handler_docx.h"
 
 #include <QFileDialog>
+#include <QMessageBox>
 
 MainWindow::MainWindow(std::shared_ptr<app::App> app, QWidget *parent)
     : QMainWindow(parent)
@@ -59,15 +60,28 @@ void MainWindow::on_pb_open_plan_month_clicked()
 
 void MainWindow::on_pb_create_plan_month_clicked()
 {
-    QString selectedFilter;
+    QString selected_filter;
     QString fileName = QFileDialog::getSaveFileName(this,
                                                     QString("Создать файл"),
                                                     QDir::currentPath(),
-                                                    "Файл Microsoft Office (*.docx);;Файл Open Office (*.odt);;PDF файлы (*.pdf)",
-                                                    &selectedFilter);              // сюда запишется выбранный фильтр
+                                                    QString("%1;;%2;;%3").arg(TypeFile::ODT).arg(TypeFile::DOCX).arg(TypeFile::PDF),
+                                                    &selected_filter);              // сюда запишется выбранный фильтр
     ui->le_plan_month->setText(fileName);
+    app_->SetPathPlanMonth(fileName.toStdString());
 
-    // Подумать как разделять какой документ создавать
-    CreateOdtWithTable(fileName);
+    if (selected_filter == TypeFile::ODT) {
+        CreateOdtWithTable(fileName);
+    }
+    else if (selected_filter == TypeFile::DOCX) {
+
+    }
+    else if (selected_filter == TypeFile::PDF) {
+
+    }
+    else {
+        QMessageBox::critical(this, "Ошибка", QString("Не могу создать файл формата %1").arg(selected_filter));
+    }
+
+
 }
 

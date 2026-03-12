@@ -6,7 +6,7 @@
 
 int main(int argc, char *argv[])
 {
-//    app::App app;
+//    std::locale::global(std::locale("ru_RU.UTF-8"));
     std::shared_ptr<app::App> app = std::make_shared<app::App>();
 
     QApplication a(argc, argv);

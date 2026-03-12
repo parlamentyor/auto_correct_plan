@@ -15,6 +15,10 @@ namespace app {
         const std::string& GetActivUserName() const;
         void AddUser(const std::string& login, const std::string& pass);
 
+        void SetPathPlanMonth(const std::string& s_path);
+        std::string GetPathPlanMonth() const;
+
+
     private:
         std::map<std::string, model::User> users_; // ключ имя; потом перейти на unordered_map; потом поменять на указатель на User; потом подтянуть базу данных с уже созданными users
 

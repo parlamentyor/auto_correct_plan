@@ -74,10 +74,13 @@ namespace model {
     public:
         bool AddContract(Contract entered_data_contract);
         bool EreseContract (std::string name_contract_);
+        void SetPath(std::string s_path);
+        std::string GetPath() const;
 
 
     private:
-        fs::path path; // нужно протестировать как он работатет с путями win, русскими буквами, пробелами в имени
+//        fs::path path_; // нужно протестировать как он работатет с путями win, русскими буквами, пробелами в имени  --- херово работает
+        std::string path_;
     };
 
     class DocumentPlanMonth : public DocumentImpl {};
