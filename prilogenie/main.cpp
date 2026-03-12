@@ -1,5 +1,5 @@
-#include "mainwindow.h"
 #include "authorization.h"
+#include "workwindow.h"
 #include "app.h"
 
 #include <QApplication>
@@ -17,13 +17,13 @@ int main(int argc, char *argv[])
     authoriz.show();
 
     // Создаем указатель на главное окно (пока nullptr)
-    MainWindow *mainWindow = nullptr;
+    WorkWindow *work_window = nullptr;
 
     // Подключаем сигнал успешного входа к созданию главного окна
     QObject::connect(&authoriz, &Authorization::loginSuccess,
-                    [&mainWindow, app]() {
-                        mainWindow = new MainWindow(app);
-                        mainWindow->show();
+                    [&work_window, app]() {
+                        work_window = new WorkWindow(app);
+                        work_window->show();
                     });
 
     return a.exec();

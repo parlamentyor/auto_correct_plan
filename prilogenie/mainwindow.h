@@ -3,20 +3,11 @@
 
 #include <QMainWindow>
 
-#include"app.h"
+#include "app.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
-
-
-
-struct TypeFile {
-    static inline const QString ODT = "Файл Open Office (*.odt)";
-    static inline const QString DOCX = "Файл Microsoft Office (*.docx)";
-    static inline const QString PDF = "PDF файлы (*.pdf)";
-};
-
 
 class MainWindow : public QMainWindow
 {

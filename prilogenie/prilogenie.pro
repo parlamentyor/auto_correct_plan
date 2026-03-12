@@ -13,22 +13,27 @@ CONFIG += c++17
 SOURCES += \
     app.cpp \
     authorization.cpp \
+    handler_odt.cpp \
     main.cpp \
     mainwindow.cpp \
-    model.cpp
+    model.cpp \
+    workwindow.cpp
 
 HEADERS += \
     app.h \
     authorization.h \
+    magic_defs.h \
     mainwindow.h \
     handler_odt.h \
     handler_pdf.h \
     handler_docx.h \
-    model.h
+    model.h \
+    workwindow.h
 
 FORMS += \
     authorization.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    workwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

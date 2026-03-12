@@ -1,17 +1,16 @@
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "workwindow.h"
+#include "ui_workwindow.h"
 
 #include "handler_odt.h"
-#include "handler_pdf.h"
-#include "handler_docx.h"
 #include "magic_defs.h"
+#include "mainwindow.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
 
-MainWindow::MainWindow(std::shared_ptr<app::App> app, QWidget *parent)
+WorkWindow::WorkWindow(std::shared_ptr<app::App> app, QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    , ui(new Ui::WorkWindow)
     , app_(app)
 {
     ui->setupUi(this);
@@ -19,31 +18,12 @@ MainWindow::MainWindow(std::shared_ptr<app::App> app, QWidget *parent)
     setWindowTitle("Менеджер работ БИТ");
 }
 
-MainWindow::~MainWindow()
+WorkWindow::~WorkWindow()
 {
     delete ui;
 }
 
-
-void MainWindow::on_pb_odt_clicked()
-{
-    CreateOdtWithTable();
-}
-
-
-void MainWindow::on_pb_pdf_clicked()
-{
-    CreatePdfReport();
-}
-
-
-void MainWindow::on_pb_docx_clicked()
-{
-    CreateDocxWithWord();
-}
-
-
-void MainWindow::on_pb_open_plan_month_clicked()
+void WorkWindow::on_pb_open_plan_month_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(
         this,
@@ -59,7 +39,7 @@ void MainWindow::on_pb_open_plan_month_clicked()
 }
 
 
-void MainWindow::on_pb_create_plan_month_clicked()
+void WorkWindow::on_pb_create_plan_month_clicked()
 {
     QString selected_filter;
     QString fileName = QFileDialog::getSaveFileName(this,
@@ -84,5 +64,13 @@ void MainWindow::on_pb_create_plan_month_clicked()
     }
 
 
+}
+
+void WorkWindow::on_pb_add_new_contract_clicked()
+{
+    MainWindow main_window(app_);
+    main_window.show();
+    main_window.raise();
+    main_window.activateWindow();
 }
 

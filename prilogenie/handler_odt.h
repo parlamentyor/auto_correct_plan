@@ -20,7 +20,7 @@
 // Для работы с файловой информацией
 #include <QFileInfo>    // QFileInfo - информация о файлах
 
-void CreateOdtWithTable(const QString& fileName = "output_document.odt") {
+inline void CreateOdtWithTable(const QString& fileName = "output_document.odt") {
     // Создаем документ
     QTextDocument *doc = new QTextDocument;
     QTextCursor cursor(doc);
