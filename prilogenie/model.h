@@ -11,14 +11,14 @@ namespace model {
     namespace fs = std::filesystem;
 
     struct Date {
-        std::size_t day_;
-        std::size_t month_;
-        std::size_t year_;
+        int day_;
+        int month_;
+        int year_;
     };
 
     struct Price {
-        std::size_t ruble_;
-        std::size_t kop_;
+        int ruble_;
+        int kop_;
     };
 
     enum TypeContract {
@@ -28,12 +28,17 @@ namespace model {
         SI
     };
 
+    struct SeparateWork {
+        std::string name_;
+        std::vector<std::string> names_responsible_employees_;
+        Date date_deadline_;
+    };
+
     struct Contract {
-        int id_;
         std::optional<std::string> number_; // подумать (протестировать) как будет работать с русским алфавитом
         Date date_;
-        std::unordered_map<int, std::string> id_number_;
-        std::unordered_map<std::string, int> number_id;
+//        std::unordered_map<int, std::string> id_number_; //на будущее для осуществления быстрого поиска
+//        std::unordered_map<std::string, int> number_id; //на будущее для осуществления быстрого поиска
         std::optional<std::string> name_organization_; // подумать (протестировать) как будет работать с русским алфавитом
         std::optional<std::string> name_short_;
         std::optional<std::string> name_full_;
@@ -42,9 +47,13 @@ namespace model {
         Price price_;
         Price price_other_department_;
         bool with_nds_;
-        std::size_t stavka_nds_;
+        int stavka_nds_;
         TypeContract type_;
         bool with_stage_;
+        std::vector<SeparateWork> pool_work;
+        int id_ = ++id_counter_;
+
+        static int id_counter_;
     };
 
     class User {
@@ -76,11 +85,11 @@ namespace model {
         bool EreseContract (std::string name_contract_);
         void SetPath(std::string s_path);
         std::string GetPath() const;
-
+        bool HasValuePath() const;
 
     private:
 //        fs::path path_; // нужно протестировать как он работатет с путями win, русскими буквами, пробелами в имени  --- херово работает
-        std::string path_;
+        std::optional<std::string> path_;
     };
 
     class DocumentPlanMonth : public DocumentImpl {};

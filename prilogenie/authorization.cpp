@@ -32,7 +32,6 @@ void Authorization::on_pb_authorization_clicked()
         app_->SetActivUserName(ui->le_login->text().toStdString());
         QMessageBox::information(this, "Успех", "Авторизация прошла успешно"); // добавить в вывод имя пользователя
         emit loginSuccess();
-        close();
     }
 }
 

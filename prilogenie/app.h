@@ -17,6 +17,8 @@ namespace app {
 
         void SetPathPlanMonth(const std::string& s_path);
         std::string GetPathPlanMonth() const;
+        bool HasValuePathPlanMonth() const;
+
 
 
     private:

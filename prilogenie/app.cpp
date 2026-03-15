@@ -28,3 +28,8 @@ void app::App::SetPathPlanMonth(const std::string &s_path) {
 std::string app::App::GetPathPlanMonth() const {
     return doc_plan_month_.GetPath();
 }
+
+bool app::App::HasValuePathPlanMonth() const
+{
+    return doc_plan_month_.HasValuePath();
+}

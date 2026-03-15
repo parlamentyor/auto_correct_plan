@@ -3,7 +3,6 @@
 
 #include "handler_odt.h"
 #include "magic_defs.h"
-#include "mainwindow.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -33,6 +32,7 @@ void WorkWindow::on_pb_open_plan_month_clicked()
         );
 
     ui->le_plan_month->setText(fileName);
+    app_->SetPathPlanMonth(fileName.toStdString());
 
     // Дальше нужен актион
 
@@ -63,14 +63,15 @@ void WorkWindow::on_pb_create_plan_month_clicked()
         QMessageBox::critical(this, "Ошибка", QString("Не могу создать файл формата %1").arg(selected_filter));
     }
 
-
 }
 
 void WorkWindow::on_pb_add_new_contract_clicked()
 {
-    MainWindow main_window(app_);
-    main_window.show();
-    main_window.raise();
-    main_window.activateWindow();
+    if (app_->HasValuePathPlanMonth()) {
+        emit AddContract();
+    }
+    else {
+        QMessageBox::critical(this, "Ошибка", QString("Не выбран файл для сохранения плана на месяц"));
+    }
 }
 

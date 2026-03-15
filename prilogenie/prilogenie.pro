@@ -17,9 +17,11 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     model.cpp \
+    windowmanager.cpp \
     workwindow.cpp
 
 HEADERS += \
+    handler_add_work.h \
     app.h \
     authorization.h \
     magic_defs.h \
@@ -28,6 +30,7 @@ HEADERS += \
     handler_pdf.h \
     handler_docx.h \
     model.h \
+    windowmanager.h \
     workwindow.h
 
 FORMS += \

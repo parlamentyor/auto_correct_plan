@@ -7,135 +7,16 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>669</height>
+    <height>683</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <widget class="QLabel" name="lb_authorization">
-      <property name="text">
-       <string>Вы не авторизировались!!!</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_13">
-      <item>
-       <widget class="QGroupBox" name="gb_plan_month">
-        <property name="title">
-         <string>План на месяц</string>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_17">
-         <item>
-          <widget class="QPushButton" name="pb_open_plan_month">
-           <property name="text">
-            <string>Открыть</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pb_create_plan_month">
-           <property name="text">
-            <string>Создать</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="le_plan_month"/>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QGroupBox" name="gb_budget">
-        <property name="title">
-         <string>Бюджет</string>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_18">
-         <item>
-          <widget class="QPushButton" name="pb_open_budget">
-           <property name="text">
-            <string>Открыть</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pb_create_budget">
-           <property name="text">
-            <string>Создать</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="le_budget"/>
-         </item>
-        </layout>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_14">
-      <item>
-       <widget class="QGroupBox" name="gb_contract_end">
-        <property name="title">
-         <string>Ближайшие закрытия</string>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_19">
-         <item>
-          <widget class="QPushButton" name="pb_open_contract_end">
-           <property name="text">
-            <string>Открыть</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pb_create_contract_end">
-           <property name="text">
-            <string>Создать</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="le_contract_end"/>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QGroupBox" name="gb_plan_week">
-        <property name="title">
-         <string>План на неделю</string>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_20">
-         <item>
-          <widget class="QPushButton" name="pb_open_plan_week">
-           <property name="text">
-            <string>Открыть</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pb_create_plan_week">
-           <property name="text">
-            <string>Создать</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="le_plan_week"/>
-         </item>
-        </layout>
-       </widget>
-      </item>
-     </layout>
+     <layout class="QHBoxLayout" name="horizontalLayout_13"/>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -556,6 +437,47 @@
      </widget>
     </item>
     <item>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QPushButton" name="pb_add_work_att_as">
+          <property name="text">
+           <string>Добавить АттАС</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pb_add_work_att_vp">
+          <property name="text">
+           <string>Добавить АттВП</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="1">
+       <widget class="QTableWidget" name="table_work">
+        <column>
+         <property name="text">
+          <string>Наименование</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Ответственные</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Срок исполнения</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
      <spacer name="verticalSpacer">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
@@ -582,6 +504,13 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pb_add_contract">
+        <property name="text">
+         <string>Добавить договор</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="pb_pdf">

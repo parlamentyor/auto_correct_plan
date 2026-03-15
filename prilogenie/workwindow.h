@@ -19,6 +19,9 @@ public:
     explicit WorkWindow(std::shared_ptr<app::App> app, QWidget *parent = nullptr);
     ~WorkWindow();
 
+signals:
+    void AddContract();
+
 private slots:
     void on_pb_open_plan_month_clicked();
 

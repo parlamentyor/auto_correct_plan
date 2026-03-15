@@ -24,12 +24,13 @@ private slots:
 
     void on_pb_docx_clicked();
 
-    void on_pb_open_plan_month_clicked();
+    void on_pb_add_work_att_as_clicked();
 
-    void on_pb_create_plan_month_clicked();
+    void on_pb_add_contract_clicked();
 
 private:
     Ui::MainWindow *ui;
     std::shared_ptr<app::App> app_;
+    std::vector<model::SeparateWork> pool_work_;
 };
 #endif // MAINWINDOW_H
