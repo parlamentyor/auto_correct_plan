@@ -21,6 +21,7 @@ SOURCES += \
     workwindow.cpp
 
 HEADERS += \
+    add_contract_plan_month_docx.h \
     handler_add_work.h \
     app.h \
     authorization.h \

@@ -5,6 +5,7 @@
 #include "handler_pdf.h"
 #include "handler_docx.h"
 #include "handler_add_work.h"
+#include "add_contract_plan_month_docx.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -102,6 +103,10 @@ void MainWindow::on_pb_add_contract_clicked() {
             pool_work_
     };
 
-
+    if (updateContractDocument(QString::fromStdString(app_->GetPathPlanMonth()), new_contract)) {
+        qDebug() << "Документ успешно обновлен!";
+    } else {
+        qDebug() << "Ошибка при обновлении документа";
+    }
 }
 
