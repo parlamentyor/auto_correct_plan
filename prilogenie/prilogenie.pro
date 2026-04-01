@@ -31,6 +31,7 @@ HEADERS += \
     handler_pdf.h \
     handler_docx.h \
     model.h \
+    my_logger.h \
     windowmanager.h \
     workwindow.h
 

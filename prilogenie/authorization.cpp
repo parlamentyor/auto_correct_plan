@@ -1,5 +1,6 @@
 #include "authorization.h"
 #include "ui_authorization.h"
+#include "my_logger.h"
 
 #include <QMessageBox>
 
@@ -21,16 +22,20 @@ void Authorization::on_pb_authorization_clicked()
 {
     if (ui->le_login->text().isEmpty() || ui->le_pass->text().isEmpty()) {
         QMessageBox::critical(this, "Ошибка", "Логин или пароль не введен");
+        LOG("Логин или пароль не введен");
     }
     else if (!(app_->AvailableUser(ui->le_login->text().toStdString()))) {
         QMessageBox::critical(this, "Ошибка", "Пользователь с таким логином отсутствует");
+        LOG("Пользователь с логином ", ui->le_login->text().toStdString() ," отсутствует");
     }
     else if (!(app_->IsCorrectPass(ui->le_login->text().toStdString(), ui->le_pass->text().toStdString()))) {
         QMessageBox::critical(this, "Ошибка", "Некорректный пароль");
+        LOG("Введен некорректный пароль для пользователя с логином: ", ui->le_login->text().toStdString());
     }
     else {
         app_->SetActivUserName(ui->le_login->text().toStdString());
         QMessageBox::information(this, "Успех", "Авторизация прошла успешно"); // добавить в вывод имя пользователя
+        LOG("Пользователь с логином: ", ui->le_login->text().toStdString(), " авторизировался");
         emit loginSuccess();
     }
 }
@@ -39,13 +44,16 @@ void Authorization::on_pb_create_user_clicked()
 {
     if (ui->le_login->text().isEmpty() || ui->le_pass->text().isEmpty()) {
         QMessageBox::critical(this, "Ошибка", "Логин или пароль не введен");
+        LOG("Логин или пароль не введен");
     }
     else if (app_->AvailableUser(ui->le_login->text().toStdString())) {
         QMessageBox::critical(this, "Ошибка", "Пользователь с таким логином уже существует");
+        LOG("Пользователь с логином ", ui->le_login->text().toStdString() ," уже существует");
     }
     else {
         app_->AddUser(ui->le_login->text().toStdString(), ui->le_pass->text().toStdString());
         QMessageBox::information(this, "Успех", "Пользователь добавлен"); // добавить в вывод имя пользователя
+        LOG("Пользователь с логином ", ui->le_login->text().toStdString() ," добавлен");
     }
 }
 

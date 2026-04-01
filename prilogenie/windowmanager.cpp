@@ -1,4 +1,5 @@
 #include "windowmanager.h"
+#include "my_logger.h"
 
 WindowManager::WindowManager(std::shared_ptr<app::App> app, QObject *parent)
     : QObject(parent)
@@ -14,6 +15,8 @@ void WindowManager::Start()
     authoriz_ = new Authorization(app_);
     connect(authoriz_, &Authorization::loginSuccess, this, &WindowManager::onLoginSuccess);
     authoriz_->show();
+    LOG("Запустилось окно авторизации");
+
 }
 
 void WindowManager::onLoginSuccess()
