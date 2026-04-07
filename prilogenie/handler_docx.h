@@ -158,7 +158,25 @@ void CreateDocxWithWord() {
         return;
     }
 
-    // 4. Теперь можно применять автоформатирование (опционально)
+    delete range;
+
+    LOG("Создали таблицу");
+
+
+    // Применяем автоформатирование таблицы
+    table->setProperty("AutoFormat", 1); // wdAutoFormatSimple
+//    table->dynamicCall("AutoFormat(int)", 1);
+
+    // Устанавливаем автоподбор ширины по содержимому
+    table->dynamicCall("AutoFitBehavior(int)", 1);  // 1 = wdAutoFitContent
+
+    // Если нужно также подогнать таблицу по ширине окна (растянуть на всю ширину)
+    // table->dynamicCall("AutoFitBehavior(int)", 2);  // 2 = wdAutoFitWindow
+
+    // Если нужно также установить фиксированную ширину (по умолчанию)
+    // table->dynamicCall("AutoFitBehavior(int)", 2);  // 0 = wdAutoFitFixed
+
+    LOG("Применили автоформатирование таблицы");
     // Обратите внимание: свойство AutoFormat может быть недоступно в новых версиях Word
     // Более надежный способ — использовать стили таблиц:
     // table->dynamicCall("ApplyStyle(const QString&)", "Light Grid");
@@ -166,24 +184,25 @@ void CreateDocxWithWord() {
     // Если очень нужно использовать AutoFormat, попробуйте так:
     // table->dynamicCall("AutoFormat(int)", 1);  // 1 = wdAutoFormatSimple
 
-    delete range;
-
-
-
-
-
-
-    LOG("Создали таблицу");
-
-    // Применяем автоформатирование таблицы
-    if (table && !table->isNull())
-    {
-        table->setProperty("AutoFormat", 1); // wdAutoFormatSimple
-        LOG("Применили автоформатирование таблицы");
+//--------------------------------------------------------------------------------------------
+    // Получаем объект Table и отключаем обтекание
+    QAxObject* tableRange = table->querySubObject("Range");
+    if (tableRange && !tableRange->isNull()) {
+        QAxObject* paragraphFormat = tableRange->querySubObject("ParagraphFormat");
+        if (paragraphFormat && !paragraphFormat->isNull()) {
+            // Устанавливаем выравнивание и отключаем обтекание
+            paragraphFormat->setProperty("Alignment", 1); // wdAlignParagraphLeft = 1
+            delete paragraphFormat;
+        }
+        delete tableRange;
     }
-    else {
-        LOG("Что-то не то с таблицей, не удаётся получить доступ к ней");
-    }
+
+    // Устанавливаем обтекание как "In line with text" (wdWrapInline = 0)
+    table->setProperty("WrapAroundText", false); // или table->setProperty("WrapAroundText", 0);
+    QVariant wrap_around_text = table->property("WrapAroundText");
+    qDebug() << "wrap_around_text:" << wrap_around_text;
+//------------------------------------------------------------------------------------------------------------
+
 
     // Заполняем каждую ячейку
     for (int col = 1; col <= 7; ++col) {
@@ -244,6 +263,149 @@ void CreateDocxWithWord() {
 
         delete range;
         delete cell;
+    }
+
+    // 1. НАСТРАИВАЕМ ПОВТОРЕНИЕ ПЕРВОЙ СТРОКИ НА ВСЕХ СТРАНИЦАХ
+    // Это свойство нужно установить ДО добавления новых строк,
+    // чтобы Word корректно применил форматирование ко всем строкам заголовка.
+
+    // это ко всем существующим строкам......неработает
+
+    QAxObject* rows = table->querySubObject("Rows");
+    if (rows && !rows->isNull())
+    {
+        // Устанавливаем HeadingFormat в true (1), чтобы первая строка повторялась [citation:6]
+        QAxObject* firstRow = table->querySubObject("Rows(int)", 1);
+        firstRow->dynamicCall("Select()");
+//        rows->setProperty("HeadingFormat", true);
+        rows->dynamicCall("HeadingFormat", 1);
+        QVariant heading_format = rows->property("HeadingFormat");
+        qDebug() << "heading_format_call:" << heading_format;
+        delete firstRow;
+        delete rows;
+    }
+
+/*
+    // к конкретной строке...тоже не работает
+    // Шаг 3: Получаем первую строку
+    QAxObject* firstRow = table->querySubObject("Rows(int)", 1);
+    if (firstRow && !firstRow->isNull()) {
+        // Шаг 4: Пробуем setProperty с boolean значением
+        firstRow->dynamicCall("Select()");
+        bool success = firstRow->setProperty("HeadingFormat", true);
+        QVariant heading_format = firstRow->property("HeadingFormat");
+        qDebug() << "heading_format_set:" << heading_format;
+        if (!success) {
+            // Если setProperty не сработал, пробуем dynamicCall
+            firstRow->dynamicCall("HeadingFormat", true);
+            QVariant heading_format = firstRow->property("HeadingFormat");
+            qDebug() << "heading_format_call:" << heading_format;
+        }
+
+        delete firstRow;
+    }
+*/
+
+/*
+    // эмулировать действие пользователя через интерфейс:
+    // Выделяем первую строку
+    QAxObject* firstRow = table->querySubObject("Rows(int)", 1);
+    if (firstRow && !firstRow->isNull()) {
+        firstRow->dynamicCall("Select()");
+        delete firstRow;
+    }
+
+    // Получаем выделение и пытаемся установить свойство через Selection
+    QAxObject* selection1 = document->querySubObject("Selection");
+    if (selection1 && !selection1->isNull()) {
+        QAxObject* selectedRows = selection1->querySubObject("Rows");
+        if (selectedRows && !selectedRows->isNull()) {
+            selectedRows->dynamicCall("HeadingFormat", true);
+            QVariant heading_format = selectedRows->property("HeadingFormat");
+            qDebug() << "heading_format_call:" << heading_format;
+            delete selectedRows;
+        }
+        delete selection1;
+    }
+*/
+
+    // Шаг 5: Теперь можно добавлять строки
+    QAxObject* rowsCollection = table->querySubObject("Rows");
+    if (rowsCollection && !rowsCollection->isNull()) {
+        for (int i = 0; i < 30; ++i) {
+            rowsCollection->dynamicCall("Add()");
+        }
+        delete rowsCollection;
+    }
+
+
+
+    // Получаем объект Borders для таблицы (для установки границ в таблице)
+    QAxObject* borders = table->querySubObject("Borders");
+
+    if (borders && !borders->isNull())
+    {
+        /*
+        // 1. Устанавливаем стиль линии для ВСЕХ границ (одинарная)
+        // Значение wdLineStyleSingle в VBA равно 1 [citation:1]
+        borders->setProperty("InsideLineStyle", 1);   // Внутренние границы
+        borders->setProperty("OutsideLineStyle", 1);  // Внешние границы
+
+        // 2. Устанавливаем толщину линии 0.5 pt
+        // wdLineWidth050pt = 4 [citation:2]
+        borders->setProperty("InsideLineWidth", 4);
+        borders->setProperty("OutsideLineWidth", 4);
+
+        // 3. Устанавливаем черный цвет
+        // wdColorBlack = 0 (в десятичной системе) или используйте RGB(0,0,0) [citation:1]
+        borders->setProperty("InsideColor", 0);
+        borders->setProperty("OutsideColor", 0);
+        LOG("Границы таблицы, по идеи должны появиться")
+
+        delete borders; // Освобождаем объект, если он больше не нужен
+        */
+
+        // Типы границ (wdBorderType):
+        // wdBorderTop = 1 (верхняя)
+        // wdBorderLeft = 2 (левая)
+        // wdBorderBottom = 3 (нижняя)
+        // wdBorderRight = 4 (правая)
+        // wdBorderHorizontal = 5 (внутренние горизонтальные)
+        // wdBorderVertical = 6 (внутренние вертикальные)
+
+        QList<int> borderTypes = {1, 2, 3, 4, 5, 6};
+
+        for (int borderType : borderTypes) {
+            // Получаем отдельную границу по её типу
+            QAxObject* border = borders->querySubObject("Item(int)", borderType);
+
+            if (border && !border->isNull()) {
+                // Шаг 1: явно делаем границу видимой (это самый важный шаг)
+                border->setProperty("Visible", true);
+
+                // Шаг 2: устанавливаем стиль линии - сплошная (wdLineStyleSingle = 1)
+                border->setProperty("LineStyle", 1);
+
+                // Шаг 3: устанавливаем толщину 0.5 pt (wdLineWidth050pt = 4)
+                border->setProperty("LineWidth", 4);
+
+                // Шаг 4: устанавливаем чёрный цвет (wdColorBlack = 0)
+                border->setProperty("Color", 0);
+
+                QVariant visible = border->property("Visible");
+                QVariant lineStyle = border->property("LineStyle");
+                qDebug() << "Border visible:" << visible << "LineStyle:" << lineStyle;
+
+                delete border;
+            }
+        }
+
+        delete borders;
+
+    }
+    else
+    {
+        LOG("Не удалось получить доступ к границам таблицы");
     }
 
     // Сохраняем документ. Формат 16 = wdFormatDocumentDefault (.docx)
