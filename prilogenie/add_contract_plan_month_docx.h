@@ -71,7 +71,7 @@ public:
             }
 
             // Добавляем новые строки
-            modifyThirdTable(table, document, contract);
+            modifyThirdTable(table, contract);
 
             // Сохраняем документ
             document->dynamicCall("Save()");
@@ -107,8 +107,8 @@ public:
         }
     }
 
-private:
-    static void modifyThirdTable(QAxObject* table, QAxObject* document, const model::Contract& contract) {
+
+    static void modifyThirdTable(QAxObject* table, const model::Contract& contract) {
         // Получаем объект Rows
         QAxObject* rows = table->querySubObject("Rows");
         if (!rows || rows->isNull()) {
@@ -138,22 +138,22 @@ private:
         qDebug() << "Начальная строка для добавления:" << startRow;
 
         // 1. Первая добавленная строка - объединенная ячейка
-        fillFirstRow(table, document, contract, startRow);
+        fillFirstRow(table, contract, startRow);
 
         // 2. Вторая добавленная строка - основные данные
-        fillSecondRow(table, document, contract, startRow + 1, rowCount);
+        fillSecondRow(table, contract, startRow + 1, rowCount);
 
         // 3. Строки для pool_work
         for (int i = 0; i < contract.pool_work.size(); ++i) {
-            fillWorkRow(table, document, contract.pool_work[i],
+            fillWorkRow(table, contract.pool_work[i],
                         startRow + 2 + i, i + 1);
         }
 
         delete rows;
     }
 
-    static void fillFirstRow(QAxObject* table, QAxObject* document,
-                             const model::Contract& contract, int row) {
+private:
+    static void fillFirstRow(QAxObject* table, const model::Contract& contract, int row) {
         LOG("Заполняем первую строку (объединенную): ", row);
 
         // Получаем ячейки для объединения
@@ -201,8 +201,7 @@ private:
         delete endCell;
     }
 
-    static void fillSecondRow(QAxObject* table, QAxObject* document,
-                              const model::Contract& contract, int row, int totalRows) {
+    static void fillSecondRow(QAxObject* table, const model::Contract& contract, int row, int totalRows) {
         LOG("Заполняем вторую строку (основные данные): ", row);
 
         // Заполняем каждую ячейку
@@ -264,8 +263,7 @@ private:
         }
     }
 
-    static void fillWorkRow(QAxObject* table, QAxObject* document,
-                            const model::SeparateWork& work, int row, int workIndex) {
+    static void fillWorkRow(QAxObject* table, const model::SeparateWork& work, int row, int workIndex) {
         qDebug() << "Заполняем строку работы" << workIndex << "в строке:" << row;
 
             for (int col = 1; col <= 7; ++col) {

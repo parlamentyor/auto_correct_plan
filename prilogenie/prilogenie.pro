@@ -17,6 +17,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     model.cpp \
+    serialization_qt_json.cpp \
     windowmanager.cpp \
     workwindow.cpp
 
@@ -32,6 +33,7 @@ HEADERS += \
     handler_docx.h \
     model.h \
     my_logger.h \
+    serialization_qt_json.h \
     windowmanager.h \
     workwindow.h
 

@@ -24,6 +24,7 @@ public:
 private slots:
     void onLoginSuccess();
     void onAddContract();
+    void onAppAboutToQuit();
 
 private:
     std::shared_ptr<app::App> app_;

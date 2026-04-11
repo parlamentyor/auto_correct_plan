@@ -1,5 +1,7 @@
 #include "app.h"
 
+#include <utility>
+
 bool app::App::AvailableUser(const std::string &login) const {
     return users_.find(login) != users_.end();
 }
@@ -18,7 +20,19 @@ const std::string& app::App::GetActivUserName() const {
 
 void app::App::AddUser(const std::string &login, const std::string &pass) {
     model::User new_user(login, pass);
-    users_.emplace(login, model::User(login, pass));
+    users_.emplace(login, std::move(new_user));
+}
+
+const std::map<std::string, model::User> &app::App::GetUsers() const {
+    return users_;
+}
+
+void app::App::AddContract(model::Contract&& contract) {
+    contracts_.push_back(std::move(contract));
+}
+
+const std::vector<model::Contract> &app::App::GetContracts() const {
+    return contracts_;
 }
 
 void app::App::SetPathPlanMonth(const std::string &s_path) {

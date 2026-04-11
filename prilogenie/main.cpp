@@ -1,7 +1,10 @@
+#include "serialization_qt_json.h"
 #include "windowmanager.h"
 #include "app.h"
 
 #include <QApplication>
+#include <QStandardPaths>
+#include <QDir>
 
 int main(int argc, char *argv[])
 {
@@ -33,7 +36,21 @@ int main(int argc, char *argv[])
 */
 
 //    std::locale::global(std::locale("ru_RU.UTF-8"));
+// Путь к файлу сохранения (например, в директории приложения)
+//    QString configPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+//    QDir().mkpath(configPath); // Создаем директорию, если её нет
+//    QString stateFile = configPath + "/app_state.json";
+    QString stateFile ="app_state.json";
+
     std::shared_ptr<app::App> app = std::make_shared<app::App>();
+
+    // Загружаем состояние при запуске
+    if (serialization::LoadFromJsonFile(stateFile, app)) {
+        qDebug() << "State loaded successfully from" << stateFile;
+    } else {
+        qDebug() << "No previous state found or error loading";
+    }
+
     QApplication a(argc, argv);
 
     WindowManager manager(app);

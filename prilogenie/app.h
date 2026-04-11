@@ -14,6 +14,9 @@ namespace app {
         void SetActivUserName(const std::string &login);
         const std::string& GetActivUserName() const;
         void AddUser(const std::string& login, const std::string& pass);
+        const std::map<std::string, model::User>& GetUsers() const;
+        void AddContract(model::Contract&& contract);
+        const std::vector<model::Contract>& GetContracts() const;
 
         void SetPathPlanMonth(const std::string& s_path);
         std::string GetPathPlanMonth() const;
@@ -26,6 +29,7 @@ namespace app {
 
         model::DocumentPlanMonth doc_plan_month_;
         std::string active_user_name_;
+        std::vector<model::Contract> contracts_;
     };
 
 

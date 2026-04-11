@@ -39,7 +39,7 @@ void MainWindow::on_pb_pdf_clicked()
 
 void MainWindow::on_pb_docx_clicked()
 {
-    CreateDocxWithWord();
+    CreateDocxWithWord(app_->GetContracts());
 }
 
 
@@ -105,8 +105,11 @@ void MainWindow::on_pb_add_contract_clicked() {
 
     if (updateContractDocument(QString::fromStdString(app_->GetPathPlanMonth()), new_contract)) {
         qDebug() << "Документ успешно обновлен!";
-    } else {
+    }
+    else {
         qDebug() << "Ошибка при обновлении документа";
     }
+
+    app_->AddContract(std::move(new_contract));
 }
 

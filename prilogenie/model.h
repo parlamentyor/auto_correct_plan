@@ -35,6 +35,86 @@ namespace model {
     };
 
     struct Contract {
+
+        // Конструктор по умолчанию
+        Contract() = default;
+
+        // Пользовательский конструктор для создания из данных
+        Contract(
+            std::optional<std::string> number,
+            Date date,
+            std::optional<std::string> name_organization,
+            std::optional<std::string> name_short,
+            std::optional<std::string> name_full,
+            Date date_deadline,
+            std::optional<std::string> name_responsible_employee,
+            Price price,
+            Price price_other_department,
+            bool with_nds,
+            int stavka_nds,
+            TypeContract type,
+            bool with_stage,
+            std::vector<SeparateWork> pool_work
+            ) : number_(std::move(number))
+            , date_(date)
+            , name_organization_(std::move(name_organization))
+            , name_short_(std::move(name_short))
+            , name_full_(std::move(name_full))
+            , date_deadline_(date_deadline)
+            , name_responsible_employee_(std::move(name_responsible_employee))
+            , price_(price)
+            , price_other_department_(price_other_department)
+            , with_nds_(with_nds)
+            , stavka_nds_(stavka_nds)
+            , type_(type)
+            , with_stage_(with_stage)
+            , pool_work(std::move(pool_work)) {
+        }
+
+        // Разрешаем перемещение
+        Contract(Contract&& other) noexcept
+            : number_(std::move(other.number_))
+            , date_(other.date_)
+            , name_organization_(std::move(other.name_organization_))
+            , name_short_(std::move(other.name_short_))
+            , name_full_(std::move(other.name_full_))
+            , date_deadline_(other.date_deadline_)
+            , name_responsible_employee_(std::move(other.name_responsible_employee_))
+            , price_(other.price_)
+            , price_other_department_(other.price_other_department_)
+            , with_nds_(other.with_nds_)
+            , stavka_nds_(other.stavka_nds_)
+            , type_(other.type_)
+            , with_stage_(other.with_stage_)
+            , pool_work(std::move(other.pool_work))
+            , id_(other.id_) {
+        }
+
+        Contract& operator=(Contract&& other) noexcept {
+            if (this != &other) {
+                number_ = std::move(other.number_);
+                date_ = other.date_;
+                name_organization_ = std::move(other.name_organization_);
+                name_short_ = std::move(other.name_short_);
+                name_full_ = std::move(other.name_full_);
+                date_deadline_ = other.date_deadline_;
+                name_responsible_employee_ = std::move(other.name_responsible_employee_);
+                price_ = other.price_;
+                price_other_department_ = other.price_other_department_;
+                with_nds_ = other.with_nds_;
+                stavka_nds_ = other.stavka_nds_;
+                type_ = other.type_;
+                with_stage_ = other.with_stage_;
+                pool_work = std::move(other.pool_work);
+                id_ = other.id_;
+            }
+            return *this;
+        }
+
+        // запрещаем использовать конструктор копирования и оператор присваивания
+        Contract(const Contract&) = delete;
+        Contract& operator=(const Contract&) = delete;
+
         std::optional<std::string> number_; // подумать (протестировать) как будет работать с русским алфавитом
         Date date_;
 //        std::unordered_map<int, std::string> id_number_; //на будущее для осуществления быстрого поиска
@@ -64,8 +144,33 @@ namespace model {
             , pass_(pass) {
         }
 
+        // Конструктор для восстановления из JSON
+        User(int id, const std::string& login, const std::string& pass)
+            : id_(id)
+            , login_(login)
+            , pass_(pass) {
+            ++id_counter_;
+        }
+
+        // Конструктор перемещения
+        User(User&& other) noexcept
+            : id_(other.id_)
+            , login_(std::move(other.login_))
+            , pass_(std::move(other.pass_)) {
+        }
+
+        // запрещаем использовать конструктор копирования и оператор присваивания
+        User(const User&) = delete;
+        User& operator=(const User&) = delete;
+
+
+        // очень не безопасно, но это временно для сериализации, потом подумать как избавиться или как минимуи хранить в зашифрованном виде
         const std::string& GetPass() const {
             return pass_;
+        }
+
+        const std::string& GetLogin() const {
+            return login_;
         }
 
         int GetId() const {
