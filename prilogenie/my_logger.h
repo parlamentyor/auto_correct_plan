@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "general_functions.h"
+
 #include <algorithm>
 #include <chrono>
 #include <iomanip>
@@ -67,8 +69,8 @@ public:
     void Log(const Ts&... args) {
         std::lock_guard<std::mutex> g(m_);
 
-        file_name_ = "sample_log_" + GetFileTimeStamp() + ".log";
-        //        abs_path_ = std::filesystem::weakly_canonical(std::filesystem::path(LOG_PATH) / std::filesystem::path(file_name_));
+        file_name_ = details::CreatePathDokument("log", "sample_log_") + GetFileTimeStamp() + ".log";
+        //  abs_path_ = std::filesystem::weakly_canonical(std::filesystem::path(LOG_PATH) / std::filesystem::path(file_name_));
         abs_path_ = std::filesystem::weakly_canonical(std::filesystem::path(file_name_));
 
         log_file_.open(abs_path_, std::ios::app);

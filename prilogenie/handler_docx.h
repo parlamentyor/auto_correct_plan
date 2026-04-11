@@ -3,6 +3,7 @@
 
 #include "my_logger.h"
 #include "add_contract_plan_month_docx.h"
+#include "general_functions.h"
 
 #include <QAxObject>
 #include <QDir>
@@ -12,6 +13,7 @@
 #include <string>
 #include <filesystem>
 
+/*
 // Создаем папку "save", если ее нет, и создаём путь к файлу
 QString CreatePathDokument() {
     // 1. Создаем папку "save" в месте расположения программы
@@ -35,6 +37,7 @@ QString CreatePathDokument() {
     std::filesystem::path doc_path = save_folder / "document.docx";
     return QString::fromStdWString(doc_path.wstring());
 }
+*/
 
 // Функция для перевода сантиметров в пункты
 double CmToPoints(double cm)
@@ -354,7 +357,7 @@ void CraeteTable(QAxObject* selection, QAxObject* document, const std::vector<mo
 
 void CreateDocxWithWord(const std::vector<model::Contract>& contracts) {
 
-    QString doc_path_qstr = CreatePathDokument();
+    QString doc_path_qstr = QString::fromStdString(details::CreatePathDokument("save", "month_plan.docx"));
 
     // Запускаем приложение Word
     QAxObject *word_app = new QAxObject("Word.Application");

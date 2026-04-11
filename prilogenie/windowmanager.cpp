@@ -1,10 +1,11 @@
 #include "windowmanager.h"
 #include "my_logger.h"
 #include "serialization_qt_json.h"
+#include "general_functions.h"
 
 #include "QCoreApplication"
-#include <QStandardPaths>
-#include <QDir>
+//#include <QStandardPaths>
+//#include <QDir>
 
 WindowManager::WindowManager(std::shared_ptr<app::App> app, QObject *parent)
     : QObject(parent)
@@ -44,16 +45,12 @@ void WindowManager::onAddContract()
 void WindowManager::onAppAboutToQuit()
 {
     LOG("Application is about to quit, saving state...");
-
-    //    QString configPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
-    //    QDir().mkpath(configPath); // Создаем директорию, если её нет
-    //    QString stateFile = configPath + "/app_state.json";
-    QString stateFile ="app_state.json";
-
+    QString stateFile = QString::fromStdString(details::CreatePathDokument("state", "app_state.json"));
     if (serialization::SaveToJsonFile(stateFile, app_)) {
-        LOG("State saved successfully on application exit. Dir:", stateFile.toStdString());
-    } else {
-        LOG("ERROR: Failed to save state on application exit");
+        LOG("При закрытии программы состояние сохранено успешно по адресу:", stateFile.toStdString());
+    }
+    else {
+        LOG("ОШИБКА: При закрытии программы состояние не сохранилось");
     }
 }
 

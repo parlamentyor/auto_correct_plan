@@ -23,6 +23,7 @@ SOURCES += \
 
 HEADERS += \
     add_contract_plan_month_docx.h \
+    general_functions.h \
     handler_add_work.h \
     app.h \
     authorization.h \
