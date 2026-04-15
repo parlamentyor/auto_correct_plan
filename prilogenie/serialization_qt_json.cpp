@@ -72,6 +72,9 @@ namespace serialization {
         }
         obj["names_responsible_employees"] = responsible_array;
         obj["date_deadline"] = SerializeDate(work.date_deadline_);
+        if (work.info_.has_value()) {
+            obj["info"] = QString::fromStdString(work.info_.value());
+        }
 
         return obj;
     }
@@ -86,6 +89,10 @@ namespace serialization {
         }
 
         work.date_deadline_ = DeserializeDate(obj["date_deadline"].toObject());
+
+        if (obj.contains("info") && !obj["info"].isNull()) {
+            work.info_ = obj["info"].toString().toStdString();
+        }
 
         return work;
     }
@@ -136,6 +143,9 @@ namespace serialization {
 
         // вот тут есть вопросики - у меня static int id_counter_, которая ++ при создании объекта......подумать как себя будет вести при серриализации
         obj["id"] = contract.id_;
+        if (contract.info_.has_value()) {
+            obj["info"] = QString::fromStdString(contract.info_.value());
+        }
 
         return obj;
     }
@@ -184,6 +194,10 @@ namespace serialization {
         // Обновляем статический счетчик (придется сделать дружественную функцию или публичный метод)
         // Временное решение - через указатель на статическую переменную
         // Лучше добавить публичный статический метод в Contract, но это потребует изменения класса
+
+        if (obj.contains("info") && !obj["info"].isNull()) {
+            contract.info_ = obj["info"].toString().toStdString();
+        }
 
         return contract;
     }

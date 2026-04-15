@@ -60,6 +60,10 @@ inline void addSeparateWorkToTable(QTableWidget* table, const model::SeparateWor
     // Заполняем третий столбец (date_deadline_) в формате dd.mm.yyyy
     table->setItem(rowCount, 2,
                    new QTableWidgetItem(formatDate(work.date_deadline_)));
+
+    // Заполняем четвёртый столбец (info_)
+    table->setItem(rowCount, 3,
+                   new QTableWidgetItem(QString::fromStdString(work.info_.value_or(""))));
 }
 
 #endif // HANDLER_ADD_WORK_H

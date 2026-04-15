@@ -40,14 +40,14 @@ QString CreatePathDokument() {
 */
 
 // Функция для перевода сантиметров в пункты
-double CmToPoints(double cm)
+inline double CmToPoints(double cm)
 {
     // 1 дюйм = 72 пункта. Например, 72 пункта = 1 дюйм = 2.54 см ИТОГО cm * 72.0 / 2.54;
     return cm * 72.0 / 2.54;
 }
 
 // Функция установки свойств страницы
-void SetPageSetup(QAxObject* page_setup) {
+inline void SetPageSetup(QAxObject* page_setup) {
     // Устанавливаем альбомную ориентацию (горизонтальную)
     page_setup->setProperty("Orientation", "wdOrientLandscape");
     LOG("Поменяли ориентацию страницы");
@@ -65,7 +65,7 @@ void SetPageSetup(QAxObject* page_setup) {
     // и вернуть bool....но это потом
 }
 
-void ApplyMainCellFormatting(QAxObject* range, bool bold, int font_size,
+inline void ApplyMainCellFormatting(QAxObject* range, bool bold, int font_size,
                                     const QString& font_name, int alignment) {
     if (!range || range->isNull()) return;
 
@@ -97,7 +97,7 @@ void ApplyMainCellFormatting(QAxObject* range, bool bold, int font_size,
     LOG("Выравняли по вертикали");
 }
 
-void SetTextMainCells(QAxObject* table) {
+inline void SetTextMainCells(QAxObject* table) {
     // Заполняем каждую ячейку заголовка
     for (int col = 1; col <= 7; ++col) {
         QAxObject* cell = table->querySubObject("Cell(int, int)", 1, col);
@@ -161,7 +161,7 @@ void SetTextMainCells(QAxObject* table) {
 }
 
 // Функция установки границ в таблице
-void SetBordersTable(QAxObject* borders) {
+inline void SetBordersTable(QAxObject* borders) {
     // Типы границ (wdBorderType):
     // wdBorderTop = 1 (верхняя)
     // wdBorderLeft = 2 (левая)
@@ -199,7 +199,7 @@ void SetBordersTable(QAxObject* borders) {
 }
 
 // Функция установки свойств таблицы
-void SetPropertyTable(QAxObject* table) {
+inline void SetPropertyTable(QAxObject* table) {
     // Применяем автоформатирование таблицы
     table->setProperty("AutoFormat", 1); // 1 = wdAutoFormatSimple
     //    table->dynamicCall("AutoFormat(int)", 1); // если что, то можно и так писать
@@ -234,7 +234,7 @@ void SetPropertyTable(QAxObject* table) {
     //------------------------------------------------------------------------------------------------------------
 }
 
-void SetRepeteMainRow(QAxObject* table) {
+inline void SetRepeteMainRow(QAxObject* table) {
     // 1. НАСТРАИВАЕМ ПОВТОРЕНИЕ ПЕРВОЙ СТРОКИ НА ВСЕХ СТРАНИЦАХ
     // Это свойство нужно установить ДО добавления новых строк,
     // чтобы Word корректно применил форматирование ко всем строкам заголовка.
@@ -301,7 +301,7 @@ void SetRepeteMainRow(QAxObject* table) {
 }
 
 // Функция создания таблицы
-void CraeteTable(QAxObject* selection, QAxObject* document, const std::vector<model::Contract>& contracts) {
+inline void CraeteTable(QAxObject* selection, QAxObject* document, const std::vector<model::Contract>& contracts) {
     // Явно получаем Range-объект из Selection
     // Это самый надежный способ получить "место" для вставки
     QAxObject* range = selection->querySubObject("Range");
@@ -355,7 +355,7 @@ void CraeteTable(QAxObject* selection, QAxObject* document, const std::vector<mo
     }
 }
 
-void CreateDocxWithWord(const std::vector<model::Contract>& contracts) {
+inline void CreateDocxWithWord(const std::vector<model::Contract>& contracts) {
 
     QString doc_path_qstr = QString::fromStdString(details::CreatePathDokument("save", "month_plan.docx"));
 

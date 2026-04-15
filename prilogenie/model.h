@@ -32,6 +32,7 @@ namespace model {
         std::string name_;
         std::vector<std::string> names_responsible_employees_;
         Date date_deadline_;
+        std::optional<std::string> info_;
     };
 
     struct Contract {
@@ -54,8 +55,10 @@ namespace model {
             int stavka_nds,
             TypeContract type,
             bool with_stage,
-            std::vector<SeparateWork> pool_work
-            ) : number_(std::move(number))
+            std::vector<SeparateWork> pool_work,
+            std::optional<std::string> info
+            )
+            : number_(std::move(number))
             , date_(date)
             , name_organization_(std::move(name_organization))
             , name_short_(std::move(name_short))
@@ -68,7 +71,8 @@ namespace model {
             , stavka_nds_(stavka_nds)
             , type_(type)
             , with_stage_(with_stage)
-            , pool_work(std::move(pool_work)) {
+            , pool_work(std::move(pool_work))
+            , info_(std::move(info)){
         }
 
         // Разрешаем перемещение
@@ -87,7 +91,8 @@ namespace model {
             , type_(other.type_)
             , with_stage_(other.with_stage_)
             , pool_work(std::move(other.pool_work))
-            , id_(other.id_) {
+            , id_(other.id_)
+            , info_(other.info_){
         }
 
         Contract& operator=(Contract&& other) noexcept {
@@ -107,6 +112,7 @@ namespace model {
                 with_stage_ = other.with_stage_;
                 pool_work = std::move(other.pool_work);
                 id_ = other.id_;
+                info_ = other.info_;
             }
             return *this;
         }
@@ -132,6 +138,7 @@ namespace model {
         bool with_stage_;
         std::vector<SeparateWork> pool_work;
         int id_ = ++id_counter_;
+        std::optional<std::string> info_;
 
         static int id_counter_;
     };

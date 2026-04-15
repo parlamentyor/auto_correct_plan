@@ -309,6 +309,11 @@ private:
                 alignment = 1; // center
                 break;
 
+            case 7: // info_
+                text = QString::fromStdString(work.info_.value_or(""));
+                alignment = 1; // center
+                break;
+
             default:
                 text = "";
                 break;
@@ -386,7 +391,7 @@ private:
 };
 
 // Основная функция для вызова
-bool updateContractDocument(const QString& filePath, const model::Contract& contract) {
+inline bool updateContractDocument(const QString& filePath, const model::Contract& contract) {
     return WordDocxEditor::updateContractDocx(filePath, contract);
 }
 

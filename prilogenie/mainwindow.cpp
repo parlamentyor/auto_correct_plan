@@ -3,7 +3,6 @@
 
 #include "handler_odt.h"
 #include "handler_pdf.h"
-#include "handler_docx.h"
 #include "handler_add_work.h"
 #include "add_contract_plan_month_docx.h"
 
@@ -37,18 +36,11 @@ void MainWindow::on_pb_pdf_clicked()
 }
 
 
-void MainWindow::on_pb_docx_clicked()
-{
-    CreateDocxWithWord(app_->GetContracts());
-}
-
-
-
 void MainWindow::on_pb_add_work_att_as_clicked()
 {
-    model::SeparateWork razrab_PIM {"Разработка ПиМ", {"Пупкин С.С."}, {11, 11, 2026}};
-    model::SeparateWork att_as {"Аттестация АС", {"Суходрищев В.В."}, {12, 12, 2026}};
-    model::SeparateWork razrab_doc {"Разработка документации после аттестационных испытаний с учетом погрешности, которая появляется в связи с долгой засухой", {"Суходрищев В.В.", "Пупкин С.С.", "Касторкин А.А."}, {1, 2, 2027}};
+    model::SeparateWork razrab_PIM {"Разработка ПиМ", {"Пупкин С.С."}, {11, 11, 2026}, "По готовности объекта"};
+    model::SeparateWork att_as {"Аттестация АС", {"Суходрищев В.В."}, {12, 12, 2026}, std::nullopt};
+    model::SeparateWork razrab_doc {"Разработка документации после аттестационных испытаний с учетом погрешности, которая появляется в связи с долгой засухой", {"Суходрищев В.В.", "Пупкин С.С.", "Касторкин А.А."}, {1, 2, 2027}, "может быть выполним когда-нибудь"};
 
     addSeparateWorkToTable(ui->table_work, razrab_PIM);
     addSeparateWorkToTable(ui->table_work, att_as);
@@ -90,17 +82,18 @@ void MainWindow::on_pb_add_contract_clicked() {
         ui->le_number->text().toStdString(),
         {ui->sb_contract_dd->value(), ui->sb_contract_mm->value(), ui->sb_contract_yyyy->value()},
         ui->le_name_organization->text().toStdString(),
-            ui->le_name_short->text().toStdString(),
-            ui->le_name_full->text().toStdString(),
-            {ui->sb_deadline_dd->value(), ui->sb_deadline_mm->value(), ui->sb_deadline_yyyy->value()},
-            ui->le_responsible_employee->text().toStdString(),
-            {ui->sb_price_ruble->value(), ui->sb_price_kop->value()},
-            {ui->sb_price_other_department_ruble->value(), ui->sb_price_other_department_kop->value()},
-            ui->chb_nds->isChecked(),
-            ui->sb_stavka_nds->value(),
-            type,
-            ui->chb_stage->isChecked(),
-            pool_work_
+        ui->le_name_short->text().toStdString(),
+        ui->le_name_full->text().toStdString(),
+        {ui->sb_deadline_dd->value(), ui->sb_deadline_mm->value(), ui->sb_deadline_yyyy->value()},
+        ui->le_responsible_employee->text().toStdString(),
+        {ui->sb_price_ruble->value(), ui->sb_price_kop->value()},
+        {ui->sb_price_other_department_ruble->value(), ui->sb_price_other_department_kop->value()},
+        ui->chb_nds->isChecked(),
+        ui->sb_stavka_nds->value(),
+        type,
+        ui->chb_stage->isChecked(),
+        pool_work_,
+        ui->le_info->text().toStdString()
     };
 
     if (updateContractDocument(QString::fromStdString(app_->GetPathPlanMonth()), new_contract)) {

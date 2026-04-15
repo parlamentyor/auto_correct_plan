@@ -22,8 +22,6 @@ private slots:
 
     void on_pb_pdf_clicked();
 
-    void on_pb_docx_clicked();
-
     void on_pb_add_work_att_as_clicked();
 
     void on_pb_add_contract_clicked();

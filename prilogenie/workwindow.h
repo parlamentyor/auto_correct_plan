@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "app.h"
+#include "handler_docx.h"
 
 namespace Ui {
 class WorkWindow;
@@ -28,6 +29,8 @@ private slots:
     void on_pb_create_plan_month_clicked();
 
     void on_pb_add_new_contract_clicked();
+
+    void on_pb_create_plan_month_default_clicked();
 
 private:
     Ui::WorkWindow *ui;

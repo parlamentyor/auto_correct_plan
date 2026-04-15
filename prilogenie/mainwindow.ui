@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>683</height>
+    <height>714</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,9 +15,6 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_13"/>
-    </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_5">
       <item>
@@ -104,6 +101,12 @@
         <property name="enabled">
          <bool>true</bool>
         </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>31</number>
+        </property>
        </widget>
       </item>
       <item>
@@ -118,6 +121,12 @@
         <property name="enabled">
          <bool>true</bool>
         </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>12</number>
+        </property>
        </widget>
       </item>
       <item>
@@ -131,6 +140,12 @@
        <widget class="QSpinBox" name="sb_contract_yyyy">
         <property name="enabled">
          <bool>true</bool>
+        </property>
+        <property name="minimum">
+         <number>2000</number>
+        </property>
+        <property name="maximum">
+         <number>9999</number>
         </property>
        </widget>
       </item>
@@ -163,6 +178,12 @@
         <property name="enabled">
          <bool>true</bool>
         </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>31</number>
+        </property>
        </widget>
       </item>
       <item>
@@ -177,6 +198,12 @@
         <property name="enabled">
          <bool>true</bool>
         </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>12</number>
+        </property>
        </widget>
       </item>
       <item>
@@ -190,6 +217,12 @@
        <widget class="QSpinBox" name="sb_deadline_yyyy">
         <property name="enabled">
          <bool>true</bool>
+        </property>
+        <property name="minimum">
+         <number>2000</number>
+        </property>
+        <property name="maximum">
+         <number>9999</number>
         </property>
        </widget>
       </item>
@@ -239,6 +272,9 @@
        <widget class="QSpinBox" name="sb_price_ruble">
         <property name="enabled">
          <bool>true</bool>
+        </property>
+        <property name="maximum">
+         <number>1000000000</number>
         </property>
        </widget>
       </item>
@@ -292,6 +328,9 @@
         <property name="enabled">
          <bool>true</bool>
         </property>
+        <property name="maximum">
+         <number>1000000000</number>
+        </property>
        </widget>
       </item>
       <item>
@@ -340,6 +379,12 @@
         <property name="text">
          <string>Договор с НДС</string>
         </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
@@ -353,6 +398,9 @@
        <widget class="QSpinBox" name="sb_stavka_nds">
         <property name="enabled">
          <bool>true</bool>
+        </property>
+        <property name="value">
+         <number>22</number>
         </property>
        </widget>
       </item>
@@ -427,6 +475,24 @@
      </layout>
     </item>
     <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_14">
+      <item>
+       <widget class="QLabel" name="lb_info">
+        <property name="text">
+         <string>Дополнительная информация</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="le_info">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
      <widget class="QCheckBox" name="chb_stage">
       <property name="enabled">
        <bool>true</bool>
@@ -471,6 +537,12 @@
         <column>
          <property name="text">
           <string>Срок исполнения</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Отметка о выполнении.
+Состояние на начало месяца</string>
          </property>
         </column>
        </widget>
@@ -529,16 +601,6 @@
         </property>
         <property name="text">
          <string>odt</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pb_docx">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="text">
-         <string>docx</string>
         </property>
        </widget>
       </item>

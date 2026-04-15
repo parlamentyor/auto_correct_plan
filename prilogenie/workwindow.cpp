@@ -1,7 +1,7 @@
 #include "workwindow.h"
 #include "ui_workwindow.h"
 
-#include "handler_odt.h"
+
 #include "magic_defs.h"
 
 #include <QFileDialog>
@@ -51,7 +51,7 @@ void WorkWindow::on_pb_create_plan_month_clicked()
     app_->SetPathPlanMonth(fileName.toStdString());
 
     if (selected_filter == TypeFile::ODT) {
-        CreateOdtWithTable(fileName);
+
     }
     else if (selected_filter == TypeFile::DOCX) {
 
@@ -65,13 +65,24 @@ void WorkWindow::on_pb_create_plan_month_clicked()
 
 }
 
-void WorkWindow::on_pb_add_new_contract_clicked()
-{
+void WorkWindow::on_pb_add_new_contract_clicked() {
     if (app_->HasValuePathPlanMonth()) {
-        emit AddContract();
+        QMessageBox::StandardButton button = QMessageBox::question(
+            this, "Добавление договора",
+            "Не выбран файл с планом на месяц для добавления договора. Добавить договор только в базу?",
+            QMessageBox::Ok | QMessageBox::Cancel
+            );
+
+        if (button == QMessageBox::Cancel) {
+            return;
+        }
     }
-    else {
-        QMessageBox::critical(this, "Ошибка", QString("Не выбран файл для сохранения плана на месяц"));
-    }
+    emit AddContract();
+}
+
+
+void WorkWindow::on_pb_create_plan_month_default_clicked() {
+    CreateDocxWithWord(app_->GetContracts());
+    QMessageBox::information(this, "Успех", "План на месяц создан");
 }
 
