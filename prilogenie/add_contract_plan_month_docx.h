@@ -250,6 +250,11 @@ private:
                 alignment = 1; // center
                 break;
 
+            case 7: // info_
+                text = QString::fromStdString(contract.info_.value_or(""));
+                alignment = 1; // center
+                break;
+
             default:
                 text = "";
                 break;

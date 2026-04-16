@@ -35,6 +35,32 @@ namespace model {
         std::optional<std::string> info_;
     };
 
+    struct Payment {
+        Price pice_;
+        Date date_;
+    };
+
+    struct Expenses {
+        Price pice_;
+        std::string name_;
+    };
+
+    struct Stage {
+        int number_;
+        std::optional<std::string> name_organization_;
+        std::optional<std::string> name_;
+        std::optional<std::string> name_short_;
+        Date date_deadline_;
+        std::optional<std::string> name_responsible_employee_;
+        Price price_;
+        Price price_other_department_;
+        bool with_nds_;
+        int stavka_nds_;
+        TypeContract type_;
+        std::vector<SeparateWork> pool_work_;
+        std::optional<std::string> info_;
+    };
+
     struct Contract {
 
         // Конструктор по умолчанию
@@ -56,7 +82,13 @@ namespace model {
             TypeContract type,
             bool with_stage,
             std::vector<SeparateWork> pool_work,
-            std::optional<std::string> info
+            std::optional<std::string> info,
+            std::optional<std::vector<Stage>> pool_stage,
+            bool is_complet,
+            bool is_paid,
+            std::optional<std::vector<Payment>> payments,
+            std::optional<std::vector<Expenses>> expenses,
+            std::string status_payment
             )
             : number_(std::move(number))
             , date_(date)
@@ -72,7 +104,13 @@ namespace model {
             , type_(type)
             , with_stage_(with_stage)
             , pool_work(std::move(pool_work))
-            , info_(std::move(info)){
+            , info_(std::move(info))
+            , pool_stage_(std::move(pool_stage))
+            , is_complet_(is_complet)
+            , is_paid_(is_paid)
+            , payments_(std::move(payments))
+            , expenses_(std::move(expenses))
+            , status_payment_(std::move(status_payment)) {
         }
 
         // Разрешаем перемещение
@@ -92,7 +130,13 @@ namespace model {
             , with_stage_(other.with_stage_)
             , pool_work(std::move(other.pool_work))
             , id_(other.id_)
-            , info_(other.info_){
+            , info_(std::move(other.info_))
+            , pool_stage_(std::move(other.pool_stage_))
+            , is_complet_(other.is_complet_)
+            , is_paid_(other.is_paid_)
+            , payments_(std::move(other.payments_))
+            , expenses_(std::move(other.expenses_))
+            , status_payment_(std::move(other.status_payment_)) {
         }
 
         Contract& operator=(Contract&& other) noexcept {
@@ -112,7 +156,13 @@ namespace model {
                 with_stage_ = other.with_stage_;
                 pool_work = std::move(other.pool_work);
                 id_ = other.id_;
-                info_ = other.info_;
+                info_ = std::move(other.info_);
+                pool_stage_ = std::move(other.pool_stage_);
+                is_complet_ = other.is_complet_;
+                is_paid_ = other.is_paid_;
+                payments_ = std::move(other.payments_);
+                expenses_ = std::move(other.expenses_);
+                status_payment_ = std::move(other.status_payment_);
             }
             return *this;
         }
@@ -139,6 +189,13 @@ namespace model {
         std::vector<SeparateWork> pool_work;
         int id_ = ++id_counter_;
         std::optional<std::string> info_;
+
+        std::optional<std::vector<Stage>> pool_stage_;
+        bool is_complet_;
+        bool is_paid_;
+        std::optional<std::vector<Payment>> payments_;
+        std::optional<std::vector<Expenses>> expenses_;
+        std::string status_payment_;
 
         static int id_counter_;
     };

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>714</height>
+    <height>769</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -260,6 +260,109 @@
      </layout>
     </item>
     <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_9">
+      <item>
+       <widget class="QLabel" name="lb_type_contract">
+        <property name="text">
+         <string>Относимось к видам работ</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="cob_type_contract">
+        <item>
+         <property name="text">
+          <string>ГОЗ</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Атт</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>БЭК</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>СИ</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_6">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_14">
+      <item>
+       <widget class="QLabel" name="lb_info">
+        <property name="text">
+         <string>Дополнительная информация</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="le_info">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_15">
+      <item>
+       <widget class="QCheckBox" name="chb_stage">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>Наличие этапов</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pb_add_stage">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Добавить этап</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_9">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+    <item>
      <layout class="QHBoxLayout" name="horizontalLayout_10">
       <item>
        <widget class="QLabel" name="lb_price">
@@ -427,80 +530,22 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_9">
+     <layout class="QHBoxLayout" name="horizontalLayout_17">
       <item>
-       <widget class="QLabel" name="lb_type_contract">
+       <widget class="QLabel" name="lb_status_payment">
         <property name="text">
-         <string>Относимось к видам работ</string>
+         <string>Состояние оплаты</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="cob_type_contract">
-        <item>
-         <property name="text">
-          <string>ГОЗ</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Атт</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>БЭК</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>СИ</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_6">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_14">
-      <item>
-       <widget class="QLabel" name="lb_info">
-        <property name="text">
-         <string>Дополнительная информация</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="le_info">
+       <widget class="QLineEdit" name="le_status_payment">
         <property name="enabled">
          <bool>true</bool>
         </property>
        </widget>
       </item>
      </layout>
-    </item>
-    <item>
-     <widget class="QCheckBox" name="chb_stage">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="text">
-       <string>Наличие этапов</string>
-      </property>
-     </widget>
     </item>
     <item>
      <layout class="QGridLayout" name="gridLayout">
@@ -548,19 +593,6 @@
        </widget>
       </item>
      </layout>
-    </item>
-    <item>
-     <spacer name="verticalSpacer">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
-      </property>
-     </spacer>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">

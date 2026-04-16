@@ -26,9 +26,12 @@ private slots:
 
     void on_pb_add_contract_clicked();
 
+    void on_chb_stage_stateChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
     std::shared_ptr<app::App> app_;
     std::vector<model::SeparateWork> pool_work_;
+    std::vector<model::Stage> pool_stage_;
 };
 #endif // MAINWINDOW_H

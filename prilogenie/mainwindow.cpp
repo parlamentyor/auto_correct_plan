@@ -93,7 +93,13 @@ void MainWindow::on_pb_add_contract_clicked() {
         type,
         ui->chb_stage->isChecked(),
         pool_work_,
-        ui->le_info->text().toStdString()
+        ui->le_info->text().toStdString(),
+        pool_stage_,
+        false,
+        false,
+        std::nullopt,
+        std::nullopt,
+        ui->le_status_payment->text().toStdString()
     };
 
     if (updateContractDocument(QString::fromStdString(app_->GetPathPlanMonth()), new_contract)) {
@@ -104,5 +110,11 @@ void MainWindow::on_pb_add_contract_clicked() {
     }
 
     app_->AddContract(std::move(new_contract));
+}
+
+
+void MainWindow::on_chb_stage_stateChanged(int arg1)
+{
+    ui->pb_add_stage->setEnabled(arg1);
 }
 
