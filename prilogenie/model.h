@@ -36,20 +36,20 @@ namespace model {
     };
 
     struct Payment {
-        Price pice_;
+        Price price_;
         Date date_;
     };
 
     struct Expenses {
-        Price pice_;
+        Price price_;
         std::string name_;
     };
 
     struct Stage {
         int number_;
         std::optional<std::string> name_organization_;
-        std::optional<std::string> name_;
         std::optional<std::string> name_short_;
+        std::optional<std::string> name_full_;
         Date date_deadline_;
         std::optional<std::string> name_responsible_employee_;
         Price price_;
@@ -59,6 +59,11 @@ namespace model {
         TypeContract type_;
         std::vector<SeparateWork> pool_work_;
         std::optional<std::string> info_;
+        bool is_complet_;
+        bool is_paid_;
+        std::optional<std::vector<Payment>> payments_;
+        std::optional<std::vector<Expenses>> expenses_;
+        std::string status_payment_;
     };
 
     struct Contract {

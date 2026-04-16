@@ -24,6 +24,15 @@ namespace serialization {
     QJsonObject SerializeSeparateWork(const model::SeparateWork& work);
     model::SeparateWork DeserializeSeparateWork(const QJsonObject& obj);
 
+    QJsonObject SerializePayment(const model::Payment& payment);
+    model::Payment DeserializePayment(const QJsonObject& obj);
+
+    QJsonObject SerializeExpenses(const model::Expenses& expenses);
+    model::Expenses DeserializeExpenses(const QJsonObject& obj);
+
+    QJsonObject SerializeStage(const model::Stage& stage);
+    model::Stage DeserializeStage(const QJsonObject& obj);
+
         // Свободные функции для сериализации Contract
     QJsonObject DerializeContract(const model::Contract& contract);
     model::Contract DeserializeContract(const QJsonObject& obj);
