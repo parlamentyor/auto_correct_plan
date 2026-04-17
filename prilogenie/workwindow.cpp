@@ -1,7 +1,7 @@
 #include "workwindow.h"
 #include "ui_workwindow.h"
 
-
+#include "handler_docx.h"
 #include "magic_defs.h"
 
 #include <QFileDialog>

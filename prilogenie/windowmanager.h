@@ -6,12 +6,9 @@
 
 #include "app.h"
 #include "authorization.h"
+#include "addstage.h"
 #include "workwindow.h"
 #include "mainwindow.h"
-
-//namespace app {
-//class App;
-//}
 
 class WindowManager : public QObject
 {
@@ -25,12 +22,14 @@ private slots:
     void onLoginSuccess();
     void onAddContract();
     void onAppAboutToQuit();
+    void onAddStageInContract(std::vector<model::Stage>& pool_stage);
 
 private:
     std::shared_ptr<app::App> app_;
     Authorization *authoriz_;
     WorkWindow *work_window_;
     MainWindow *main_window_;
+    AddStage *add_stage_;
 };
 
 

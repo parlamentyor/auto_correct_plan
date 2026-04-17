@@ -11,6 +11,7 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    addstage.cpp \
     app.cpp \
     authorization.cpp \
     handler_odt.cpp \
@@ -23,6 +24,7 @@ SOURCES += \
 
 HEADERS += \
     add_contract_plan_month_docx.h \
+    addstage.h \
     general_functions.h \
     handler_add_work.h \
     app.h \
@@ -39,6 +41,7 @@ HEADERS += \
     workwindow.h
 
 FORMS += \
+    addstage.ui \
     authorization.ui \
     mainwindow.ui \
     workwindow.ui

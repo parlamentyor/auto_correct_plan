@@ -6,7 +6,6 @@
 #include <memory>
 
 #include "app.h"
-#include "handler_docx.h"
 
 namespace Ui {
 class WorkWindow;

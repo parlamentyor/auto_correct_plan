@@ -17,6 +17,9 @@ public:
     MainWindow(std::shared_ptr<app::App> app, QWidget *parent = nullptr);
     ~MainWindow();
 
+signals:
+    void AddStageInContract(std::vector<model::Stage>& pool_stage);
+
 private slots:
     void on_pb_odt_clicked();
 
@@ -27,6 +30,8 @@ private slots:
     void on_pb_add_contract_clicked();
 
     void on_chb_stage_stateChanged(int arg1);
+
+    void on_pb_add_stage_clicked();
 
 private:
     Ui::MainWindow *ui;

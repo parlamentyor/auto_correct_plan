@@ -116,5 +116,16 @@ void MainWindow::on_pb_add_contract_clicked() {
 void MainWindow::on_chb_stage_stateChanged(int arg1)
 {
     ui->pb_add_stage->setEnabled(arg1);
+    ui->sb_price_kop->setEnabled(!arg1);
+    ui->sb_price_ruble->setEnabled(!arg1);
+    ui->sb_price_other_department_kop->setEnabled(!arg1);
+    ui->sb_price_other_department_ruble->setEnabled(!arg1);
+}
+
+
+void MainWindow::on_pb_add_stage_clicked()
+{
+    ui->chb_stage->setEnabled(false);
+    emit AddStageInContract(pool_stage_);
 }
 
