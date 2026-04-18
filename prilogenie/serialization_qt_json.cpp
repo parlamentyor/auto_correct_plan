@@ -129,7 +129,7 @@ namespace serialization {
     QJsonObject SerializeStage(const model::Stage &stage) {
         QJsonObject obj;
         obj["number"] = stage.number_;
-
+/*
         if (stage.name_organization_.has_value()) {
             obj["name_organization"] = QString::fromStdString(stage.name_organization_.value());
         }
@@ -137,12 +137,14 @@ namespace serialization {
         if (stage.name_short_.has_value()) {
             obj["name_short"] = QString::fromStdString(stage.name_short_.value());
         }
-
+*/
         if (stage.name_full_.has_value()) {
             obj["name_full"] = QString::fromStdString(stage.name_full_.value());
         }
 
-        obj["date_deadline"] = SerializeDate(stage.date_deadline_);
+        if (stage.date_deadline_.has_value()) {
+            obj["date_deadline"] = SerializeDate(stage.date_deadline_.value());
+        }
 
         if (stage.name_responsible_employee_.has_value()) {
             obj["name_responsible_employee"] = QString::fromStdString(stage.name_responsible_employee_.value());
@@ -150,20 +152,23 @@ namespace serialization {
 
         obj["price"] = SerializePrice(stage.price_);
         obj["price_other_department"] = SerializePrice(stage.price_other_department_);
-        obj["with_nds"] = stage.with_nds_;
-        obj["stavka_nds"] = stage.stavka_nds_;
-        obj["type"] = SerializeTypeContract(stage.type_);
+//        obj["with_nds"] = stage.with_nds_;
+//        obj["stavka_nds"] = stage.stavka_nds_;
+//        obj["type"] = SerializeTypeContract(stage.type_);
 
         // Сохраняем вектор SeparateWork
-        QJsonArray pool_array;
-        for (const auto& work : stage.pool_work_) {
-            pool_array.append(SerializeSeparateWork(work));
+        if (stage.pool_work_.has_value()) {
+            QJsonArray pool_array;
+            for (const auto& work : stage.pool_work_.value()) {
+                pool_array.append(SerializeSeparateWork(work));
+            }
+            obj["pool_work"] = pool_array;
         }
 
-        obj["pool_work"] = pool_array;
         if (stage.info_.has_value()) {
             obj["info"] = QString::fromStdString(stage.info_.value());
         }
+
         obj["is_complet"] = stage.is_complet_;
         obj["is_paid"] = stage.is_paid_;
 
@@ -184,7 +189,10 @@ namespace serialization {
 
             obj["expenses"] = expenses;
         }
-        obj["status_payment"] = QString::fromStdString(stage.status_payment_);
+
+        if (stage.status_payment_.has_value()) {
+            obj["status_payment"] = QString::fromStdString(stage.status_payment_.value());
+        }
 
         return obj;
     }
@@ -193,7 +201,7 @@ namespace serialization {
         model::Stage stage;
 
         stage.number_ = obj["number"].toInt();
-
+/*
         if (obj.contains("name_organization") && !obj["name_organization"].isNull()) {
             stage.name_organization_ = obj["name_organization"].toString().toStdString();
         }
@@ -201,12 +209,14 @@ namespace serialization {
         if (obj.contains("name_short") && !obj["name_short"].isNull()) {
             stage.name_short_ = obj["name_short"].toString().toStdString();
         }
-
+*/
         if (obj.contains("name_full") && !obj["name_full"].isNull()) {
             stage.name_full_ = obj["name_full"].toString().toStdString();
         }
 
-        stage.date_deadline_ = DeserializeDate(obj["date_deadline"].toObject());
+        if (obj.contains("date_deadline") && !obj["date_deadline"].isNull()) {
+            stage.date_deadline_ = DeserializeDate(obj["date_deadline"].toObject());
+        }
 
         if (obj.contains("name_responsible_employee") && !obj["name_responsible_employee"].isNull()) {
             stage.name_responsible_employee_ = obj["name_responsible_employee"].toString().toStdString();
@@ -214,13 +224,18 @@ namespace serialization {
 
         stage.price_ = DeserializePrice(obj["price"].toObject());
         stage.price_other_department_ = DeserializePrice(obj["price_other_department"].toObject());
-        stage.with_nds_ = obj["with_nds"].toBool();
-        stage.stavka_nds_ = obj["stavka_nds"].toInt();
-        stage.type_ = DeserializeTypeContract(obj["type"].toString());
+//        stage.with_nds_ = obj["with_nds"].toBool();
+//        stage.stavka_nds_ = obj["stavka_nds"].toInt();
+//        stage.type_ = DeserializeTypeContract(obj["type"].toString());
 
-        QJsonArray pool_array = obj["pool_work"].toArray();
-        for (const auto& item : pool_array) {
-            stage.pool_work_.push_back(DeserializeSeparateWork(item.toObject()));
+        if (obj.contains("pool_work") && !obj["pool_work"].isNull()) {
+            QJsonArray pool_array = obj["pool_work"].toArray();
+            if (!stage.pool_work_.has_value()) {
+                stage.pool_work_ = std::vector<model::SeparateWork>{};
+            }
+            for (const auto& item : pool_array) {
+                stage.pool_work_.value().push_back(DeserializeSeparateWork(item.toObject()));
+            }
         }
 
         if (obj.contains("info") && !obj["info"].isNull()) {
@@ -232,6 +247,9 @@ namespace serialization {
 
         if (obj.contains("payments") && !obj["payments"].isNull()) {
             QJsonArray payments = obj["payments"].toArray();
+            if (!stage.payments_.has_value()) {
+                stage.payments_ = std::vector<model::Payment>{};
+            }
             for (const auto& item : payments) {
                 stage.payments_.value().push_back(DeserializePayment(item.toObject()));
             }
@@ -239,12 +257,17 @@ namespace serialization {
 
         if (obj.contains("expenses") && !obj["expenses"].isNull()) {
             QJsonArray expenses = obj["expenses"].toArray();
+            if (!stage.expenses_.has_value()) {
+                stage.expenses_ = std::vector<model::Expenses>{};
+            }
             for (const auto& item : expenses) {
                 stage.expenses_.value().push_back(DeserializeExpenses(item.toObject()));
             }
         }
 
-        stage.status_payment_ = obj["status_payment"].toString().toStdString();
+        if (obj.contains("status_payment") && !obj["status_payment"].isNull()) {
+            stage.status_payment_ = obj["status_payment"].toString().toStdString();
+        }
 
         return stage;
     }
@@ -258,7 +281,10 @@ namespace serialization {
             obj["number"] = QString::fromStdString(contract.number_.value());
         }
 
-        obj["date"] = SerializeDate(contract.date_);
+        if (contract.date_.has_value()) {
+            obj["date"] = SerializeDate(contract.date_.value());
+        }
+
 
         if (contract.name_organization_.has_value()) {
             obj["name_organization"] = QString::fromStdString(contract.name_organization_.value());
@@ -272,7 +298,9 @@ namespace serialization {
             obj["name_full"] = QString::fromStdString(contract.name_full_.value());
         }
 
-        obj["date_deadline"] = SerializeDate(contract.date_deadline_);
+        if (contract.date_deadline_.has_value()) {
+            obj["date_deadline"] = SerializeDate(contract.date_deadline_.value());
+        }
 
         if (contract.name_responsible_employee_.has_value()) {
             obj["name_responsible_employee"] = QString::fromStdString(contract.name_responsible_employee_.value());
@@ -286,12 +314,13 @@ namespace serialization {
         obj["with_stage"] = contract.with_stage_;
 
         // Сохраняем вектор SeparateWork
-        QJsonArray pool_array;
-        for (const auto& work : contract.pool_work) {
-            pool_array.append(SerializeSeparateWork(work));
+        if (contract.pool_work.has_value()) {
+            QJsonArray pool_array;
+            for (const auto& work : contract.pool_work.value()) {
+                pool_array.append(SerializeSeparateWork(work));
+            }
+            obj["pool_work"] = pool_array;
         }
-        obj["pool_work"] = pool_array;
-
 
         // вот тут есть вопросики - у меня static int id_counter_, которая ++ при создании объекта......подумать как себя будет вести при серриализации
         obj["id"] = contract.id_;
@@ -328,7 +357,9 @@ namespace serialization {
 
             obj["expenses"] = expenses;
         }
-        obj["status_payment"] = QString::fromStdString(contract.status_payment_);
+        if (contract.status_payment_.has_value()) {
+            obj["status_payment"] = QString::fromStdString(contract.status_payment_.value());
+        }
 
         return obj;
     }
@@ -340,7 +371,9 @@ namespace serialization {
             contract.number_ = obj["number"].toString().toStdString();
         }
 
-        contract.date_ = DeserializeDate(obj["date"].toObject());
+        if (obj.contains("date") && !obj["date"].isNull()) {
+            contract.date_ = DeserializeDate(obj["date"].toObject());
+        }
 
         if (obj.contains("name_organization") && !obj["name_organization"].isNull()) {
             contract.name_organization_ = obj["name_organization"].toString().toStdString();
@@ -354,7 +387,9 @@ namespace serialization {
             contract.name_full_ = obj["name_full"].toString().toStdString();
         }
 
-        contract.date_deadline_ = DeserializeDate(obj["date_deadline"].toObject());
+        if (obj.contains("date_deadline") && !obj["date_deadline"].isNull()) {
+            contract.date_deadline_ = DeserializeDate(obj["date_deadline"].toObject());
+        }
 
         if (obj.contains("name_responsible_employee") && !obj["name_responsible_employee"].isNull()) {
             contract.name_responsible_employee_ = obj["name_responsible_employee"].toString().toStdString();
@@ -367,9 +402,14 @@ namespace serialization {
         contract.type_ = DeserializeTypeContract(obj["type"].toString());
         contract.with_stage_ = obj["with_stage"].toBool();
 
-        QJsonArray pool_array = obj["pool_work"].toArray();
-        for (const auto& item : pool_array) {
-            contract.pool_work.push_back(DeserializeSeparateWork(item.toObject()));
+        if (obj.contains("pool_work") && !obj["pool_work"].isNull()) {
+            QJsonArray pool_array = obj["pool_work"].toArray();
+            if (!contract.pool_work.has_value()) {
+                contract.pool_work = std::vector<model::SeparateWork>{};
+            }
+            for (const auto& item : pool_array) {
+                contract.pool_work.value().push_back(DeserializeSeparateWork(item.toObject()));
+            }
         }
 
         contract.id_ = obj["id"].toInt();
@@ -384,6 +424,9 @@ namespace serialization {
 
         if (obj.contains("pool_stage") && !obj["pool_stage"].isNull()) {
             QJsonArray pool_stage = obj["pool_stage"].toArray();
+            if (!contract.pool_stage_.has_value()) {
+                contract.pool_stage_ = std::vector<model::Stage>{};
+            }
             for (const auto& item : pool_stage) {
                 contract.pool_stage_.value().push_back(DeserializeStage(item.toObject()));
             }
@@ -394,6 +437,9 @@ namespace serialization {
 
         if (obj.contains("payments") && !obj["payments"].isNull()) {
             QJsonArray payments = obj["payments"].toArray();
+            if (!contract.payments_.has_value()) {
+                contract.payments_ = std::vector<model::Payment>{};
+            }
             for (const auto& item : payments) {
                 contract.payments_.value().push_back(DeserializePayment(item.toObject()));
             }
@@ -401,12 +447,16 @@ namespace serialization {
 
         if (obj.contains("expenses") && !obj["expenses"].isNull()) {
             QJsonArray expenses = obj["expenses"].toArray();
+            if (!contract.expenses_.has_value()) {
+                contract.expenses_ = std::vector<model::Expenses>{};
+            }
             for (const auto& item : expenses) {
                 contract.expenses_.value().push_back(DeserializeExpenses(item.toObject()));
             }
         }
-
-        contract.status_payment_ = obj["status_payment"].toString().toStdString();
+        if (obj.contains("status_payment") && !obj["status_payment"].isNull()) {
+            contract.status_payment_ = obj["status_payment"].toString().toStdString();
+        }
 
         return contract;
     }

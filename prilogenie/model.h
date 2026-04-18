@@ -47,23 +47,23 @@ namespace model {
 
     struct Stage {
         int number_;
-        std::optional<std::string> name_organization_;
-        std::optional<std::string> name_short_;
+//        std::optional<std::string> name_organization_;
+//        std::optional<std::string> name_short_;
         std::optional<std::string> name_full_;
-        Date date_deadline_;
+        std::optional<Date> date_deadline_;
         std::optional<std::string> name_responsible_employee_;
         Price price_;
         Price price_other_department_;
-        bool with_nds_;
-        int stavka_nds_;
-        TypeContract type_;
-        std::vector<SeparateWork> pool_work_;
+//        bool with_nds_;
+//        int stavka_nds_;
+//        TypeContract type_;
+        std::optional<std::vector<SeparateWork>> pool_work_;
         std::optional<std::string> info_;
         bool is_complet_;
         bool is_paid_;
         std::optional<std::vector<Payment>> payments_;
         std::optional<std::vector<Expenses>> expenses_;
-        std::string status_payment_;
+        std::optional<std::string> status_payment_;
     };
 
     struct Contract {
@@ -74,11 +74,11 @@ namespace model {
         // Пользовательский конструктор для создания из данных
         Contract(
             std::optional<std::string> number,
-            Date date,
+            std::optional<Date> date,
             std::optional<std::string> name_organization,
             std::optional<std::string> name_short,
             std::optional<std::string> name_full,
-            Date date_deadline,
+            std::optional<Date> date_deadline,
             std::optional<std::string> name_responsible_employee,
             Price price,
             Price price_other_department,
@@ -86,14 +86,14 @@ namespace model {
             int stavka_nds,
             TypeContract type,
             bool with_stage,
-            std::vector<SeparateWork> pool_work,
+            std::optional<std::vector<SeparateWork>> pool_work,
             std::optional<std::string> info,
             std::optional<std::vector<Stage>> pool_stage,
             bool is_complet,
             bool is_paid,
             std::optional<std::vector<Payment>> payments,
             std::optional<std::vector<Expenses>> expenses,
-            std::string status_payment
+            std::optional<std::string> status_payment
             )
             : number_(std::move(number))
             , date_(date)
@@ -176,14 +176,14 @@ namespace model {
         Contract(const Contract&) = delete;
         Contract& operator=(const Contract&) = delete;
 
-        std::optional<std::string> number_; // подумать (протестировать) как будет работать с русским алфавитом
-        Date date_;
+        std::optional<std::string> number_;
+        std::optional<Date> date_;
 //        std::unordered_map<int, std::string> id_number_; //на будущее для осуществления быстрого поиска
 //        std::unordered_map<std::string, int> number_id; //на будущее для осуществления быстрого поиска
         std::optional<std::string> name_organization_; // подумать (протестировать) как будет работать с русским алфавитом
         std::optional<std::string> name_short_;
         std::optional<std::string> name_full_;
-        Date date_deadline_;
+        std::optional<Date> date_deadline_;
         std::optional<std::string> name_responsible_employee_;
         Price price_;
         Price price_other_department_;
@@ -191,7 +191,7 @@ namespace model {
         int stavka_nds_;
         TypeContract type_;
         bool with_stage_;
-        std::vector<SeparateWork> pool_work;
+        std::optional<std::vector<SeparateWork>> pool_work;
         int id_ = ++id_counter_;
         std::optional<std::string> info_;
 
@@ -200,7 +200,7 @@ namespace model {
         bool is_paid_;
         std::optional<std::vector<Payment>> payments_;
         std::optional<std::vector<Expenses>> expenses_;
-        std::string status_payment_;
+        std::optional<std::string> status_payment_;
 
         static int id_counter_;
     };

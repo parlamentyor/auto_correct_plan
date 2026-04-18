@@ -150,6 +150,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QCheckBox" name="cb_with_date">
+        <property name="text">
+         <string>Договор без даты</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -223,6 +230,13 @@
         </property>
         <property name="maximum">
          <number>9999</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="cb_with_deadline_data">
+        <property name="text">
+         <string>Дата исполнения неизвестна</string>
         </property>
        </widget>
       </item>

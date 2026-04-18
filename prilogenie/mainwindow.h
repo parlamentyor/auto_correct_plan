@@ -18,7 +18,7 @@ public:
     ~MainWindow();
 
 signals:
-    void AddStageInContract(std::vector<model::Stage>& pool_stage);
+    void AddStageInContract(std::optional<std::vector<model::Stage>>& pool_stage);
 
 private slots:
     void on_pb_odt_clicked();
@@ -33,10 +33,14 @@ private slots:
 
     void on_pb_add_stage_clicked();
 
+    void on_cb_with_date_stateChanged(int arg1);
+
+    void on_cb_with_deadline_data_stateChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
     std::shared_ptr<app::App> app_;
-    std::vector<model::SeparateWork> pool_work_;
-    std::vector<model::Stage> pool_stage_;
+    std::optional<std::vector<model::SeparateWork>> pool_work_;
+    std::optional<std::vector<model::Stage>> pool_stage_;
 };
 #endif // MAINWINDOW_H

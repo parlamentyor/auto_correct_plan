@@ -122,7 +122,7 @@ public:
         LOG("Текущее количество строк в таблице: ", rowCount);
 
         // Добавляем новые строки в конец таблицы
-        int newRowsCount = contract.pool_work.size() + 2;
+        int newRowsCount = contract.pool_work.value().size() + 2;
         LOG("Добавляем строк: ", newRowsCount);
 
             for (int i = 0; i < newRowsCount; ++i) {
@@ -144,8 +144,8 @@ public:
         fillSecondRow(table, contract, startRow + 1, rowCount);
 
         // 3. Строки для pool_work
-        for (int i = 0; i < contract.pool_work.size(); ++i) {
-            fillWorkRow(table, contract.pool_work[i],
+        for (int i = 0; i < contract.pool_work.value().size(); ++i) {
+            fillWorkRow(table, contract.pool_work.value()[i],
                         startRow + 2 + i, i + 1);
         }
 
@@ -224,7 +224,7 @@ private:
 
             switch (col) {
             case 1: // Номер
-                text = QString::number(totalRows - contract.pool_work.size() - 1);
+                text = QString::number(totalRows - contract.pool_work.value().size() - 1);
                 alignment = 0; // left
                 break;
 
@@ -236,12 +236,12 @@ private:
             case 3: // Договор
                 text = QString("Договор № %1 от %2")
                            .arg(QString::fromStdString(contract.number_.value_or("")))
-                           .arg(formatDate(contract.date_));
+                           .arg(formatDate(contract.date_.value()));
                 alignment = 1; // center
                 break;
 
             case 4: // date_deadline_
-                text = formatDate(contract.date_deadline_);
+                text = formatDate(contract.date_deadline_.value());
                 alignment = 1; // center
                 break;
 

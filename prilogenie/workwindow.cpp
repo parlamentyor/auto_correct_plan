@@ -66,7 +66,7 @@ void WorkWindow::on_pb_create_plan_month_clicked()
 }
 
 void WorkWindow::on_pb_add_new_contract_clicked() {
-    if (app_->HasValuePathPlanMonth()) {
+    if (!(app_->HasValuePathPlanMonth())) {
         QMessageBox::StandardButton button = QMessageBox::question(
             this, "Добавление договора",
             "Не выбран файл с планом на месяц для добавления договора. Добавить договор только в базу?",

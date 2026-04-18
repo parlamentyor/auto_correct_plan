@@ -22,7 +22,7 @@ private slots:
     void onLoginSuccess();
     void onAddContract();
     void onAppAboutToQuit();
-    void onAddStageInContract(std::vector<model::Stage>& pool_stage);
+    void onAddStageInContract(std::optional<std::vector<model::Stage>>& pool_stage);
 
 private:
     std::shared_ptr<app::App> app_;

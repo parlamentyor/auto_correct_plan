@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>769</height>
+    <height>616</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,42 +15,6 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_5">
-      <item>
-       <widget class="QLabel" name="lb_name_organization">
-        <property name="text">
-         <string>Наименование организации</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="le_name_organization">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QLabel" name="lb_name_short">
-        <property name="text">
-         <string>Краткое наименование этапа</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="le_name_short">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
@@ -81,7 +45,7 @@
       <item>
        <widget class="QLineEdit" name="le_number">
         <property name="enabled">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -150,6 +114,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QCheckBox" name="cb_with_deadline_data">
+        <property name="text">
+         <string>Дата исполнения неизестна</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -179,54 +150,6 @@
          <bool>true</bool>
         </property>
        </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_9">
-      <item>
-       <widget class="QLabel" name="lb_type_contract">
-        <property name="text">
-         <string>Относимось к видам работ</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="cob_type_contract">
-        <item>
-         <property name="text">
-          <string>ГОЗ</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Атт</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>БЭК</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>СИ</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_6">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
       </item>
      </layout>
     </item>
@@ -359,63 +282,6 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_12">
-      <item>
-       <widget class="QCheckBox" name="chb_nds">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Договор с НДС</string>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_19">
-        <property name="text">
-         <string>Ставка НДС</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="sb_stavka_nds">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="value">
-         <number>22</number>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_20">
-        <property name="text">
-         <string>%</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_5">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </item>
-    <item>
      <layout class="QHBoxLayout" name="horizontalLayout_17">
       <item>
        <widget class="QLabel" name="lb_status_payment">
@@ -496,29 +362,9 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pb_add_contract">
+       <widget class="QPushButton" name="pb_add_stage">
         <property name="text">
-         <string>Добавить договор</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pb_pdf">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="text">
-         <string>pdf</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pb_odt">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="text">
-         <string>odt</string>
+         <string>Добавить этап</string>
         </property>
        </widget>
       </item>

@@ -33,7 +33,12 @@ void WindowManager::onLoginSuccess() {
 void WindowManager::onAddContract() {
     if (!main_window_) {
         main_window_ = new MainWindow(app_);
+        main_window_->setAttribute(Qt::WA_DeleteOnClose);
         connect(main_window_, &MainWindow::AddStageInContract, this, &WindowManager::onAddStageInContract);
+        // Дополнительно: отслеживаем уничтожение окна, чтобы обнулить указатель
+        connect(main_window_, &QObject::destroyed, this, [this]() {
+            main_window_ = nullptr;
+        });
     }
     main_window_->show();
 }
@@ -49,9 +54,13 @@ void WindowManager::onAppAboutToQuit() {
     }
 }
 
-void WindowManager::onAddStageInContract(std::vector<model::Stage> &pool_stage) {
+void WindowManager::onAddStageInContract(std::optional<std::vector<model::Stage>> &pool_stage) {
     if (!add_stage_) {
         add_stage_ = new AddStage(pool_stage);
+        add_stage_->setAttribute(Qt::WA_DeleteOnClose);
+        connect(add_stage_, &QObject::destroyed, this, [this]() {
+            add_stage_ = nullptr;
+        });
     }
     add_stage_->show();
 }
