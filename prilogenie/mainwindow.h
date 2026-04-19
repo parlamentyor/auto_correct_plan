@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTableWidget>
 
 #include "app.h"
 
@@ -20,6 +21,9 @@ public:
 signals:
     void AddStageInContract(std::optional<std::vector<model::Stage>>& pool_stage);
 
+public slots:
+    void toUpdateTable();
+
 private slots:
     void on_pb_odt_clicked();
 
@@ -37,10 +41,14 @@ private slots:
 
     void on_cb_with_deadline_data_stateChanged(int arg1);
 
+
 private:
     Ui::MainWindow *ui;
     std::shared_ptr<app::App> app_;
     std::optional<std::vector<model::SeparateWork>> pool_work_;
     std::optional<std::vector<model::Stage>> pool_stage_;
+
+    void SetTableProperties(QTableWidget* table);
+    void UpdateTable();
 };
 #endif // MAINWINDOW_H

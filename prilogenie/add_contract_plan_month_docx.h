@@ -236,12 +236,12 @@ private:
             case 3: // Договор
                 text = QString("Договор № %1 от %2")
                            .arg(QString::fromStdString(contract.number_.value_or("")))
-                           .arg(formatDate(contract.date_.value()));
+                           .arg(details::FormatDate(contract.date_.value()));
                 alignment = 1; // center
                 break;
 
             case 4: // date_deadline_
-                text = formatDate(contract.date_deadline_.value());
+                text = details::FormatDate(contract.date_deadline_.value());
                 alignment = 1; // center
                 break;
 
@@ -310,7 +310,7 @@ private:
             break;
 
             case 6: // date_deadline_
-                text = formatDate(work.date_deadline_);
+                text = details::FormatDate(work.date_deadline_);
                 alignment = 1; // center
                 break;
 

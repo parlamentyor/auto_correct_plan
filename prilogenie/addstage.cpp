@@ -31,9 +31,9 @@ void AddStage::on_pb_add_work_att_as_clicked() {
     model::SeparateWork att_as {"Аттестация АС", {"Суходрищев В.В."}, {12, 12, 2026}, std::nullopt};
     model::SeparateWork razrab_doc {"Разработка документации после аттестационных испытаний с учетом погрешности, которая появляется в связи с долгой засухой", {"Суходрищев В.В.", "Пупкин С.С.", "Касторкин А.А."}, {1, 2, 2027}, "может быть выполним когда-нибудь"};
 
-    addSeparateWorkToTable(ui->table_work, razrab_PIM);
-    addSeparateWorkToTable(ui->table_work, att_as);
-    addSeparateWorkToTable(ui->table_work, razrab_doc);
+    details::AddSeparateWorkToTable(ui->table_work, razrab_PIM);
+    details::AddSeparateWorkToTable(ui->table_work, att_as);
+    details::AddSeparateWorkToTable(ui->table_work, razrab_doc);
 
     // Настраиваем свойства таблицы для многострочного отображения
     ui->table_work->resizeRowsToContents();
@@ -84,6 +84,8 @@ void AddStage::on_pb_add_stage_clicked() {
     }
 
     pool_stage_.value().push_back(std::move(new_stage));
+
+    emit UpdateTable();
 
     QMessageBox::information(this, "Добавление этапа", "Этап добавлен!");
 }

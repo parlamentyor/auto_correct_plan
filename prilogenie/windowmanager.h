@@ -23,6 +23,7 @@ private slots:
     void onAddContract();
     void onAppAboutToQuit();
     void onAddStageInContract(std::optional<std::vector<model::Stage>>& pool_stage);
+    void onUpdateTable();
 
 private:
     std::shared_ptr<app::App> app_;
@@ -31,7 +32,5 @@ private:
     MainWindow *main_window_;
     AddStage *add_stage_;
 };
-
-
 
 #endif // WINDOWMANAGER_H

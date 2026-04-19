@@ -17,11 +17,17 @@ MainWindow::MainWindow(std::shared_ptr<app::App> app, QWidget *parent)
     , pool_stage_(std::nullopt) {
     ui->setupUi(this);
     setWindowTitle("Добавление договора");
+    SetTableProperties(ui->table_work);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::toUpdateTable()
+{
+    UpdateTable();
 }
 
 
@@ -43,26 +49,14 @@ void MainWindow::on_pb_add_work_att_as_clicked()
     model::SeparateWork att_as {"Аттестация АС", {"Суходрищев В.В."}, {12, 12, 2026}, std::nullopt};
     model::SeparateWork razrab_doc {"Разработка документации после аттестационных испытаний с учетом погрешности, которая появляется в связи с долгой засухой", {"Суходрищев В.В.", "Пупкин С.С.", "Касторкин А.А."}, {1, 2, 2027}, "может быть выполним когда-нибудь"};
 
-    addSeparateWorkToTable(ui->table_work, razrab_PIM);
-    addSeparateWorkToTable(ui->table_work, att_as);
-    addSeparateWorkToTable(ui->table_work, razrab_doc);
-
-    // Настраиваем свойства таблицы для многострочного отображения
-    ui->table_work->resizeRowsToContents();
-    ui->table_work->resizeColumnsToContents();
-
-    // Включаем перенос текста для второго столбца
-    ui->table_work->setWordWrap(true);
-
-    // Устанавливаем политику размеров для строк
-    ui->table_work->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-
     if (!pool_work_.has_value()) {
         pool_work_ = std::vector<model::SeparateWork>{};
     }
     pool_work_.value().push_back(razrab_PIM);
     pool_work_.value().push_back(att_as);
     pool_work_.value().push_back(razrab_doc);
+
+    UpdateTable();
 }
 
 
@@ -170,3 +164,35 @@ void MainWindow::on_cb_with_deadline_data_stateChanged(int arg1)
     ui->sb_deadline_yyyy->setEnabled(arg1);
 }
 
+
+void MainWindow::SetTableProperties(QTableWidget* table) {
+    // Настраиваем свойства таблицы для многострочного отображения
+    table->resizeRowsToContents();
+    table->resizeColumnsToContents();
+
+    // Включаем перенос текста для второго столбца
+    table->setWordWrap(true);
+
+    // Устанавливаем политику размеров для строк
+    table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+}
+
+void MainWindow::UpdateTable()
+{
+    ui->table_work->setRowCount(0);
+
+    if (pool_stage_.has_value()) {
+        for (const auto& stage : pool_stage_.value()) {
+            details::AddStageToTable(ui->table_work, stage);
+        }
+    }
+
+    if (pool_work_.has_value()) {
+        for (const auto& work : pool_work_.value()) {
+            details::AddSeparateWorkToTable(ui->table_work, work);
+        }
+    }
+
+    SetTableProperties(ui->table_work);
+
+}

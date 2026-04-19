@@ -49,9 +49,9 @@ namespace model {
         int number_;
 //        std::optional<std::string> name_organization_;
 //        std::optional<std::string> name_short_;
-        std::optional<std::string> name_full_;
+        std::optional<std::string> name_full_; // убрать optional полное наименование обязано быть
         std::optional<Date> date_deadline_;
-        std::optional<std::string> name_responsible_employee_;
+        std::optional<std::string> name_responsible_employee_; // убрать optional ответственный обязан быть
         Price price_;
         Price price_other_department_;
 //        bool with_nds_;
@@ -77,9 +77,9 @@ namespace model {
             std::optional<Date> date,
             std::optional<std::string> name_organization,
             std::optional<std::string> name_short,
-            std::optional<std::string> name_full,
+            std::optional<std::string> name_full,  // убрать optional полное наименование обязано быть
             std::optional<Date> date_deadline,
-            std::optional<std::string> name_responsible_employee,
+            std::optional<std::string> name_responsible_employee, // убрать optional ответственный обязан быть
             Price price,
             Price price_other_department,
             bool with_nds,

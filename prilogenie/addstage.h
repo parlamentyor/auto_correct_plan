@@ -18,6 +18,9 @@ public:
     explicit AddStage(std::optional<std::vector<model::Stage>> &pool_stage, QWidget *parent = nullptr);
     ~AddStage();
 
+signals:
+    void UpdateTable();
+
 private slots:
     void on_pb_add_work_att_as_clicked();
 

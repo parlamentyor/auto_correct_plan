@@ -61,7 +61,23 @@ void WindowManager::onAddStageInContract(std::optional<std::vector<model::Stage>
         connect(add_stage_, &QObject::destroyed, this, [this]() {
             add_stage_ = nullptr;
         });
+
+        // Соединяем сигнал со слотом менеджера для обновления таблицы в окне добавления договора
+        connect(add_stage_, &AddStage::UpdateTable,
+                this, &WindowManager::onUpdateTable);
     }
     add_stage_->show();
+}
+
+void WindowManager::onUpdateTable()
+{
+    if (main_window_) {
+        main_window_->toUpdateTable();
+    } else {
+        LOG("Ошибка: main_window_ не существует при попытке обновить таблицу");
+        // Можно создать main_window_ если нужно
+        // onAddContract();
+        // if (main_window_) main_window_->toUpdateTable();
+    }
 }
 
