@@ -28,6 +28,8 @@ private slots:
 
     void on_cb_with_deadline_data_stateChanged(int arg1);
 
+    void on_cb_correct_number_stateChanged(int arg1);
+
 private:
     Ui::AddStage *ui;
     std::optional<std::vector<model::Stage>>& pool_stage_;

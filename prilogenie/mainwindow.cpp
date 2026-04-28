@@ -128,6 +128,8 @@ void MainWindow::on_pb_add_contract_clicked() {
     }
 
     app_->AddContract(std::move(new_contract));
+
+    QMessageBox::information(this, "Добавление договора", "Договор добавлен!");
 }
 
 

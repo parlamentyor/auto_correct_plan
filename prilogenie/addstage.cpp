@@ -95,3 +95,9 @@ void AddStage::on_cb_with_deadline_data_stateChanged(int arg1) {
     ui->sb_deadline_mm->setEnabled(arg1);
     ui->sb_deadline_yyyy->setEnabled(arg1);
 }
+
+void AddStage::on_cb_correct_number_stateChanged(int arg1)
+{
+    ui->le_number->setEnabled(arg1);
+}
+

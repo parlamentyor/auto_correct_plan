@@ -14,6 +14,8 @@ SOURCES += \
     addstage.cpp \
     app.cpp \
     authorization.cpp \
+    contractmodel.cpp \
+    contractview.cpp \
     handler_odt.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -25,6 +27,8 @@ SOURCES += \
 HEADERS += \
     add_contract_plan_month_docx.h \
     addstage.h \
+    contractmodel.h \
+    contractview.h \
     general_functions.h \
     handler_add_work.h \
     app.h \

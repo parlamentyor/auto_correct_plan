@@ -49,6 +49,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCheckBox" name="cb_correct_number">
+        <property name="text">
+         <string>Ввести номер этапа в ручную</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>
