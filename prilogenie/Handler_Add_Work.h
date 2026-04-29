@@ -64,21 +64,27 @@ namespace details {
         table->insertRow(rowCount);
 
         // Заполняем первый столбец (name_)
-        table->setItem(rowCount, 0,
-                       new QTableWidgetItem(QString::fromStdString(work.name_)));
+        QTableWidgetItem* nameItem = new QTableWidgetItem(QString::fromStdString(work.name_));
+        nameItem->setFlags(nameItem->flags() | Qt::ItemIsEditable);
+        table->setItem(rowCount, 0, nameItem);
+
+        // Второй столбец может быть пустым или содержать что-то еще
+        table->setItem(rowCount, 1, new QTableWidgetItem(""));
 
         // Заполняем третий столбец (name_responsible_employee_)
-        // Каждый элемент с новой строки
-        table->setItem(rowCount, 2,
-                       new QTableWidgetItem(FormatResponsibleEmployees(work.names_responsible_employees_)));
+        QTableWidgetItem* respItem = new QTableWidgetItem(FormatResponsibleEmployees(work.names_responsible_employees_));
+        respItem->setFlags(respItem->flags() | Qt::ItemIsEditable);
+        table->setItem(rowCount, 2, respItem);
 
-        // Заполняем четвёртый столбец (date_deadline_) в формате dd.mm.yyyy
-        table->setItem(rowCount, 3,
-                       new QTableWidgetItem(FormatDate(work.date_deadline_)));
+        // Заполняем четвёртый столбец (date_deadline_)
+        QTableWidgetItem* dateItem = new QTableWidgetItem(FormatDate(work.date_deadline_));
+        dateItem->setFlags(dateItem->flags() | Qt::ItemIsEditable);
+        table->setItem(rowCount, 3, dateItem);
 
         // Заполняем пятый столбец (info_)
-        table->setItem(rowCount, 4,
-                       new QTableWidgetItem(QString::fromStdString(work.info_.value_or(""))));
+        QTableWidgetItem* infoItem = new QTableWidgetItem(QString::fromStdString(work.info_.value_or("")));
+        infoItem->setFlags(infoItem->flags() | Qt::ItemIsEditable);
+        table->setItem(rowCount, 4, infoItem);
     }
 
     inline void AddStageToTable(QTableWidget* table, const model::Stage& stage) {

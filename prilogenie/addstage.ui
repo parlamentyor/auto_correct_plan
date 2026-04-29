@@ -311,6 +311,13 @@
       <item row="0" column="0">
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
+         <widget class="QPushButton" name="pb_add_work">
+          <property name="text">
+           <string>Добавить работу</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="pb_add_work_att_as">
           <property name="text">
            <string>Добавить АттАС</string>

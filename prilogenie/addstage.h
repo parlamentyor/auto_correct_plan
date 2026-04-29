@@ -23,12 +23,11 @@ signals:
 
 private slots:
     void on_pb_add_work_att_as_clicked();
-
     void on_pb_add_stage_clicked();
-
     void on_cb_with_deadline_data_stateChanged(int arg1);
-
     void on_cb_correct_number_stateChanged(int arg1);
+    void on_pb_add_work_clicked();
+    void on_table_work_cellChanged(int row, int column);
 
 private:
     Ui::AddStage *ui;
