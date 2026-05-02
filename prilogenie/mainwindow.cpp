@@ -17,6 +17,11 @@ MainWindow::MainWindow(std::shared_ptr<app::App> app, QWidget *parent)
     , pool_stage_(std::nullopt) {
     ui->setupUi(this);
     setWindowTitle("Добавление договора");
+
+    // Подключаем сигнал изменения ячейки таблицы
+    connect(ui->table_work, &QTableWidget::cellChanged,
+            this, &MainWindow::on_table_work_cellChanged);
+
     SetTableProperties(ui->table_work);
 }
 
@@ -181,6 +186,8 @@ void MainWindow::SetTableProperties(QTableWidget* table) {
 
 void MainWindow::UpdateTable()
 {
+    // Отключаем сигнал временно, чтобы избежать рекурсии
+    ui->table_work->blockSignals(true);
     ui->table_work->setRowCount(0);
 
     if (pool_stage_.has_value()) {
@@ -196,5 +203,99 @@ void MainWindow::UpdateTable()
     }
 
     SetTableProperties(ui->table_work);
-
+    // Включаем сигналы обратно, чтобы изменения в таблице сразу заносились в работы/этапы
+    ui->table_work->blockSignals(false);
 }
+
+void MainWindow::on_pb_add_work_clicked()
+{
+    // Создаем новую работу со значениями по умолчанию
+    model::SeparateWork newWork{
+        .name_ = "Новая работа",
+        .names_responsible_employees_ = {},
+        .date_deadline_ = model::Date(),
+    };
+
+    // Добавляем в pool_work_
+    if (!pool_work_.has_value()) {
+        pool_work_ = std::vector<model::SeparateWork>();
+    }
+    pool_work_->push_back(newWork);
+
+    // Добавляем в таблицу
+    details::AddSeparateWorkToTable(ui->table_work, newWork);
+}
+
+void MainWindow::on_table_work_cellChanged(int row, int column)
+{
+    // Отключаем сигнал временно, чтобы избежать рекурсии
+    ui->table_work->blockSignals(true);
+
+    // Проверяем, что pool_work_ инициализирован и row в пределах
+    if (!pool_work_.has_value() || row >= static_cast<int>(pool_work_->size())) {
+        ui->table_work->blockSignals(false);
+        return;
+    }
+
+    // Получаем текущий элемент
+    model::SeparateWork& work = (*pool_work_)[row];
+    QTableWidgetItem* item = ui->table_work->item(row, column);
+
+    if (!item) {
+        ui->table_work->blockSignals(false);
+        return;
+    }
+
+    // Обновляем соответствующее поле в зависимости от колонки
+    switch (column) {
+    case 0: // name_
+        work.name_ = item->text().toStdString();
+        break;
+
+    case 2: { // names_responsible_employees_
+        // Преобразуем текст обратно в вектор строк
+        std::string text = item->text().toStdString();
+        std::vector<std::string> employees;
+
+        // Разделяем по запятой или новой строке
+        std::stringstream ss(text);
+        std::string employee;
+        while (std::getline(ss, employee, ',')) {
+            // Удаляем пробелы в начале и конце
+            employee.erase(0, employee.find_first_not_of(" \t\n\r"));
+            employee.erase(employee.find_last_not_of(" \t\n\r") + 1);
+            if (!employee.empty()) {
+                employees.push_back(employee);
+            }
+        }
+        work.names_responsible_employees_ = employees;
+        break;
+    }
+
+    case 3: { // date_deadline_
+        // Парсим дату из формата dd.mm.yyyy
+        QString dateStr = item->text();
+        QStringList parts = dateStr.split('.');
+        if (parts.size() == 3) {
+            model::Date data;
+            data.day_ = parts[0].toInt();
+            data.month_ = parts[1].toInt();
+            data.year_ = parts[2].toInt();
+            work.date_deadline_ = data;
+        }
+        break;
+    }
+
+    case 4: // info_
+        if (item->text().isEmpty()) {
+            work.info_ = std::nullopt;
+        } else {
+            work.info_ = item->text().toStdString();
+        }
+        break;
+    }
+
+    // Включаем сигналы обратно
+    ui->table_work->blockSignals(false);
+}
+

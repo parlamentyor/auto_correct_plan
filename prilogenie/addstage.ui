@@ -342,6 +342,11 @@
         </column>
         <column>
          <property name="text">
+          <string>Срок исполнения по договору</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
           <string>Ответственные</string>
          </property>
         </column>

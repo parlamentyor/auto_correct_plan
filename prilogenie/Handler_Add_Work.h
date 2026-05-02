@@ -95,24 +95,39 @@ namespace details {
         table->insertRow(rowCount);
 
         // Заполняем первый столбец (name_)
-        table->setItem(rowCount, 0,
-                       new QTableWidgetItem(QString::fromStdString(stage.name_full_.value_or(""))));
+//        table->setItem(rowCount, 0,
+//                       new QTableWidgetItem(QString::fromStdString(stage.name_full_.value_or(""))));
+        QTableWidgetItem* nameItem = new QTableWidgetItem(QString::fromStdString(stage.name_full_.value_or("")));
+        nameItem->setFlags(nameItem->flags() | Qt::ItemIsEditable);
+        table->setItem(rowCount, 0, nameItem);
 
         // Заполняем Второй столбец (date_deadline_) в формате dd.mm.yyyy
         QString date_deadline = "";
         if (stage.date_deadline_.has_value()) {
             date_deadline = FormatDate(stage.date_deadline_.value());
         }
-        table->setItem(rowCount, 1,
-                       new QTableWidgetItem(date_deadline));
+//        table->setItem(rowCount, 1,
+//                       new QTableWidgetItem(date_deadline));
+        QTableWidgetItem* dateItem = new QTableWidgetItem(date_deadline);
+        dateItem->setFlags(dateItem->flags() | Qt::ItemIsEditable);
+        table->setItem(rowCount, 1, dateItem);
 
         // Заполняем третий столбец (name_responsible_employee_)
-        table->setItem(rowCount, 2,
-                       new QTableWidgetItem(QString::fromStdString(stage.name_responsible_employee_.value_or(""))));
+//        table->setItem(rowCount, 2,
+//                       new QTableWidgetItem(QString::fromStdString(stage.name_responsible_employee_.value_or(""))));
+        QTableWidgetItem* respItem = new QTableWidgetItem(QString::fromStdString(stage.name_responsible_employee_.value_or("")));
+        respItem->setFlags(respItem->flags() | Qt::ItemIsEditable);
+        table->setItem(rowCount, 2, respItem);
+
+        // Заполняем четвёртый столбец
+        table->setItem(rowCount, 3, new QTableWidgetItem(""));
 
         // Заполняем пятый столбец (info_)
-        table->setItem(rowCount, 4,
-                       new QTableWidgetItem(QString::fromStdString(stage.info_.value_or(""))));
+//        table->setItem(rowCount, 4,
+//                       new QTableWidgetItem(QString::fromStdString(stage.info_.value_or(""))));
+        QTableWidgetItem* infoItem = new QTableWidgetItem(QString::fromStdString(stage.info_.value_or("")));
+        infoItem->setFlags(infoItem->flags() | Qt::ItemIsEditable);
+        table->setItem(rowCount, 4, infoItem);
 
         SetRowBold(table, rowCount);
     }

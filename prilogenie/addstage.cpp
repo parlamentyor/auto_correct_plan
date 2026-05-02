@@ -17,6 +17,8 @@ AddStage::AddStage(std::optional<std::vector<model::Stage>> &pool_stage, QWidget
     connect(ui->table_work, &QTableWidget::cellChanged,
             this, &AddStage::on_table_work_cellChanged);
 
+    SetTableProperties(ui->table_work);
+
     if (!pool_stage_.has_value()) {
         ui->le_number->setText("1");
     }
@@ -196,4 +198,16 @@ void AddStage::on_table_work_cellChanged(int row, int column)
 
     // Включаем сигналы обратно
     ui->table_work->blockSignals(false);
+}
+
+void AddStage::SetTableProperties(QTableWidget* table) {
+    // Настраиваем свойства таблицы для многострочного отображения
+    table->resizeRowsToContents();
+    table->resizeColumnsToContents();
+
+    // Включаем перенос текста для второго столбца
+    table->setWordWrap(true);
+
+    // Устанавливаем политику размеров для строк
+    table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }

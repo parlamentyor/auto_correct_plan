@@ -2,6 +2,8 @@
 #define ADDSTAGE_H
 
 #include <QMainWindow>
+#include <QTableWidget>
+
 #include <vector>
 
 #include <model.h>
@@ -33,6 +35,8 @@ private:
     Ui::AddStage *ui;
     std::optional<std::vector<model::Stage>>& pool_stage_;
     std::optional<std::vector<model::SeparateWork>> pool_work_;
+
+    void SetTableProperties(QTableWidget* table);
 };
 
 #endif // ADDSTAGE_H
