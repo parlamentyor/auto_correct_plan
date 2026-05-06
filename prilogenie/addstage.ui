@@ -342,7 +342,8 @@
         </column>
         <column>
          <property name="text">
-          <string>Срок исполнения по договору</string>
+          <string>Срок исполнения
+по договору</string>
          </property>
         </column>
         <column>
@@ -357,8 +358,7 @@
         </column>
         <column>
          <property name="text">
-          <string>Отметка о выполнении.
-Состояние на начало месяца</string>
+          <string>Примечание</string>
          </property>
         </column>
        </widget>

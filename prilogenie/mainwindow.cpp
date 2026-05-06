@@ -173,14 +173,17 @@ void MainWindow::on_cb_with_deadline_data_stateChanged(int arg1)
 
 
 void MainWindow::SetTableProperties(QTableWidget* table) {
-    // Настраиваем свойства таблицы для многострочного отображения
-    table->resizeRowsToContents();
-    table->resizeColumnsToContents();
+    // Настройка растягивания колонок
+    table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);     // Растягивается
+    table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    table->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    table->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+    table->horizontalHeader()->setSectionResizeMode(4, QHeaderView::Stretch);
 
-    // Включаем перенос текста для второго столбца
+    // Включаем перенос текста для всех ячеек
     table->setWordWrap(true);
 
-    // Устанавливаем политику размеров для строк
+    // Настройка автоматической высоты строк
     table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
@@ -224,6 +227,7 @@ void MainWindow::on_pb_add_work_clicked()
 
     // Добавляем в таблицу
     details::AddSeparateWorkToTable(ui->table_work, newWork);
+    SetTableProperties(ui->table_work);
 }
 
 void MainWindow::on_table_work_cellChanged(int row, int column)
