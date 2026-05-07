@@ -11,7 +11,8 @@ WindowManager::WindowManager(std::shared_ptr<app::App> app, QObject *parent)
     , authoriz_(nullptr)
     , work_window_(nullptr)
     , main_window_(nullptr)
-    , add_stage_(nullptr) {
+    , add_stage_(nullptr)
+    , add_work_window_(nullptr) {
     connect(qApp, &QCoreApplication::aboutToQuit, this, &WindowManager::onAppAboutToQuit);
 }
 
@@ -35,12 +36,29 @@ void WindowManager::onAddContract() {
         main_window_ = new MainWindow(app_);
         main_window_->setAttribute(Qt::WA_DeleteOnClose);
         connect(main_window_, &MainWindow::AddStageInContract, this, &WindowManager::onAddStageInContract);
+        connect(main_window_, &MainWindow::AddWorkInContract, this, &WindowManager::onAddWorkInContract);
         // Дополнительно: отслеживаем уничтожение окна, чтобы обнулить указатель
         connect(main_window_, &QObject::destroyed, this, [this]() {
             main_window_ = nullptr;
         });
     }
     main_window_->show();
+}
+
+void WindowManager::onAddWorkInContract(std::shared_ptr<app::App> app,
+                                        std::optional<std::vector<model::SeparateWork>>& pool_work) {
+    if (!add_work_window_) {
+        add_work_window_ = new AddWorkWindow(app, pool_work);
+        add_work_window_->setAttribute(Qt::WA_DeleteOnClose);
+        connect(add_work_window_, &QObject::destroyed, this, [this]() {
+            add_work_window_ = nullptr;
+        });
+
+        // Соединяем сигнал со слотом менеджера для обновления таблицы в окне добавления договора
+        connect(add_work_window_, &AddWorkWindow::UpdateTable,
+                this, &WindowManager::onUpdateTable);
+    }
+    add_work_window_->show();
 }
 
 void WindowManager::onAppAboutToQuit() {

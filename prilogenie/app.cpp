@@ -47,3 +47,13 @@ bool app::App::HasValuePathPlanMonth() const
 {
     return doc_plan_month_.HasValuePath();
 }
+
+void app::App::AddBaseWork(const std::string &base_work)
+{
+    base_works_.insert(base_work);
+}
+
+const std::set<std::string> &app::App::GetBaseWork() const
+{
+    return base_works_;
+}

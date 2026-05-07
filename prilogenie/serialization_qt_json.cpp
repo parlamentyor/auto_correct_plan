@@ -503,6 +503,13 @@ namespace serialization {
             root_object["path_plan_month"] = QString::fromStdString(app->GetPathPlanMonth());
         }
 
+        // Сохраняем base_works_
+        QJsonArray base_works_array;
+        for (const auto& base_work : app->GetBaseWork()) {
+            base_works_array.append(QString::fromStdString(base_work));
+        }
+        root_object["base_works"] = base_works_array;
+
         QFile file(filename);
         if (!file.open(QIODevice::WriteOnly)) {
             return false;
@@ -555,6 +562,14 @@ namespace serialization {
 
         if (root_object.contains("path_plan_month")) {
             app->SetPathPlanMonth(root_object["path_plan_month"].toString().toStdString());
+        }
+
+        // Загружаем base_works_
+        if (root_object.contains("base_works")) {
+            QJsonArray base_works_array = root_object["base_works"].toArray();
+            for (const auto& item : base_works_array) {
+                app->AddBaseWork(item.toString().toStdString());
+            }
         }
 
         return true;

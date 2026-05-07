@@ -2,7 +2,8 @@
 
 int model::User::id_counter_ = 0;
 int model::Contract::id_counter_ = 0;
-
+int model::Contractor::id_counter_ = 0;
+int model::Customer::id_counter_ = 0;
 
 void model::DocumentImpl::SetPath(std::string s_path)
 {

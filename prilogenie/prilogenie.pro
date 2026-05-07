@@ -12,6 +12,7 @@ CONFIG += c++17
 
 SOURCES += \
     addstage.cpp \
+    addworkwindow.cpp \
     app.cpp \
     authorization.cpp \
     contractmodel.cpp \
@@ -27,6 +28,7 @@ SOURCES += \
 HEADERS += \
     add_contract_plan_month_docx.h \
     addstage.h \
+    addworkwindow.h \
     contractmodel.h \
     contractview.h \
     general_functions.h \
@@ -46,6 +48,7 @@ HEADERS += \
 
 FORMS += \
     addstage.ui \
+    addworkwindow.ui \
     authorization.ui \
     mainwindow.ui \
     workwindow.ui

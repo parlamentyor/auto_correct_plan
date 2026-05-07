@@ -21,6 +21,41 @@ namespace model {
         int kop_;
     };
 
+    // Подрядчик
+    struct Contractor {
+        int id_;
+        std::string name_;
+        static int id_counter_;
+    };
+
+    // Заказчик
+    struct Customer {
+        int id_;
+        std::string name_;
+        static int id_counter_;
+    };
+/*
+    struct Work {
+        int id_;
+        std::string name_;
+        static int id_counter_;
+    };
+*/
+    enum StatusEmployee {
+        DISMISSED,
+        CURRENT
+    };
+
+    struct Employee {
+        int id_;
+        std::string name_;
+        std::string patronymic_;
+        std::string surname_;
+        StatusEmployee status_employee_;
+        static int id_counter_;
+
+    };
+
     enum TypeContract {
         GOZ,
         ATT,
@@ -35,11 +70,13 @@ namespace model {
         std::optional<std::string> info_;
     };
 
+    // Оплаты
     struct Payment {
         Price price_;
         Date date_;
     };
 
+    // Траты по договору
     struct Expenses {
         Price price_;
         std::string name_;

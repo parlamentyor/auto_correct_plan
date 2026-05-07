@@ -3,7 +3,8 @@
 
 #include"model.h"
 
-#include<map>
+#include <map>
+#include <set>
 
 namespace app {
 
@@ -22,6 +23,9 @@ namespace app {
         std::string GetPathPlanMonth() const;
         bool HasValuePathPlanMonth() const;
 
+        void AddBaseWork(const std::string& base_work);
+        const std::set<std::string>& GetBaseWork() const;
+
 
 
     private:
@@ -30,6 +34,7 @@ namespace app {
         model::DocumentPlanMonth doc_plan_month_;
         std::string active_user_name_;
         std::vector<model::Contract> contracts_;
+        std::set<std::string> base_works_;
     };
 
 

@@ -132,6 +132,24 @@ void MainWindow::on_pb_add_contract_clicked() {
         }
     }
 
+
+    // добавление работы в базу работ
+    if (pool_stage_.has_value()) {
+        for (const auto& stage : pool_stage_.value()) {
+            if (stage.pool_work_.has_value()) {
+                for (const auto& work : stage.pool_work_.value()) {
+                    app_->AddBaseWork(work.name_);
+                }
+            }
+        }
+    }
+
+    if (pool_work_.has_value()) {
+        for (const auto& work : pool_work_.value()) {
+            app_->AddBaseWork(work.name_);
+        }
+    }
+
     app_->AddContract(std::move(new_contract));
 
     QMessageBox::information(this, "Добавление договора", "Договор добавлен!");
@@ -212,22 +230,7 @@ void MainWindow::UpdateTable()
 
 void MainWindow::on_pb_add_work_clicked()
 {
-    // Создаем новую работу со значениями по умолчанию
-    model::SeparateWork newWork{
-        .name_ = "Новая работа",
-        .names_responsible_employees_ = {},
-        .date_deadline_ = model::Date(),
-    };
-
-    // Добавляем в pool_work_
-    if (!pool_work_.has_value()) {
-        pool_work_ = std::vector<model::SeparateWork>();
-    }
-    pool_work_->push_back(newWork);
-
-    // Добавляем в таблицу
-    details::AddSeparateWorkToTable(ui->table_work, newWork);
-    SetTableProperties(ui->table_work);
+    emit AddWorkInContract(app_, pool_work_);
 }
 
 void MainWindow::on_table_work_cellChanged(int row, int column)

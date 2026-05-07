@@ -7,6 +7,7 @@
 #include "app.h"
 #include "authorization.h"
 #include "addstage.h"
+#include "addworkwindow.h"
 #include "workwindow.h"
 #include "mainwindow.h"
 
@@ -21,6 +22,8 @@ public:
 private slots:
     void onLoginSuccess();
     void onAddContract();
+    void onAddWorkInContract(std::shared_ptr<app::App> app,
+                             std::optional<std::vector<model::SeparateWork>>& pool_work);
     void onAppAboutToQuit();
     void onAddStageInContract(std::optional<std::vector<model::Stage>>& pool_stage);
     void onUpdateTable();
@@ -31,6 +34,8 @@ private:
     WorkWindow *work_window_;
     MainWindow *main_window_;
     AddStage *add_stage_;
+    AddWorkWindow *add_work_window_;
+
 };
 
 #endif // WINDOWMANAGER_H
