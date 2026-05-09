@@ -31,10 +31,14 @@ private slots:
     void on_pb_add_work_clicked();
     void on_table_work_cellChanged(int row, int column);
 
+    void on_pb_edit_deadline_data_clicked();
+    void on_de_deadline_data_dateChanged(const QDate &date);
+
 private:
     Ui::AddStage *ui;
     std::optional<std::vector<model::Stage>>& pool_stage_;
     std::optional<std::vector<model::SeparateWork>> pool_work_;
+    std::optional<model::Date> date_;
 
     void SetTableProperties(QTableWidget* table);
 };

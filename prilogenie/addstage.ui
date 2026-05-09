@@ -68,62 +68,19 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="sb_deadline_dd">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>31</number>
-        </property>
-       </widget>
+       <widget class="QDateEdit" name="de_deadline_data"/>
       </item>
       <item>
-       <widget class="QLabel" name="label_9">
+       <widget class="QPushButton" name="pb_edit_deadline_data">
         <property name="text">
-         <string>.</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="sb_deadline_mm">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>12</number>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_10">
-        <property name="text">
-         <string>.</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="sb_deadline_yyyy">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="minimum">
-         <number>2000</number>
-        </property>
-        <property name="maximum">
-         <number>9999</number>
+         <string>Выбрать дату</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="cb_with_deadline_data">
         <property name="text">
-         <string>Дата исполнения неизестна</string>
+         <string>Дата исполнения неизвестна</string>
         </property>
        </widget>
       </item>

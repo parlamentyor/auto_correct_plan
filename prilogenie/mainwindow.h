@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTableWidget>
+#include <QDateEdit>
 
 #include "app.h"
 
@@ -38,14 +39,22 @@ private slots:
     void on_pb_add_work_clicked();
     void on_table_work_cellChanged(int row, int column);
 
+    void on_pb_edit_contract_data_clicked();
+    void on_de_contract_data_dateChanged(const QDate &date);
+
+    void on_pb_edit_deadline_data_clicked();
+    void on_de_deadline_data_dateChanged(const QDate &date);
 
 private:
     Ui::MainWindow *ui;
     std::shared_ptr<app::App> app_;
     std::optional<std::vector<model::SeparateWork>> pool_work_;
     std::optional<std::vector<model::Stage>> pool_stage_;
+    std::optional<model::Date> contract_date_;
+    std::optional<model::Date> deadline_date_;
 
     void SetTableProperties(QTableWidget* table);
     void UpdateTable();
+    void UpdateDate(std::optional<model::Date>& date, QDateEdit *de);
 };
 #endif // MAINWINDOW_H

@@ -55,7 +55,7 @@
       <item>
        <widget class="QCheckBox" name="cb_with_deadline_data">
         <property name="text">
-         <string>Дата исполнения неизестна</string>
+         <string>Дата исполнения неизвестна</string>
         </property>
        </widget>
       </item>

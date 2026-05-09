@@ -46,7 +46,6 @@ private:
     std::optional<model::Date> date_;
 
     void SetCompleter(QLineEdit *le, const std::set<std::string>& base);
-//    void InitializeDateDisplay();
 };
 
 #endif // ADDWORKWINDOW_H

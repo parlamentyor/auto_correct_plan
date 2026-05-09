@@ -37,6 +37,10 @@ AddWorkWindow::~AddWorkWindow() {
 }
 
 void AddWorkWindow::on_pb_add_work_clicked() {
+    if (ui->le_name->text().isEmpty()) {
+        QMessageBox::warning(this, "Добавление работы", "Отсутстует наименование работы!");
+        return;
+    }
 
     std::vector<std::string> employees;
     if (!(ui->le_responsible_employee_1->text().isEmpty())) {
@@ -53,6 +57,11 @@ void AddWorkWindow::on_pb_add_work_clicked() {
     }
     if (!(ui->le_responsible_employee_5->text().isEmpty())) {
         employees.push_back(ui->le_responsible_employee_5->text().toStdString());
+    }
+
+    if (employees.empty()) {
+        QMessageBox::warning(this, "Добавление работы", "Ниодного работника не добавлено!");
+        return;
     }
 
     model::SeparateWork new_work{
@@ -96,7 +105,7 @@ void AddWorkWindow::on_pb_add_employee_4_clicked() {
 }
 
 void AddWorkWindow::on_pb_add_employee_5_clicked() {
-    QMessageBox::warning(this, "Добавление сотрудника", "Имей совесть! И так уже пол отдела поставил трудиться над этой работёнкой");
+    QMessageBox::warning(this, "Добавление сотрудника", "Имей совесть! И так уже пол отдела поставил трудиться над этой работёнкой!");
 }
 
 void AddWorkWindow::SetCompleter(QLineEdit *le, const std::set<std::string>& base) {
@@ -169,24 +178,6 @@ void AddWorkWindow::on_pb_edit_deadline_data_clicked() {
     dialog->deleteLater();
 }
 
-/*
-void AddWorkWindow::InitializeDateDisplay() {
-    if (date_.day_ > 0 && date_.month_ > 0 && date_.year_ > 0) {
-        QDate date(date_.year_, date_.month_, date_.day_);
-        if (date.isValid()) {
-            ui->de_deadline_data->setDate(date);
-        } else {
-            ui->de_deadline_data->setDate(QDate::currentDate());
-        }
-    } else {
-        ui->de_deadline_data->setDate(QDate::currentDate());
-    }
-
-    // Настройка формата отображения даты (опционально)
-    ui->de_deadline_data->setDisplayFormat("dd.MM.yyyy");
-}
-*/
-
 void AddWorkWindow::on_de_deadline_data_dateChanged(const QDate &date)
 {
     if (date.isValid()) {
@@ -198,14 +189,9 @@ void AddWorkWindow::on_de_deadline_data_dateChanged(const QDate &date)
 
 void AddWorkWindow::on_cb_with_deadline_data_stateChanged(int arg1)
 {
-//    ui->pb_edit_deadline_data->setEnabled(!arg1);
-//    ui->de_deadline_data->setEnabled(!arg1);
     if (arg1 == Qt::Checked) {
         date_= std::nullopt;
         ui->de_deadline_data->setDate(QDate());
-        ui->de_deadline_data->setSpecialValueText("Не выбрано"); // Текст, когда дата не установлена
-//        ui->de_deadline_data->setDisplayFormat("dd.MM.yyyy");
-
         ui->pb_edit_deadline_data->setEnabled(false);
         ui->de_deadline_data->setEnabled(false);
     }

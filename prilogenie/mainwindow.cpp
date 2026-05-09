@@ -8,15 +8,28 @@
 
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QCalendarWidget>
 
 MainWindow::MainWindow(std::shared_ptr<app::App> app, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , app_(app)
     , pool_work_(std::nullopt)
-    , pool_stage_(std::nullopt) {
+    , pool_stage_(std::nullopt)
+    , contract_date_({QDate::currentDate().day(),
+             QDate::currentDate().month(),
+             QDate::currentDate().year()})
+    , deadline_date_({QDate::currentDate().day(),
+             QDate::currentDate().month(),
+             QDate::currentDate().year()}){
     ui->setupUi(this);
     setWindowTitle("Добавление договора");
+
+    ui->de_contract_data->setDate(QDate::currentDate());
+    ui->de_contract_data->setDisplayFormat("dd.MM.yyyy");
+
+    ui->de_deadline_data->setDate(QDate::currentDate());
+    ui->de_deadline_data->setDisplayFormat("dd.MM.yyyy");
 
     // Подключаем сигнал изменения ячейки таблицы
     connect(ui->table_work, &QTableWidget::cellChanged,
@@ -84,31 +97,13 @@ void MainWindow::on_pb_add_contract_clicked() {
         type = model::TypeContract::BEK;
     }
 
-    std::optional<model::Date> date_contract = std::nullopt;
-    if (!(ui->cb_with_date->isChecked())) {
-        date_contract = model::Date{
-            .day_ = ui->sb_contract_dd->value(),
-            .month_ = ui->sb_contract_mm->value(),
-            .year_ = ui->sb_contract_yyyy->value()
-        };
-    }
-
-    std::optional<model::Date> date_deadline = std::nullopt;
-    if (!(ui->cb_with_date->isChecked())) {
-        date_deadline = model::Date{
-            .day_ = ui->sb_deadline_dd->value(),
-            .month_ = ui->sb_deadline_mm->value(),
-            .year_ = ui->sb_deadline_yyyy->value()
-        };
-    }
-
     model::Contract new_contract {
         ui->le_number->text().toStdString(),
-        date_contract,
+        contract_date_,
         ui->le_name_organization->text().toStdString(),
         ui->le_name_short->text().toStdString(),
         ui->le_name_full->text().toStdString(),
-        date_deadline,
+        deadline_date_,
         ui->le_responsible_employee->text().toStdString(),
         {ui->sb_price_ruble->value(), ui->sb_price_kop->value()},
         {ui->sb_price_other_department_ruble->value(), ui->sb_price_other_department_kop->value()},
@@ -175,23 +170,6 @@ void MainWindow::on_pb_add_stage_clicked()
 
     emit AddStageInContract(pool_stage_);
 }
-
-
-void MainWindow::on_cb_with_date_stateChanged(int arg1)
-{
-    ui->sb_contract_dd->setEnabled(!arg1);
-    ui->sb_contract_mm->setEnabled(!arg1);
-    ui->sb_contract_yyyy->setEnabled(!arg1);
-}
-
-
-void MainWindow::on_cb_with_deadline_data_stateChanged(int arg1)
-{
-    ui->sb_deadline_dd->setEnabled(!arg1);
-    ui->sb_deadline_mm->setEnabled(!arg1);
-    ui->sb_deadline_yyyy->setEnabled(!arg1);
-}
-
 
 void MainWindow::SetTableProperties(QTableWidget* table) {
     // Настройка растягивания колонок
@@ -307,5 +285,120 @@ void MainWindow::on_table_work_cellChanged(int row, int column)
 
     // Включаем сигналы обратно
     ui->table_work->blockSignals(false);
+}
+
+void MainWindow::on_pb_edit_deadline_data_clicked() {
+    UpdateDate(deadline_date_, ui->de_deadline_data);
+}
+
+void MainWindow::on_de_deadline_data_dateChanged(const QDate &date)
+{
+    if (date.isValid()) {
+        deadline_date_.value().day_ = date.day();
+        deadline_date_.value().month_ = date.month();
+        deadline_date_.value().year_ = date.year();
+    }
+}
+
+void MainWindow::on_cb_with_deadline_data_stateChanged(int arg1)
+{
+    if (arg1 == Qt::Checked) {
+        deadline_date_= std::nullopt;
+        ui->de_deadline_data->setDate(QDate());
+        ui->pb_edit_deadline_data->setEnabled(false);
+        ui->de_deadline_data->setEnabled(false);
+    }
+    else {
+        ui->pb_edit_deadline_data->setEnabled(true);
+        ui->de_deadline_data->setEnabled(true);
+        deadline_date_ = {QDate::currentDate().day(),
+                 QDate::currentDate().month(),
+                 QDate::currentDate().year()};
+        ui->de_deadline_data->setDate(QDate::currentDate());
+    }
+}
+
+void MainWindow::on_pb_edit_contract_data_clicked() {
+    UpdateDate(contract_date_, ui->de_contract_data);
+}
+
+void MainWindow::on_de_contract_data_dateChanged(const QDate &date)
+{
+    if (date.isValid()) {
+        contract_date_.value().day_ = date.day();
+        contract_date_.value().month_ = date.month();
+        contract_date_.value().year_ = date.year();
+    }
+}
+
+void MainWindow::on_cb_with_date_stateChanged(int arg1)
+{
+    if (arg1 == Qt::Checked) {
+        contract_date_= std::nullopt;
+        ui->de_contract_data->setDate(QDate());
+        ui->pb_edit_contract_data->setEnabled(false);
+        ui->de_contract_data->setEnabled(false);
+    }
+    else {
+        ui->pb_edit_contract_data->setEnabled(true);
+        ui->de_contract_data->setEnabled(true);
+        contract_date_ = {QDate::currentDate().day(),
+                          QDate::currentDate().month(),
+                          QDate::currentDate().year()};
+        ui->de_contract_data->setDate(QDate::currentDate());
+    }
+}
+
+void MainWindow::UpdateDate(std::optional<model::Date>& date, QDateEdit *de) {
+    // Создаём диалоговое окно
+    QDialog *dialog = new QDialog(this);
+    dialog->setWindowTitle("Выберите дату");
+    dialog->setModal(true);
+
+    // Создаём календарь
+    QCalendarWidget *calendar = new QCalendarWidget(dialog);
+
+    // Устанавливаем текущую дату из data_ в календарь
+    QDate currentDate;
+    if (date.has_value()) {
+        currentDate = QDate(date.value().year_, date.value().month_, date.value().day_);
+        if (currentDate.isValid()) {
+            calendar->setSelectedDate(currentDate);
+        } else {
+            calendar->setSelectedDate(QDate::currentDate());
+        }
+    } else {
+        calendar->setSelectedDate(QDate::currentDate());
+    }
+
+    // Компоновка
+    QVBoxLayout *layout = new QVBoxLayout(dialog);
+    layout->addWidget(calendar);
+
+    // Подключаем сигнал выбора даты
+    connect(calendar, &QCalendarWidget::selectionChanged, [this, dialog, calendar, &date, &de]() {
+        QDate selectedDate = calendar->selectedDate();
+
+        // 1. Сохраняем дату в структуру data
+        date.value().day_ = selectedDate.day();
+        date.value().month_ = selectedDate.month();
+        date.value().year_ = selectedDate.year();
+
+        // 2. Отображаем дату в QDateEdit de_deadline_data
+        de->setDate(selectedDate);
+
+        // 3. Закрываем диалог
+        dialog->accept();
+    });
+
+    // Позиционируем окно в месте курсора мыши
+    QPoint cursorPos = QCursor::pos();
+    dialog->move(cursorPos);
+
+    // Показываем диалог
+    dialog->exec();
+
+    // Удаляем диалог после закрытия
+    dialog->deleteLater();
 }
 

@@ -4,14 +4,23 @@
 #include <handler_add_work.h>
 
 #include <QMessageBox>
+#include <QCalendarWidget>
 
 AddStage::AddStage(std::optional<std::vector<model::Stage>> &pool_stage, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::AddStage)
     , pool_stage_(pool_stage)
-    , pool_work_(std::nullopt) {
+    , pool_work_(std::nullopt)
+    , date_({QDate::currentDate().day(),
+             QDate::currentDate().month(),
+             QDate::currentDate().year()}) {
     ui->setupUi(this);
     setWindowTitle("Добавление этапа");
+
+    ui->de_deadline_data->setDate(QDate::currentDate());
+    ui->de_deadline_data->setDisplayFormat("dd.MM.yyyy");
+    connect(ui->de_deadline_data, &QDateEdit::dateChanged,
+            this, &AddStage::on_de_deadline_data_dateChanged);
 
     // Подключаем сигнал изменения ячейки таблицы
     connect(ui->table_work, &QTableWidget::cellChanged,
@@ -65,19 +74,10 @@ void AddStage::on_pb_add_work_att_as_clicked() {
 }
 
 void AddStage::on_pb_add_stage_clicked() {
-    std::optional<model::Date> date_deadline = std::nullopt;
-    if (!(ui->cb_with_deadline_data->isChecked())) {
-        date_deadline = model::Date{
-            .day_ = ui->sb_deadline_dd->value(),
-            .month_ = ui->sb_deadline_mm->value(),
-            .year_ = ui->sb_deadline_yyyy->value()
-        };
-    }
-
     model::Stage new_stage {
         ui->le_number->text().toInt(),
         ui->le_name_full->text().toStdString(),
-        date_deadline,
+        date_,
         ui->le_responsible_employee->text().toStdString(),
         {ui->sb_price_ruble->value(), ui->sb_price_kop->value()},
         {ui->sb_price_other_department_ruble->value(), ui->sb_price_other_department_kop->value()},
@@ -99,12 +99,6 @@ void AddStage::on_pb_add_stage_clicked() {
     emit UpdateTable();
 
     QMessageBox::information(this, "Добавление этапа", "Этап добавлен!");
-}
-
-void AddStage::on_cb_with_deadline_data_stateChanged(int arg1) {
-    ui->sb_deadline_dd->setEnabled(arg1);
-    ui->sb_deadline_mm->setEnabled(arg1);
-    ui->sb_deadline_yyyy->setEnabled(arg1);
 }
 
 void AddStage::on_cb_correct_number_stateChanged(int arg1)
@@ -220,4 +214,85 @@ void AddStage::SetTableProperties(QTableWidget* table) {
 
     // Настройка автоматической высоты строк
     table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+}
+
+void AddStage::on_pb_edit_deadline_data_clicked() {
+    // Создаём диалоговое окно
+    QDialog *dialog = new QDialog(this);
+    dialog->setWindowTitle("Выберите дату дедлайна");
+    dialog->setModal(true);
+
+    // Создаём календарь
+    QCalendarWidget *calendar = new QCalendarWidget(dialog);
+
+    // Устанавливаем текущую дату из data_ в календарь
+    QDate currentDate;
+    if (date_.has_value()) {
+        currentDate = QDate(date_.value().year_, date_.value().month_, date_.value().day_);
+        if (currentDate.isValid()) {
+            calendar->setSelectedDate(currentDate);
+        } else {
+            calendar->setSelectedDate(QDate::currentDate());
+        }
+    } else {
+        calendar->setSelectedDate(QDate::currentDate());
+    }
+
+    // Компоновка
+    QVBoxLayout *layout = new QVBoxLayout(dialog);
+    layout->addWidget(calendar);
+
+    // Подключаем сигнал выбора даты
+    connect(calendar, &QCalendarWidget::selectionChanged, [this, dialog, calendar]() {
+        QDate selectedDate = calendar->selectedDate();
+
+        // 1. Сохраняем дату в структуру data_
+        date_.value().day_ = selectedDate.day();
+        date_.value().month_ = selectedDate.month();
+        date_.value().year_ = selectedDate.year();
+
+        // 2. Отображаем дату в QDateEdit de_deadline_data
+        ui->de_deadline_data->setDate(selectedDate);
+
+        // 3. Закрываем диалог
+        dialog->accept();
+    });
+
+    // Позиционируем окно в месте курсора мыши
+    QPoint cursorPos = QCursor::pos();
+    dialog->move(cursorPos);
+
+    // Показываем диалог
+    dialog->exec();
+
+    // Удаляем диалог после закрытия
+    dialog->deleteLater();
+}
+
+void AddStage::on_de_deadline_data_dateChanged(const QDate &date)
+{
+    if (date.isValid()) {
+        date_.value().day_ = date.day();
+        date_.value().month_ = date.month();
+        date_.value().year_ = date.year();
+    }
+}
+
+
+void AddStage::on_cb_with_deadline_data_stateChanged(int arg1)
+{
+    if (arg1 == Qt::Checked) {
+        date_= std::nullopt;
+        ui->de_deadline_data->setDate(QDate());
+        ui->pb_edit_deadline_data->setEnabled(false);
+        ui->de_deadline_data->setEnabled(false);
+    }
+    else {
+        ui->pb_edit_deadline_data->setEnabled(true);
+        ui->de_deadline_data->setEnabled(true);
+        date_ = {QDate::currentDate().day(),
+                 QDate::currentDate().month(),
+                 QDate::currentDate().year()};
+        ui->de_deadline_data->setDate(QDate::currentDate());
+    }
 }
