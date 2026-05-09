@@ -26,19 +26,17 @@ signals:
 
 private slots:
     void on_pb_open_plan_month_clicked();
-
     void on_pb_create_plan_month_clicked();
-
     void on_pb_add_new_contract_clicked();
-
     void on_pb_create_plan_month_default_clicked();
-
     void on_pushButton_clicked();
 
     // для контекстного меню
     void onTableViewCustomContextMenuRequested(const QPoint& pos);
     void onDeleteContractAction();
     void onMarkAsCompletedAction();
+
+    void on_pb_add_employee_clicked();
 
 private:
     Ui::WorkWindow *ui;
@@ -53,6 +51,9 @@ private:
     void DeleteWidgetInLayout();
 
     int getCurrentContractIndex() const;
+
+    void UpdateTableEmployees();
+    void ApplyIterator();
 };
 
 #endif // WORKWINDOW_H

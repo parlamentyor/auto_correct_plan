@@ -32,7 +32,7 @@
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
-        <string>Работа с договорами</string>
+        <string>Договоры</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
@@ -205,7 +205,58 @@
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
-        <string>Tab 2</string>
+        <string>Сотрудники</string>
+       </attribute>
+       <widget class="QListWidget" name="lw_employees">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>20</y>
+          <width>256</width>
+          <height>192</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pb_add_employee">
+        <property name="geometry">
+         <rect>
+          <x>220</x>
+          <y>270</y>
+          <width>171</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Добавить нового сотрудника</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="le_add_employee">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>270</y>
+          <width>151</width>
+          <height>24</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pb_delete_employee">
+        <property name="geometry">
+         <rect>
+          <x>220</x>
+          <y>310</y>
+          <width>171</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Удалить сотрудника</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>Страница</string>
        </attribute>
       </widget>
      </widget>

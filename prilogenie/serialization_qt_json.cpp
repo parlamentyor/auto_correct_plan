@@ -510,6 +510,13 @@ namespace serialization {
         }
         root_object["base_works"] = base_works_array;
 
+        // Сохраняем base_employees_
+        QJsonArray base_employees_array;
+        for (const auto& base_employee : app->GetBaseEmployee()) {
+            base_employees_array.append(QString::fromStdString(base_employee));
+        }
+        root_object["base_employees"] = base_employees_array;
+
         QFile file(filename);
         if (!file.open(QIODevice::WriteOnly)) {
             return false;
@@ -569,6 +576,14 @@ namespace serialization {
             QJsonArray base_works_array = root_object["base_works"].toArray();
             for (const auto& item : base_works_array) {
                 app->AddBaseWork(item.toString().toStdString());
+            }
+        }
+
+        // Загружаем base_employees_
+        if (root_object.contains("base_employees")) {
+            QJsonArray base_employees_array = root_object["base_employees"].toArray();
+            for (const auto& item : base_employees_array) {
+                app->AddBaseEmployee(item.toString().toStdString());
             }
         }
 

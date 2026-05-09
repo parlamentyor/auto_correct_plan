@@ -25,6 +25,7 @@ WorkWindow::WorkWindow(std::shared_ptr<app::App> app, QWidget *parent)
     setWindowTitle("Менеджер работ БИТ");
 
     AddMainTable();
+    UpdateTableEmployees();
 
 //    setupContractsTable(); // нужно проверить нужен ли он тут
 
@@ -190,12 +191,6 @@ void WorkWindow::on_pushButton_clicked()
     setupContractsTable();
 }
 
-
-
-
-
-
-
 int WorkWindow::getCurrentContractIndex() const {
     if (!tableView_ || !model_) return -1;
 
@@ -206,6 +201,13 @@ int WorkWindow::getCurrentContractIndex() const {
 
     // Возвращаем индекс контракта для любой строки (заголовок, контракт, этап, работа)
     return itemInfo.contractIndex;
+}
+
+void WorkWindow::UpdateTableEmployees() {
+    ui->lw_employees->clear();
+    for (const auto& employee : app_->GetBaseEmployee()) {
+            ui->lw_employees->addItem(QString::fromStdString(employee));
+    }
 }
 
 void WorkWindow::onTableViewCustomContextMenuRequested(const QPoint& pos) {
@@ -290,3 +292,12 @@ void WorkWindow::onMarkAsCompletedAction() {
             }
     }
 }
+
+void WorkWindow::on_pb_add_employee_clicked() {
+    if (!(ui->le_add_employee->text().isEmpty())) {
+        app_->AddBaseEmployee(ui->le_add_employee->text().toStdString());
+        UpdateTableEmployees();
+    };
+    ui->le_add_employee->clear();
+}
+

@@ -43,17 +43,22 @@ std::string app::App::GetPathPlanMonth() const {
     return doc_plan_month_.GetPath();
 }
 
-bool app::App::HasValuePathPlanMonth() const
-{
+bool app::App::HasValuePathPlanMonth() const {
     return doc_plan_month_.HasValuePath();
 }
 
-void app::App::AddBaseWork(const std::string &base_work)
-{
-    base_works_.insert(base_work);
+void app::App::AddBaseWork(const std::string &new_work) {
+    base_works_.insert(new_work);
 }
 
-const std::set<std::string> &app::App::GetBaseWork() const
-{
+const std::set<std::string> &app::App::GetBaseWork() const {
     return base_works_;
+}
+
+void app::App::AddBaseEmployee(const std::string &new_employee) {
+    base_employees_.insert(new_employee);
+}
+
+const std::set<std::string> &app::App::GetBaseEmployee() const {
+    return base_employees_;
 }

@@ -23,18 +23,19 @@ namespace app {
         std::string GetPathPlanMonth() const;
         bool HasValuePathPlanMonth() const;
 
-        void AddBaseWork(const std::string& base_work);
+        void AddBaseWork(const std::string& new_work);
         const std::set<std::string>& GetBaseWork() const;
 
-
+        void AddBaseEmployee(const std::string& new_employee);
+        const std::set<std::string>& GetBaseEmployee() const;
 
     private:
         std::map<std::string, model::User> users_; // ключ имя; потом перейти на unordered_map; потом поменять на указатель на User; потом подтянуть базу данных с уже созданными users
-
         model::DocumentPlanMonth doc_plan_month_;
         std::string active_user_name_;
         std::vector<model::Contract> contracts_;
         std::set<std::string> base_works_;
+        std::set<std::string> base_employees_;
     };
 
 
