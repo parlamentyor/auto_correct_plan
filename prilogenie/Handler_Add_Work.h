@@ -77,7 +77,11 @@ namespace details {
         table->setItem(rowCount, 2, respItem);
 
         // Заполняем четвёртый столбец (date_deadline_)
-        QTableWidgetItem* dateItem = new QTableWidgetItem(FormatDate(work.date_deadline_));
+        QString date_deadline = "";
+        if (work.date_deadline_.has_value()) {
+            date_deadline = FormatDate(work.date_deadline_.value());
+        }
+        QTableWidgetItem* dateItem = new QTableWidgetItem(date_deadline);
         dateItem->setFlags(dateItem->flags() | Qt::ItemIsEditable);
         table->setItem(rowCount, 3, dateItem);
 

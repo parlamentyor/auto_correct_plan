@@ -66,7 +66,7 @@ namespace model {
     struct SeparateWork {
         std::string name_;
         std::vector<std::string> names_responsible_employees_;
-        Date date_deadline_;
+        std::optional<Date> date_deadline_;
         std::optional<std::string> info_;
     };
 

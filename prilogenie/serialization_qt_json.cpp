@@ -71,7 +71,11 @@ namespace serialization {
             responsible_array.append(QString::fromStdString(employee));
         }
         obj["names_responsible_employees"] = responsible_array;
-        obj["date_deadline"] = SerializeDate(work.date_deadline_);
+
+        if (work.date_deadline_.has_value()) {
+            obj["date_deadline"] = SerializeDate(work.date_deadline_.value());
+        }
+
         if (work.info_.has_value()) {
             obj["info"] = QString::fromStdString(work.info_.value());
         }
@@ -88,7 +92,9 @@ namespace serialization {
             work.names_responsible_employees_.push_back(item.toString().toStdString());
         }
 
-        work.date_deadline_ = DeserializeDate(obj["date_deadline"].toObject());
+        if (obj.contains("date_deadline") && !obj["date_deadline"].isNull()) {
+            work.date_deadline_ = DeserializeDate(obj["date_deadline"].toObject());
+        }
 
         if (obj.contains("info") && !obj["info"].isNull()) {
             work.info_ = obj["info"].toString().toStdString();

@@ -33,9 +33,12 @@ AddStage::~AddStage()
 }
 
 void AddStage::on_pb_add_work_att_as_clicked() {
-    model::SeparateWork razrab_PIM {"Разработка ПиМ", {"Пупкин С.С."}, {11, 11, 2026}, "По готовности объекта"};
-    model::SeparateWork att_as {"Аттестация АС", {"Суходрищев В.В."}, {12, 12, 2026}, std::nullopt};
-    model::SeparateWork razrab_doc {"Разработка документации после аттестационных испытаний с учетом погрешности, которая появляется в связи с долгой засухой", {"Суходрищев В.В.", "Пупкин С.С.", "Касторкин А.А."}, {1, 2, 2027}, "может быть выполним когда-нибудь"};
+    model::Date date_razrab_PIM = {11, 11, 2026};
+    model::Date date_att_as = {12, 12, 2026};
+    model::Date date_razrab_doc = {1, 2, 2027};
+    model::SeparateWork razrab_PIM {"Разработка ПиМ", {"Пупкин С.С."}, date_razrab_PIM, "По готовности объекта"};
+    model::SeparateWork att_as {"Аттестация АС", {"Суходрищев В.В."}, date_att_as, std::nullopt};
+    model::SeparateWork razrab_doc {"Разработка документации после аттестационных испытаний с учетом погрешности, которая появляется в связи с долгой засухой", {"Суходрищев В.В.", "Пупкин С.С.", "Касторкин А.А."}, date_razrab_doc, "может быть выполним когда-нибудь"};
 
     details::AddSeparateWorkToTable(ui->table_work, razrab_PIM);
     details::AddSeparateWorkToTable(ui->table_work, att_as);

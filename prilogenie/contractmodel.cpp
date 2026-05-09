@@ -354,7 +354,8 @@ QVariant ContractModel::getWorkRowData(const ItemInfo& info, int column, int rol
         case 0: return prefix;
         case 1: return QString::fromStdString(work->name_);
         case 4: return formatResponsibleEmployees(work->names_responsible_employees_).join("\n");
-        case 5: return formatDate(work->date_deadline_);
+        case 5: return work->date_deadline_.has_value() ?
+                       formatDate(work->date_deadline_.value()) : "";
         case 6: return work->info_.has_value() ?
                        QString::fromStdString(work->info_.value()) : "";
         default: return QVariant();

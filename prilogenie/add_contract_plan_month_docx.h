@@ -310,9 +310,15 @@ private:
             break;
 
             case 6: // date_deadline_
-                text = details::FormatDate(work.date_deadline_);
+            {
+                QString date_deadline = "";
+                if (work.date_deadline_.has_value()) {
+                    date_deadline = details::FormatDate(work.date_deadline_.value());
+                }
+                text = date_deadline;
                 alignment = 1; // center
-                break;
+            }
+            break;
 
             case 7: // info_
                 text = QString::fromStdString(work.info_.value_or(""));

@@ -36,15 +36,17 @@ private slots:
     void on_pb_edit_deadline_data_clicked();
     void on_de_deadline_data_dateChanged(const QDate &date);
 
+    void on_cb_with_deadline_data_stateChanged(int arg1);
+
 private:
     Ui::AddWorkWindow *ui;
 
     std::shared_ptr<app::App> app_;
     std::optional<std::vector<model::SeparateWork>>& pool_work_;
-    model::Date date_;
+    std::optional<model::Date> date_;
 
     void SetCompleter(QLineEdit *le, const std::set<std::string>& base);
-    void InitializeDateDisplay();
+//    void InitializeDateDisplay();
 };
 
 #endif // ADDWORKWINDOW_H

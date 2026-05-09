@@ -12,11 +12,14 @@ AddWorkWindow::AddWorkWindow(std::shared_ptr<app::App> app,
     , ui(new Ui::AddWorkWindow)
     , app_(app)
     , pool_work_(pool_work)
-    , date_({01, 01, 2025}){
+    , date_({QDate::currentDate().day(),
+             QDate::currentDate().month(),
+             QDate::currentDate().year()}){
     ui->setupUi(this);    
     setWindowTitle("Добавление работы");
 
-    InitializeDateDisplay();
+    ui->de_deadline_data->setDate(QDate::currentDate());
+    ui->de_deadline_data->setDisplayFormat("dd.MM.yyyy");
 
     SetCompleter(ui->le_name, app_->GetBaseWork());
     SetCompleter(ui->le_responsible_employee_1, app_->GetBaseEmployee());
@@ -124,8 +127,8 @@ void AddWorkWindow::on_pb_edit_deadline_data_clicked() {
 
     // Устанавливаем текущую дату из data_ в календарь
     QDate currentDate;
-    if (date_.day_ > 0 && date_.month_ > 0 && date_.year_ > 0) {
-        currentDate = QDate(date_.year_, date_.month_, date_.day_);
+    if (date_.has_value()) {
+        currentDate = QDate(date_.value().year_, date_.value().month_, date_.value().day_);
         if (currentDate.isValid()) {
             calendar->setSelectedDate(currentDate);
         } else {
@@ -144,9 +147,9 @@ void AddWorkWindow::on_pb_edit_deadline_data_clicked() {
         QDate selectedDate = calendar->selectedDate();
 
         // 1. Сохраняем дату в структуру data_
-        date_.day_ = selectedDate.day();
-        date_.month_ = selectedDate.month();
-        date_.year_ = selectedDate.year();
+        date_.value().day_ = selectedDate.day();
+        date_.value().month_ = selectedDate.month();
+        date_.value().year_ = selectedDate.year();
 
         // 2. Отображаем дату в QDateEdit de_deadline_data
         ui->de_deadline_data->setDate(selectedDate);
@@ -166,6 +169,7 @@ void AddWorkWindow::on_pb_edit_deadline_data_clicked() {
     dialog->deleteLater();
 }
 
+/*
 void AddWorkWindow::InitializeDateDisplay() {
     if (date_.day_ > 0 && date_.month_ > 0 && date_.year_ > 0) {
         QDate date(date_.year_, date_.month_, date_.day_);
@@ -181,12 +185,37 @@ void AddWorkWindow::InitializeDateDisplay() {
     // Настройка формата отображения даты (опционально)
     ui->de_deadline_data->setDisplayFormat("dd.MM.yyyy");
 }
+*/
 
 void AddWorkWindow::on_de_deadline_data_dateChanged(const QDate &date)
 {
     if (date.isValid()) {
-        date_.day_ = date.day();
-        date_.month_ = date.month();
-        date_.year_ = date.year();
+        date_.value().day_ = date.day();
+        date_.value().month_ = date.month();
+        date_.value().year_ = date.year();
     }
 }
+
+void AddWorkWindow::on_cb_with_deadline_data_stateChanged(int arg1)
+{
+//    ui->pb_edit_deadline_data->setEnabled(!arg1);
+//    ui->de_deadline_data->setEnabled(!arg1);
+    if (arg1 == Qt::Checked) {
+        date_= std::nullopt;
+        ui->de_deadline_data->setDate(QDate());
+        ui->de_deadline_data->setSpecialValueText("Не выбрано"); // Текст, когда дата не установлена
+//        ui->de_deadline_data->setDisplayFormat("dd.MM.yyyy");
+
+        ui->pb_edit_deadline_data->setEnabled(false);
+        ui->de_deadline_data->setEnabled(false);
+    }
+    else {
+        ui->pb_edit_deadline_data->setEnabled(true);
+        ui->de_deadline_data->setEnabled(true);
+        date_ = {QDate::currentDate().day(),
+                 QDate::currentDate().month(),
+                 QDate::currentDate().year()};
+        ui->de_deadline_data->setDate(QDate::currentDate());
+    }
+}
+
