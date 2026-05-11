@@ -17,6 +17,7 @@ SOURCES += \
     authorization.cpp \
     contractmodel.cpp \
     contractview.cpp \
+    expenseswindow.cpp \
     handler_odt.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -31,6 +32,7 @@ HEADERS += \
     addworkwindow.h \
     contractmodel.h \
     contractview.h \
+    expenseswindow.h \
     general_functions.h \
     handler_add_work.h \
     app.h \
@@ -50,6 +52,7 @@ FORMS += \
     addstage.ui \
     addworkwindow.ui \
     authorization.ui \
+    expenseswindow.ui \
     mainwindow.ui \
     workwindow.ui
 

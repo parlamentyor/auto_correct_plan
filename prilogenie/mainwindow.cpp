@@ -21,7 +21,8 @@ MainWindow::MainWindow(std::shared_ptr<app::App> app, QWidget *parent)
              QDate::currentDate().year()})
     , deadline_date_({QDate::currentDate().day(),
              QDate::currentDate().month(),
-             QDate::currentDate().year()}){
+             QDate::currentDate().year()})
+    , expenses_(std::nullopt) {
     ui->setupUi(this);
     setWindowTitle("Добавление договора");
 
@@ -400,5 +401,10 @@ void MainWindow::UpdateDate(std::optional<model::Date>& date, QDateEdit *de) {
 
     // Удаляем диалог после закрытия
     dialog->deleteLater();
+}
+
+
+void MainWindow::on_pb_expenses_clicked() {
+    emit AddExpensesInContract(app_, expenses_);
 }
 

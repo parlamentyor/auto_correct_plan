@@ -10,6 +10,7 @@
 #include "addworkwindow.h"
 #include "workwindow.h"
 #include "mainwindow.h"
+#include "expenseswindow.h"
 
 class WindowManager : public QObject
 {
@@ -27,6 +28,8 @@ private slots:
     void onAppAboutToQuit();
     void onAddStageInContract(std::optional<std::vector<model::Stage>>& pool_stage);
     void onUpdateTable();
+    void onAddExpensesInContract(std::shared_ptr<app::App> app,
+                                 std::optional<std::vector<model::Expenses>>& expenses);
 
 private:
     std::shared_ptr<app::App> app_;
@@ -35,7 +38,7 @@ private:
     MainWindow *main_window_;
     AddStage *add_stage_;
     AddWorkWindow *add_work_window_;
-
+    ExpensesWindow *expenses_window_;
 };
 
 #endif // WINDOWMANAGER_H

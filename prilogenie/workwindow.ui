@@ -28,7 +28,7 @@
     <item>
      <widget class="QTabWidget" name="tab_w_main">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -255,6 +255,11 @@
        </widget>
       </widget>
       <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>Организации</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_4">
        <attribute name="title">
         <string>Страница</string>
        </attribute>

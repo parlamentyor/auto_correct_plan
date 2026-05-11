@@ -1,0 +1,37 @@
+#ifndef EXPENSESWINDOW_H
+#define EXPENSESWINDOW_H
+
+#include <QMainWindow>
+#include <QTableWidget>
+
+#include "app.h"
+#include "model.h"
+
+namespace Ui {
+class ExpensesWindow;
+}
+
+class ExpensesWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit ExpensesWindow(std::shared_ptr<app::App> app,
+                            std::optional<std::vector<model::Expenses>>& expenses,
+                            QWidget *parent = nullptr);
+    ~ExpensesWindow();
+
+private slots:
+    void on_pb_add_clicked();
+
+private:
+    Ui::ExpensesWindow *ui;
+
+    std::shared_ptr<app::App> app_;
+    std::optional<std::vector<model::Expenses>>& expenses_;
+
+    void SetTableProperties();
+    void UpdateTable();
+};
+
+#endif // EXPENSESWINDOW_H
