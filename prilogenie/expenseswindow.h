@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include <QTableWidget>
+#include <QLineEdit>
+
+#include <set>
 
 #include "app.h"
 #include "model.h"
@@ -32,6 +35,7 @@ private:
 
     void SetTableProperties();
     void UpdateTable();
+    void SetCompleter(QLineEdit *le, const std::set<std::string>& base);
 };
 
 #endif // EXPENSESWINDOW_H

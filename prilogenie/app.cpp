@@ -62,3 +62,11 @@ void app::App::AddBaseEmployee(const std::string &new_employee) {
 const std::set<std::string> &app::App::GetBaseEmployee() const {
     return base_employees_;
 }
+
+void app::App::AddBaseExpenses(const std::string &new_expenses) {
+    base_expenses_.insert(new_expenses);
+}
+
+const std::set<std::string> &app::App::GetBaseExpenses() const {
+    return base_expenses_;
+}

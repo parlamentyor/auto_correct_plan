@@ -2,6 +2,7 @@
 #include "ui_expenseswindow.h"
 
 #include <QMessageBox>
+#include <QCompleter>
 
 ExpensesWindow::ExpensesWindow(std::shared_ptr<app::App> app,
                                std::optional<std::vector<model::Expenses> > &expenses,
@@ -12,6 +13,7 @@ ExpensesWindow::ExpensesWindow(std::shared_ptr<app::App> app,
     , expenses_(expenses) {
     ui->setupUi(this);
     setWindowTitle("Добавление затрат");
+    SetCompleter(ui->le_add_name, app_->GetBaseExpenses());
     SetTableProperties();
     UpdateTable();
 }
@@ -49,6 +51,23 @@ void ExpensesWindow::UpdateTable() {
                                      new QTableWidgetItem(QString("%1,%2 рублей").arg(item.price_.ruble_).arg(item.price_.kop_)));
         }
     }
+}
+
+void ExpensesWindow::SetCompleter(QLineEdit *le, const std::set<std::string> &base) {
+    // 1. Наша база слов для автодополнения le_name
+    QStringList base_qsl;
+    base_qsl.reserve(base.size());
+    for (const auto& item : base) {
+        base_qsl << QString::fromStdString(item);
+    }
+    // 2. Создаем QCompleter на основе нашего списка
+    QCompleter *completer = new QCompleter(base_qsl, this);
+    // Дополнительно: сделаем поиск нечувствительным к регистру (чтобы "Я" и "я" считались одинаковыми)
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    // Искать вхождение, а не только с начала
+    completer->setFilterMode(Qt::MatchContains);
+    // 3. Устанавливаем в le_name completer
+    le->setCompleter(completer);
 }
 
 void ExpensesWindow::on_pb_add_clicked() {

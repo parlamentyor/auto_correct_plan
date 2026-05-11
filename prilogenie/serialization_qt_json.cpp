@@ -523,6 +523,13 @@ namespace serialization {
         }
         root_object["base_employees"] = base_employees_array;
 
+        // Сохраняем base_expenses_
+        QJsonArray base_expenses_array;
+        for (const auto& base_expense : app->GetBaseExpenses()) {
+            base_expenses_array.append(QString::fromStdString(base_expense));
+        }
+        root_object["base_expenses"] = base_expenses_array;
+
         QFile file(filename);
         if (!file.open(QIODevice::WriteOnly)) {
             return false;
@@ -590,6 +597,14 @@ namespace serialization {
             QJsonArray base_employees_array = root_object["base_employees"].toArray();
             for (const auto& item : base_employees_array) {
                 app->AddBaseEmployee(item.toString().toStdString());
+            }
+        }
+
+        // Загружаем base_employees_
+            if (root_object.contains("base_expenses")) {
+            QJsonArray base_expenses_array = root_object["base_expenses"].toArray();
+            for (const auto& item : base_expenses_array) {
+                app->AddBaseExpenses(item.toString().toStdString());
             }
         }
 

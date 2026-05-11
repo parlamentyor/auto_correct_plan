@@ -118,7 +118,7 @@ void MainWindow::on_pb_add_contract_clicked() {
         false,
         false,
         std::nullopt,
-        std::nullopt,
+        expenses_,
         ui->le_status_payment->text().toStdString()
     };
 
@@ -146,6 +146,13 @@ void MainWindow::on_pb_add_contract_clicked() {
     if (pool_work_.has_value()) {
         for (const auto& work : pool_work_.value()) {
             app_->AddBaseWork(work.name_);
+        }
+    }
+
+    // добавление работы в базу работ
+    if (expenses_.has_value()) {
+        for (const auto& expense : expenses_.value()) {
+            app_->AddBaseExpenses(expense.name_);
         }
     }
 
