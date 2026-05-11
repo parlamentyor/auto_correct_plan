@@ -28,6 +28,7 @@ namespace app {
 
         void AddBaseEmployee(const std::string& new_employee);
         const std::set<std::string>& GetBaseEmployee() const;
+        std::set<std::string>& GetBaseEmployee();
 
         void AddBaseExpenses(const std::string& new_expenses);
         const std::set<std::string>& GetBaseExpenses() const;
@@ -40,6 +41,7 @@ namespace app {
 
         std::set<std::string> base_works_;
         std::set<std::string> base_employees_;
+        std::set<std::string>::iterator it_base_employees_ = base_employees_.begin();
         std::set<std::string> base_expenses_;
     };
 

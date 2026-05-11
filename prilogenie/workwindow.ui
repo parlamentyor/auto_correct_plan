@@ -253,6 +253,16 @@
          <string>Удалить сотрудника</string>
         </property>
        </widget>
+       <widget class="QLineEdit" name="le_delete_employee">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>310</y>
+          <width>151</width>
+          <height>24</height>
+         </rect>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">

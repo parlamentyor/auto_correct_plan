@@ -19,6 +19,7 @@ WorkWindow::WorkWindow(std::shared_ptr<app::App> app, QWidget *parent)
     , tableView_(nullptr)
     , model_(nullptr)
     , currentContextMenuRow_(-1)
+    , pos_employee_(std::nullopt)
 {
     ui->setupUi(this);
     ui->lb_authorization->setText(QString("Добро пожаловать, вы авторизовались как %1!").arg(QString::fromStdString(app->GetActivUserName())));
@@ -203,13 +204,6 @@ int WorkWindow::getCurrentContractIndex() const {
     return itemInfo.contractIndex;
 }
 
-void WorkWindow::UpdateTableEmployees() {
-    ui->lw_employees->clear();
-    for (const auto& employee : app_->GetBaseEmployee()) {
-            ui->lw_employees->addItem(QString::fromStdString(employee));
-    }
-}
-
 void WorkWindow::onTableViewCustomContextMenuRequested(const QPoint& pos) {
     QModelIndex index = tableView_->indexAt(pos);
     if (!index.isValid()) return;
@@ -300,4 +294,50 @@ void WorkWindow::on_pb_add_employee_clicked() {
     };
     ui->le_add_employee->clear();
 }
+
+
+void WorkWindow::UpdateTableEmployees() {
+    ui->lw_employees->clear();
+    for (const auto& employee : app_->GetBaseEmployee()) {
+        ui->lw_employees->addItem(QString::fromStdString(employee));
+    }
+    ApplyIterator();
+}
+
+
+void WorkWindow::ApplyIterator() {
+    if (it_base_employees_ == app_->GetBaseEmployee().end()) {
+        ui->le_delete_employee->setText("");
+        ui->pb_delete_employee->setEnabled(false);
+        return;
+    }
+    int pos = std::distance(app_->GetBaseEmployee().begin(), it_base_employees_);
+    ui->lw_employees->setCurrentRow(pos);
+    ui->le_delete_employee->setText(QString::fromStdString(*it_base_employees_));
+    ui->pb_delete_employee->setEnabled(true);
+}
+
+void WorkWindow::on_pb_delete_employee_clicked() {
+    app_->GetBaseEmployee().erase(it_base_employees_);
+    it_base_employees_ = app_->GetBaseEmployee().begin();
+    UpdateTableEmployees();
+}
+
+
+void WorkWindow::on_lw_employees_currentRowChanged(int currentRow) {
+    if (currentRow < 0) {
+        return;
+    }
+
+    if (currentRow >= static_cast<int>(app_->GetBaseEmployee().size())) {
+        it_base_employees_ = app_->GetBaseEmployee().end();
+    }
+    else {
+        auto it = app_->GetBaseEmployee().begin();
+        std::advance(it, currentRow);
+        it_base_employees_ = it;
+    }
+    ApplyIterator();
+}
+
 

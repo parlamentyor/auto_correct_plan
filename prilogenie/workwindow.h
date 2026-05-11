@@ -37,6 +37,9 @@ private slots:
     void onMarkAsCompletedAction();
 
     void on_pb_add_employee_clicked();
+    void on_pb_delete_employee_clicked();
+
+    void on_lw_employees_currentRowChanged(int currentRow);
 
 private:
     Ui::WorkWindow *ui;
@@ -45,6 +48,9 @@ private:
     ContractView* tableView_;
     ContractModel* model_;
     int currentContextMenuRow_;
+
+    std::set<std::string>::iterator it_base_employees_ = app_->GetBaseEmployee().begin();
+    std::optional<int> pos_employee_;
 
     void setupContractsTable();
     void AddMainTable();
