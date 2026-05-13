@@ -61,5 +61,7 @@ private:
     void SetTableProperties(QTableWidget* table);
     void UpdateTable();
     void UpdateDate(std::optional<model::Date>& date, QDateEdit *de);
+    void AddWorkInBase();
+    void AddExpenseInBase();
 };
 #endif // MAINWINDOW_H

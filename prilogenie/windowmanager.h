@@ -25,11 +25,14 @@ private slots:
     void onAddContract();
     void onAddWorkInContract(std::shared_ptr<app::App> app,
                              std::optional<std::vector<model::SeparateWork>>& pool_work);
+    void onAddWorkInStage(std::optional<std::vector<model::SeparateWork>>& pool_work);
+    void onUpdateTableWorkInStage();
     void onAppAboutToQuit();
     void onAddStageInContract(std::optional<std::vector<model::Stage>>& pool_stage);
     void onUpdateTable();
     void onAddExpensesInContract(std::shared_ptr<app::App> app,
                                  std::optional<std::vector<model::Expenses>>& expenses);
+    void onAddExpensesInStage(std::optional<std::vector<model::Expenses>>& expenses);
 
 private:
     std::shared_ptr<app::App> app_;

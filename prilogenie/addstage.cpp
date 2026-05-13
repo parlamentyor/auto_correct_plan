@@ -6,14 +6,17 @@
 #include <QMessageBox>
 #include <QCalendarWidget>
 
-AddStage::AddStage(std::optional<std::vector<model::Stage>> &pool_stage, QWidget *parent)
+AddStage::AddStage(std::shared_ptr<app::App> app,
+                   std::optional<std::vector<model::Stage>> &pool_stage, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::AddStage)
     , pool_stage_(pool_stage)
     , pool_work_(std::nullopt)
     , date_({QDate::currentDate().day(),
              QDate::currentDate().month(),
-             QDate::currentDate().year()}) {
+             QDate::currentDate().year()})
+    , app_(app)
+    , expenses_(std::nullopt) {
     ui->setupUi(this);
     setWindowTitle("Добавление этапа");
 
@@ -41,6 +44,10 @@ AddStage::~AddStage()
     delete ui;
 }
 
+void AddStage::toUpdateTableWorkInStage() {
+    UpdateTableWorkInStage();
+}
+
 void AddStage::on_pb_add_work_att_as_clicked() {
     model::Date date_razrab_PIM = {11, 11, 2026};
     model::Date date_att_as = {12, 12, 2026};
@@ -49,20 +56,6 @@ void AddStage::on_pb_add_work_att_as_clicked() {
     model::SeparateWork att_as {"Аттестация АС", {"Суходрищев В.В."}, date_att_as, std::nullopt};
     model::SeparateWork razrab_doc {"Разработка документации после аттестационных испытаний с учетом погрешности, которая появляется в связи с долгой засухой", {"Суходрищев В.В.", "Пупкин С.С.", "Касторкин А.А."}, date_razrab_doc, "может быть выполним когда-нибудь"};
 
-    details::AddSeparateWorkToTable(ui->table_work, razrab_PIM);
-    details::AddSeparateWorkToTable(ui->table_work, att_as);
-    details::AddSeparateWorkToTable(ui->table_work, razrab_doc);
-
-    // Настраиваем свойства таблицы для многострочного отображения
-    ui->table_work->resizeRowsToContents();
-    ui->table_work->resizeColumnsToContents();
-
-    // Включаем перенос текста для второго столбца
-    ui->table_work->setWordWrap(true);
-
-    // Устанавливаем политику размеров для строк
-    ui->table_work->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-
     if (!pool_work_.has_value()) {
         pool_work_ = std::vector<model::SeparateWork>{};
     }
@@ -70,7 +63,7 @@ void AddStage::on_pb_add_work_att_as_clicked() {
     pool_work_.value().push_back(att_as);
     pool_work_.value().push_back(razrab_doc);
 
-    SetTableProperties(ui->table_work);
+    UpdateTableWorkInStage();
 }
 
 void AddStage::on_pb_add_stage_clicked() {
@@ -86,7 +79,7 @@ void AddStage::on_pb_add_stage_clicked() {
         false,
         false,
         std::nullopt,
-        std::nullopt,
+        expenses_,
         ui->le_status_payment->text().toStdString()
     };
 
@@ -101,15 +94,14 @@ void AddStage::on_pb_add_stage_clicked() {
     QMessageBox::information(this, "Добавление этапа", "Этап добавлен!");
 }
 
-void AddStage::on_cb_correct_number_stateChanged(int arg1)
-{
+void AddStage::on_cb_correct_number_stateChanged(int arg1) {
     ui->le_number->setEnabled(arg1);
 }
 
-void AddStage::on_pb_add_work_clicked()
-{
+void AddStage::on_pb_add_work_clicked() {
+/*
     // Создаем новую работу со значениями по умолчанию
-    model::SeparateWork newWork{
+    model::SeparateWork new_work{
         .name_ = "Новая работа",
         .names_responsible_employees_ = {},
         .date_deadline_ = model::Date(), // или Date() для пустой даты
@@ -120,12 +112,14 @@ void AddStage::on_pb_add_work_clicked()
     if (!pool_work_.has_value()) {
         pool_work_ = std::vector<model::SeparateWork>();
     }
-    pool_work_->push_back(newWork);
+    pool_work_->push_back(new_work);
 
     // Добавляем в таблицу
-    details::AddSeparateWorkToTable(ui->table_work, newWork);
+    details::AddSeparateWorkToTable(ui->table_work, new_work);
 
     SetTableProperties(ui->table_work);
+*/
+    emit AddWorkInStage(pool_work_);
 }
 
 void AddStage::on_table_work_cellChanged(int row, int column)
@@ -216,6 +210,22 @@ void AddStage::SetTableProperties(QTableWidget* table) {
     table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
+void AddStage::UpdateTableWorkInStage() {
+    // Отключаем сигнал временно, чтобы избежать рекурсии
+    ui->table_work->blockSignals(true);
+    ui->table_work->setRowCount(0);
+
+    if (pool_work_.has_value()) {
+        for (const auto& work : pool_work_.value()) {
+            details::AddSeparateWorkToTable(ui->table_work, work);
+        }
+    }
+
+    SetTableProperties(ui->table_work);
+    // Включаем сигналы обратно, чтобы изменения в таблице сразу заносились в работы/этапы
+    ui->table_work->blockSignals(false);
+}
+
 void AddStage::on_pb_edit_deadline_data_clicked() {
     // Создаём диалоговое окно
     QDialog *dialog = new QDialog(this);
@@ -296,3 +306,8 @@ void AddStage::on_cb_with_deadline_data_stateChanged(int arg1)
         ui->de_deadline_data->setDate(QDate::currentDate());
     }
 }
+
+void AddStage::on_pb_expenses_clicked() {
+    emit AddExpensesInStage(expenses_);
+}
+

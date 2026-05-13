@@ -246,6 +246,24 @@
      </layout>
     </item>
     <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="pb_expenses">
+        <property name="text">
+         <string>Затраты</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pb_payments">
+        <property name="text">
+         <string>Оплаты</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
      <layout class="QHBoxLayout" name="horizontalLayout_17">
       <item>
        <widget class="QLabel" name="lb_status_payment">

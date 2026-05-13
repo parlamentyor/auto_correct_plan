@@ -131,30 +131,8 @@ void MainWindow::on_pb_add_contract_clicked() {
         }
     }
 
-
-    // добавление работы в базу работ
-    if (pool_stage_.has_value()) {
-        for (const auto& stage : pool_stage_.value()) {
-            if (stage.pool_work_.has_value()) {
-                for (const auto& work : stage.pool_work_.value()) {
-                    app_->AddBaseWork(work.name_);
-                }
-            }
-        }
-    }
-
-    if (pool_work_.has_value()) {
-        for (const auto& work : pool_work_.value()) {
-            app_->AddBaseWork(work.name_);
-        }
-    }
-
-    // добавление работы в базу работ
-    if (expenses_.has_value()) {
-        for (const auto& expense : expenses_.value()) {
-            app_->AddBaseExpenses(expense.name_);
-        }
-    }
+    AddWorkInBase();
+    AddExpenseInBase();
 
     app_->AddContract(std::move(new_contract));
 
@@ -217,13 +195,11 @@ void MainWindow::UpdateTable()
     ui->table_work->blockSignals(false);
 }
 
-void MainWindow::on_pb_add_work_clicked()
-{
+void MainWindow::on_pb_add_work_clicked() {
     emit AddWorkInContract(app_, pool_work_);
 }
 
-void MainWindow::on_table_work_cellChanged(int row, int column)
-{
+void MainWindow::on_table_work_cellChanged(int row, int column) {
     // Отключаем сигнал временно, чтобы избежать рекурсии
     ui->table_work->blockSignals(true);
 
@@ -408,6 +384,42 @@ void MainWindow::UpdateDate(std::optional<model::Date>& date, QDateEdit *de) {
 
     // Удаляем диалог после закрытия
     dialog->deleteLater();
+}
+
+void MainWindow::AddWorkInBase() {
+    if (pool_stage_.has_value()) {
+        for (const auto& stage : pool_stage_.value()) {
+            if (stage.pool_work_.has_value()) {
+                for (const auto& work : stage.pool_work_.value()) {
+                    app_->AddBaseWork(work.name_);
+                }
+            }
+        }
+    }
+
+    if (pool_work_.has_value()) {
+        for (const auto& work : pool_work_.value()) {
+            app_->AddBaseWork(work.name_);
+        }
+    }
+}
+
+void MainWindow::AddExpenseInBase() {
+    if (pool_stage_.has_value()) {
+        for (const auto& stage : pool_stage_.value()) {
+            if (stage.expenses_.has_value()) {
+                for (const auto& expense : stage.expenses_.value()) {
+                    app_->AddBaseExpenses(expense.name_);
+                }
+            }
+        }
+    }
+
+    if (expenses_.has_value()) {
+        for (const auto& expense : expenses_.value()) {
+            app_->AddBaseExpenses(expense.name_);
+        }
+    }
 }
 
 

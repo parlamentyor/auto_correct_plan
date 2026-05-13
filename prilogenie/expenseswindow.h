@@ -26,6 +26,9 @@ public:
 
 private slots:
     void on_pb_add_clicked();
+    void on_tw_expenses_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
+
+    void on_pb_delete_clicked();
 
 private:
     Ui::ExpensesWindow *ui;

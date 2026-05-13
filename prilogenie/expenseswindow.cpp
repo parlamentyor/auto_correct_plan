@@ -37,19 +37,25 @@ void ExpensesWindow::SetTableProperties() {
 
 void ExpensesWindow::UpdateTable() {
     ui->tw_expenses->setRowCount(0);
-    if (expenses_.has_value()) {
-        for (const auto& item : expenses_.value()) {
-            // Получаем текущее количество строк
-            int rowCount = ui->tw_expenses->rowCount();
-            // Добавляем новую строку
-            ui->tw_expenses->insertRow(rowCount);
-            // Заполняем первый столбец (наименование)
-            ui->tw_expenses->setItem(rowCount, 0,
-                                     new QTableWidgetItem(QString::fromStdString(item.name_)));
-            // Заполняем второй столбец (стоимость)
-            ui->tw_expenses->setItem(rowCount, 1,
-                                     new QTableWidgetItem(QString("%1,%2 рублей").arg(item.price_.ruble_).arg(item.price_.kop_)));
-        }
+
+    // Очищаем выделение и поля удаления, если таблица пуста
+    if (!expenses_.has_value() || expenses_.value().empty()) {
+        ui->le_delete->setText("");
+        ui->pb_delete->setEnabled(false);
+        return;
+    }
+
+    for (const auto& item : expenses_.value()) {
+        // Получаем текущее количество строк
+        int rowCount = ui->tw_expenses->rowCount();
+        // Добавляем новую строку
+        ui->tw_expenses->insertRow(rowCount);
+        // Заполняем первый столбец (наименование)
+        ui->tw_expenses->setItem(rowCount, 0,
+                                 new QTableWidgetItem(QString::fromStdString(item.name_)));
+        // Заполняем второй столбец (стоимость)
+        ui->tw_expenses->setItem(rowCount, 1,
+                                 new QTableWidgetItem(QString("%1,%2 рублей").arg(item.price_.ruble_).arg(item.price_.kop_)));
     }
 }
 
@@ -85,5 +91,42 @@ void ExpensesWindow::on_pb_add_clicked() {
     expenses_.value().push_back({{ui->sb_price_add_ruble->value(), ui->sb_price_add_kop->value()},
                                   ui->le_add_name->text().toStdString()});
     UpdateTable();
+}
+
+
+void ExpensesWindow::on_tw_expenses_currentCellChanged(int currentRow, int, int, int) {
+    // Проверяем, что currentRow валидный и что expenses_ содержит данные
+    if (currentRow != -1 && expenses_.has_value() && currentRow < static_cast<int>(expenses_.value().size())) {
+        ui->le_delete->setText(QString::fromStdString(expenses_.value().at(currentRow).name_));
+        ui->pb_delete->setEnabled(true);
+    }
+    else {
+        ui->le_delete->setText("");
+        ui->pb_delete->setEnabled(false);
+    }
+}
+
+
+void ExpensesWindow::on_pb_delete_clicked() {
+    std::string find_str = ui->le_delete->text().toStdString();
+    if (expenses_.has_value()) {
+        auto& expenses = expenses_.value();
+
+        auto it = std::find_if(expenses.begin(), expenses.end(),
+                               [&find_str](const model::Expenses& expense) {
+                                   return expense.name_ == find_str;
+                               });
+
+        if (it != expenses.end()) {
+            expenses.erase(it);
+            if (expenses.empty()) {
+                ui->tw_expenses->clearSelection();
+                ui->le_delete->setText("");
+                ui->pb_delete->setEnabled(false);
+                expenses_ = std::nullopt;
+            }
+            UpdateTable();
+        }
+    }
 }
 
