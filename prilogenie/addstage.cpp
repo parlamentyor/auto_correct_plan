@@ -16,7 +16,8 @@ AddStage::AddStage(std::shared_ptr<app::App> app,
              QDate::currentDate().month(),
              QDate::currentDate().year()})
     , app_(app)
-    , expenses_(std::nullopt) {
+    , expenses_(std::nullopt)
+    , payments_(std::nullopt) {
     ui->setupUi(this);
     setWindowTitle("Добавление этапа");
 
@@ -78,7 +79,7 @@ void AddStage::on_pb_add_stage_clicked() {
         ui->le_info->text().toStdString(),
         false,
         false,
-        std::nullopt,
+        payments_,
         expenses_,
         ui->le_status_payment->text().toStdString()
     };
@@ -99,26 +100,6 @@ void AddStage::on_cb_correct_number_stateChanged(int arg1) {
 }
 
 void AddStage::on_pb_add_work_clicked() {
-/*
-    // Создаем новую работу со значениями по умолчанию
-    model::SeparateWork new_work{
-        .name_ = "Новая работа",
-        .names_responsible_employees_ = {},
-        .date_deadline_ = model::Date(), // или Date() для пустой даты
-        .info_ = std::nullopt
-    };
-
-    // Добавляем в pool_work_
-    if (!pool_work_.has_value()) {
-        pool_work_ = std::vector<model::SeparateWork>();
-    }
-    pool_work_->push_back(new_work);
-
-    // Добавляем в таблицу
-    details::AddSeparateWorkToTable(ui->table_work, new_work);
-
-    SetTableProperties(ui->table_work);
-*/
     emit AddWorkInStage(pool_work_);
 }
 
@@ -309,5 +290,10 @@ void AddStage::on_cb_with_deadline_data_stateChanged(int arg1)
 
 void AddStage::on_pb_expenses_clicked() {
     emit AddExpensesInStage(expenses_);
+}
+
+
+void AddStage::on_pb_payments_clicked() {
+    emit EditPaymentsInStage(payments_);
 }
 

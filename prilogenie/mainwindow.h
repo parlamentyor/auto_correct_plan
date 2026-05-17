@@ -25,6 +25,7 @@ signals:
                            std::optional<std::vector<model::SeparateWork>>& pool_work);
     void AddExpensesInContract(std::shared_ptr<app::App> app,
                                std::optional<std::vector<model::Expenses>>& expenses);
+    void EditPaymentsInContract(std::optional<std::vector<model::Payment>>& payments);
 
 public slots:
     void toUpdateTable();
@@ -46,8 +47,8 @@ private slots:
 
     void on_pb_edit_deadline_data_clicked();
     void on_de_deadline_data_dateChanged(const QDate &date);
-
     void on_pb_expenses_clicked();
+    void on_pb_payments_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -57,6 +58,7 @@ private:
     std::optional<model::Date> contract_date_;
     std::optional<model::Date> deadline_date_;
     std::optional<std::vector<model::Expenses>> expenses_;
+    std::optional<std::vector<model::Payment>> payments_;
 
     void SetTableProperties(QTableWidget* table);
     void UpdateTable();

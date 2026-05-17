@@ -22,7 +22,8 @@ MainWindow::MainWindow(std::shared_ptr<app::App> app, QWidget *parent)
     , deadline_date_({QDate::currentDate().day(),
              QDate::currentDate().month(),
              QDate::currentDate().year()})
-    , expenses_(std::nullopt) {
+    , expenses_(std::nullopt)
+    , payments_(std::nullopt) {
     ui->setupUi(this);
     setWindowTitle("Добавление договора");
 
@@ -117,7 +118,7 @@ void MainWindow::on_pb_add_contract_clicked() {
         pool_stage_,
         false,
         false,
-        std::nullopt,
+        payments_,
         expenses_,
         ui->le_status_payment->text().toStdString()
     };
@@ -425,5 +426,10 @@ void MainWindow::AddExpenseInBase() {
 
 void MainWindow::on_pb_expenses_clicked() {
     emit AddExpensesInContract(app_, expenses_);
+}
+
+
+void MainWindow::on_pb_payments_clicked() {
+    emit EditPaymentsInContract(payments_);
 }
 

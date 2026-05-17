@@ -26,6 +26,7 @@ signals:
     void UpdateTable();
     void AddWorkInStage(std::optional<std::vector<model::SeparateWork>>& pool_work);
     void AddExpensesInStage(std::optional<std::vector<model::Expenses>>& expenses);
+    void EditPaymentsInStage(std::optional<std::vector<model::Payment>>& payments);
 
 public slots:
     void toUpdateTableWorkInStage();
@@ -43,6 +44,8 @@ private slots:
 
     void on_pb_expenses_clicked();
 
+    void on_pb_payments_clicked();
+
 private:
     Ui::AddStage *ui;
     std::optional<std::vector<model::Stage>>& pool_stage_;
@@ -50,6 +53,7 @@ private:
     std::optional<model::Date> date_;
     std::shared_ptr<app::App> app_;
     std::optional<std::vector<model::Expenses>> expenses_;
+    std::optional<std::vector<model::Payment>> payments_;
 
     void SetTableProperties(QTableWidget* table);
     void UpdateTableWorkInStage();

@@ -22,6 +22,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     model.cpp \
+    paymentwindow.cpp \
     serialization_qt_json.cpp \
     windowmanager.cpp \
     workwindow.cpp
@@ -44,6 +45,7 @@ HEADERS += \
     handler_docx.h \
     model.h \
     my_logger.h \
+    paymentwindow.h \
     serialization_qt_json.h \
     windowmanager.h \
     workwindow.h
@@ -54,6 +56,7 @@ FORMS += \
     authorization.ui \
     expenseswindow.ui \
     mainwindow.ui \
+    paymentwindow.ui \
     workwindow.ui
 
 # Default rules for deployment.

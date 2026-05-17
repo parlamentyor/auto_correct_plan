@@ -13,7 +13,8 @@ WindowManager::WindowManager(std::shared_ptr<app::App> app, QObject *parent)
     , main_window_(nullptr)
     , add_stage_(nullptr)
     , add_work_window_(nullptr)
-    , expenses_window_(nullptr) {
+    , expenses_window_(nullptr)
+    , payments_window_(nullptr) {
     connect(qApp, &QCoreApplication::aboutToQuit, this, &WindowManager::onAppAboutToQuit);
 }
 
@@ -39,6 +40,7 @@ void WindowManager::onAddContract() {
         connect(main_window_, &MainWindow::AddStageInContract, this, &WindowManager::onAddStageInContract);
         connect(main_window_, &MainWindow::AddWorkInContract, this, &WindowManager::onAddWorkInContract);
         connect(main_window_, &MainWindow::AddExpensesInContract, this, &WindowManager::onAddExpensesInContract);
+        connect(main_window_, &MainWindow::EditPaymentsInContract, this, &WindowManager::onEditPayments);
         // Дополнительно: отслеживаем уничтожение окна, чтобы обнулить указатель
         connect(main_window_, &QObject::destroyed, this, [this]() {
             main_window_ = nullptr;
@@ -106,6 +108,7 @@ void WindowManager::onAddStageInContract(std::optional<std::vector<model::Stage>
         add_stage_->setAttribute(Qt::WA_DeleteOnClose);
         connect(add_stage_, &AddStage::AddWorkInStage, this, &WindowManager::onAddWorkInStage);
         connect(add_stage_, &AddStage::AddExpensesInStage, this, &WindowManager::onAddExpensesInStage);
+        connect(add_stage_, &AddStage::EditPaymentsInStage, this, &WindowManager::onEditPayments);
         connect(add_stage_, &QObject::destroyed, this, [this]() {
             add_stage_ = nullptr;
         });
@@ -145,7 +148,7 @@ void WindowManager::onAddExpensesInContract(std::shared_ptr<app::App> app, std::
     expenses_window_->show();
 }
 
-void WindowManager::onAddExpensesInStage(std::optional<std::vector<model::Expenses> > &expenses) {
+void WindowManager::onAddExpensesInStage(std::optional<std::vector<model::Expenses>> &expenses) {
 //     !!!!!!!!!!!!!!!!!!!------ПО ФАКТУ МОЖНО СДЕЛАТЬ ОДИН СЛОТ onAddExpenses--------------!!!!!!!!!!!!!!!!!!!!
     if (!expenses_window_) {
         expenses_window_ = new ExpensesWindow(app_, expenses);
@@ -160,5 +163,21 @@ void WindowManager::onAddExpensesInStage(std::optional<std::vector<model::Expens
         //                this, &WindowManager::onUpdateTable);
     }
     expenses_window_->show();
+}
+
+void WindowManager::onEditPayments(std::optional<std::vector<model::Payment>> &payments) {
+    if (!payments_window_) {
+        payments_window_ = new PaymentWindow(payments);
+        payments_window_->setAttribute(Qt::WA_DeleteOnClose);
+        connect(payments_window_, &QObject::destroyed, this, [this]() {
+            payments_window_ = nullptr;
+        });
+
+        // Соединяем сигнал со слотом менеджера для обновления таблицы в окне добавления договора
+        // В будущем нужно отображать затраты в главном окне
+        //        connect(payments_window_, &PaymentWindow::UpdateTable,
+        //                this, &WindowManager::onUpdateTable);
+    }
+    payments_window_->show();
 }
 
