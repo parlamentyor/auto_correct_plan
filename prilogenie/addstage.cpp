@@ -5,6 +5,7 @@
 
 #include <QMessageBox>
 #include <QCalendarWidget>
+#include <QCompleter>
 
 AddStage::AddStage(std::shared_ptr<app::App> app,
                    std::optional<std::vector<model::Stage>> &pool_stage, QWidget *parent)
@@ -20,6 +21,7 @@ AddStage::AddStage(std::shared_ptr<app::App> app,
     , payments_(std::nullopt) {
     ui->setupUi(this);
     setWindowTitle("Добавление этапа");
+    SetCompleter(ui->le_responsible_employee, app_->GetBaseEmployee());
 
     ui->de_deadline_data->setDate(QDate::currentDate());
     ui->de_deadline_data->setDisplayFormat("dd.MM.yyyy");
@@ -38,6 +40,14 @@ AddStage::AddStage(std::shared_ptr<app::App> app,
     else {
         ui->le_number->setText(QString::number(pool_stage_.value().size() + 1));
     }
+
+    // Для контекстного меню
+    // 1. Включаем политику, разрешающую генерацию сигнала при запросе контекстного меню
+    ui->table_work->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    // 2. Подключаем сигнал к нашему слоту
+    connect(ui->table_work, &QTableWidget::customContextMenuRequested,
+            this, &AddStage::ShowContextMenu);
 }
 
 AddStage::~AddStage()
@@ -53,9 +63,12 @@ void AddStage::on_pb_add_work_att_as_clicked() {
     model::Date date_razrab_PIM = {11, 11, 2026};
     model::Date date_att_as = {12, 12, 2026};
     model::Date date_razrab_doc = {1, 2, 2027};
-    model::SeparateWork razrab_PIM {"Разработка ПиМ", {"Пупкин С.С."}, date_razrab_PIM, "По готовности объекта"};
-    model::SeparateWork att_as {"Аттестация АС", {"Суходрищев В.В."}, date_att_as, std::nullopt};
-    model::SeparateWork razrab_doc {"Разработка документации после аттестационных испытаний с учетом погрешности, которая появляется в связи с долгой засухой", {"Суходрищев В.В.", "Пупкин С.С.", "Касторкин А.А."}, date_razrab_doc, "может быть выполним когда-нибудь"};
+    model::SeparateWork razrab_PIM {"Разработка ПиМ", {"Пупкин С.С."}, date_razrab_PIM, "По готовности объекта", {false, std::nullopt}};
+    model::SeparateWork att_as {"Аттестация АС", {"Суходрищев В.В."}, date_att_as, std::nullopt, {false, std::nullopt}};
+    model::SeparateWork razrab_doc {"Разработка документации после аттестационных испытаний с учетом погрешности, которая появляется в связи с долгой засухой",
+                                    {"Суходрищев В.В.", "Пупкин С.С.", "Касторкин А.А."},
+                                    date_razrab_doc, "может быть выполним когда-нибудь",
+                                    {false, std::nullopt}};
 
     if (!pool_work_.has_value()) {
         pool_work_ = std::vector<model::SeparateWork>{};
@@ -199,12 +212,33 @@ void AddStage::UpdateTableWorkInStage() {
     if (pool_work_.has_value()) {
         for (const auto& work : pool_work_.value()) {
             details::AddSeparateWorkToTable(ui->table_work, work);
+            int row = ui->table_work->rowCount() - 1;
+            if (work.status_complet_.is_complet_) {
+                SetRowBackgroundColor(row, QColor(144, 238, 144));  //Светло-зеленый, Qt::lightGray - Светло-серый
+            }
         }
     }
 
     SetTableProperties(ui->table_work);
     // Включаем сигналы обратно, чтобы изменения в таблице сразу заносились в работы/этапы
     ui->table_work->blockSignals(false);
+}
+
+void AddStage::SetCompleter(QLineEdit *le, const std::set<std::string> &base) {
+    // 1. Наша база слов для автодополнения le_name
+    QStringList base_qsl;
+    base_qsl.reserve(base.size());
+    for (const auto& item : base) {
+        base_qsl << QString::fromStdString(item);
+    }
+    // 2. Создаем QCompleter на основе нашего списка
+    QCompleter *completer = new QCompleter(base_qsl, this);
+    // Дополнительно: сделаем поиск нечувствительным к регистру (чтобы "Я" и "я" считались одинаковыми)
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    // Искать вхождение, а не только с начала
+    completer->setFilterMode(Qt::MatchContains);
+    // 3. Устанавливаем в le_name completer
+    le->setCompleter(completer);
 }
 
 void AddStage::on_pb_edit_deadline_data_clicked() {
@@ -295,5 +329,75 @@ void AddStage::on_pb_expenses_clicked() {
 
 void AddStage::on_pb_payments_clicked() {
     emit EditPaymentsInStage(payments_);
+}
+
+void AddStage::ShowContextMenu(const QPoint &pos) {
+    // pos - это координаты клика относительно виджета tableWidget.
+    // Чтобы узнать, по какой именно ячейке кликнули, используем itemAt().
+    QTableWidgetItem* item = ui->table_work->itemAt(pos);
+
+    if (!item) {
+        // Кликнули не по ячейке, а по пустой области таблицы
+        return;
+    }
+
+    // Сохраняем строку, чтобы потом знать, над чем производить действие
+    int row = item->row();
+
+    // Создаем и настраиваем меню
+    QMenu menu;
+    QAction* actionEdit = menu.addAction("Редактировать работу");
+    QAction* actionDone = menu.addAction("Работа выполнена");
+    QAction* actionDelete = menu.addAction("Удалить работу");
+
+    // Показываем меню в точке клика. mapToGlobal преобразует локальные координаты в глобальные.
+    QAction* selectedAction = menu.exec(ui->table_work->mapToGlobal(pos));
+
+    if (selectedAction == actionEdit) {
+        qDebug() << "Редактируем строку" << row;
+        // Здесь код для редактирования...
+    }
+    else if (selectedAction == actionDelete) {
+        pool_work_.value().erase(pool_work_.value().begin() + row);
+        if (pool_work_.value().empty()) {
+            pool_work_ = std::nullopt;
+        }
+        UpdateTableWorkInStage();
+
+    }
+    else if (selectedAction == actionDone) {
+        model::Date date = {QDate::currentDate().day(),
+                            QDate::currentDate().month(),
+                            QDate::currentDate().year()};
+        pool_work_.value()[row].status_complet_ = {true, date};
+        QString qstr = QString("Выполнена\n%1.%2.%3")
+                           .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
+                           .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
+                           .arg(QDate::currentDate().year(), 4, 10, QChar('0'));
+        std::string str_info = qstr.toStdString();
+        pool_work_.value()[row].info_ = str_info;
+        UpdateTableWorkInStage();
+    }
+}
+
+void AddStage::SetRowBackgroundColor(int row, const QColor& color) {
+    // Получаем количество столбцов в таблице
+    int columnCount = ui->table_work->columnCount();
+
+    // Перебираем все столбцы в указанной строке
+    for (int col = 0; col < columnCount; ++col) {
+        QTableWidgetItem* item = ui->table_work->item(row, col);
+
+        // Если ячейка существует
+        if (item) {
+            // Устанавливаем цвет фона
+            item->setBackground(color);
+        } else {
+            // Если ячейка пустая, создаем новый item
+            item = new QTableWidgetItem();
+            item->setBackground(color);
+            ui->table_work->setItem(row, col, item);
+        }
+    }
 }
 

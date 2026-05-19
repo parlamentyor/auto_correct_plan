@@ -8,19 +8,18 @@
 
 namespace serialization {
 
-        // Свободные функции для сериализации Date
     QJsonObject SerializeDate(const model::Date& date);
     model::Date DeserializeDate(const QJsonObject& obj);
 
-        // Свободные функции для сериализации Price
     QJsonObject SerializePrice(const model::Price& price);
     model::Price DeserializePrice(const QJsonObject& obj);
 
-        // Свободные функции для сериализации TypeContract
     QString SerializeTypeContract(model::TypeContract type);
     model::TypeContract DeserializeTypeContract(const QString& str);
 
-        // Свободные функции для сериализации SeparateWork
+    QJsonObject SerializeStatusComplet(const model::StatusComplet& status_complet);
+    model::StatusComplet DeserializeStatusComplet(const QJsonObject& obj);
+
     QJsonObject SerializeSeparateWork(const model::SeparateWork& work);
     model::SeparateWork DeserializeSeparateWork(const QJsonObject& obj);
 
@@ -33,11 +32,9 @@ namespace serialization {
     QJsonObject SerializeStage(const model::Stage& stage);
     model::Stage DeserializeStage(const QJsonObject& obj);
 
-        // Свободные функции для сериализации Contract
     QJsonObject DerializeContract(const model::Contract& contract);
     model::Contract DeserializeContract(const QJsonObject& obj);
 
-        // Свободные функции для сериализации User
     QJsonObject SerializeUser(const model::User& user);
     model::User DeserializeUser(const QJsonObject& obj);
 

@@ -61,6 +61,29 @@ namespace serialization {
         return model::GOZ;
     }
 
+
+    QJsonObject SerializeStatusComplet(const model::StatusComplet &status_complet){
+        QJsonObject obj;
+        obj["is_complet"] = status_complet.is_complet_;
+
+        if (status_complet.date_complet_.has_value()) {
+            obj["date_complet"] = SerializeDate(status_complet.date_complet_.value());
+        }
+
+        return obj;
+    }
+
+    model::StatusComplet DeserializeStatusComplet(const QJsonObject &obj) {
+        model::StatusComplet status_complet;
+        status_complet.is_complet_ = obj["is_complet"].toBool();
+
+        if (obj.contains("date_complet") && !obj["date_complet"].isNull()) {
+            status_complet.date_complet_ = DeserializeDate(obj["date_complet"].toObject());
+        }
+
+        return status_complet;
+    }
+
     // Свободные функции для сериализации SeparateWork
     QJsonObject SerializeSeparateWork(const model::SeparateWork& work) {
         QJsonObject obj;
@@ -79,6 +102,8 @@ namespace serialization {
         if (work.info_.has_value()) {
             obj["info"] = QString::fromStdString(work.info_.value());
         }
+
+        obj["status_complet"] = SerializeStatusComplet(work.status_complet_);
 
         return obj;
     }
@@ -99,6 +124,8 @@ namespace serialization {
         if (obj.contains("info") && !obj["info"].isNull()) {
             work.info_ = obj["info"].toString().toStdString();
         }
+
+        work.status_complet_ = DeserializeStatusComplet(obj["status_complet"].toObject());
 
         return work;
     }
@@ -608,7 +635,6 @@ namespace serialization {
             }
         }
 
-        return true;
+            return true;
     }
-
 }   // namespace serialization

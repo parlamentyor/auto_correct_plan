@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTableWidget>
+#include <QLineEdit>
 
 #include <vector>
 
@@ -41,10 +42,10 @@ private slots:
 
     void on_pb_edit_deadline_data_clicked();
     void on_de_deadline_data_dateChanged(const QDate &date);
-
     void on_pb_expenses_clicked();
-
     void on_pb_payments_clicked();
+
+    void ShowContextMenu(const QPoint& pos);
 
 private:
     Ui::AddStage *ui;
@@ -57,6 +58,8 @@ private:
 
     void SetTableProperties(QTableWidget* table);
     void UpdateTableWorkInStage();
+    void SetCompleter(QLineEdit *le, const std::set<std::string>& base);
+    void SetRowBackgroundColor(int row, const QColor& color);
 };
 
 #endif // ADDSTAGE_H

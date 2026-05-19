@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QTableWidget>
 #include <QDateEdit>
+#include <QLineEdit>
 
 #include "app.h"
 
@@ -65,5 +66,6 @@ private:
     void UpdateDate(std::optional<model::Date>& date, QDateEdit *de);
     void AddWorkInBase();
     void AddExpenseInBase();
+    void SetCompleter(QLineEdit *le, const std::set<std::string>& base);
 };
 #endif // MAINWINDOW_H

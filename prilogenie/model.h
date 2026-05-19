@@ -63,11 +63,18 @@ namespace model {
         SI
     };
 
+    struct StatusComplet {
+        bool is_complet_;
+        std::optional<Date> date_complet_;
+    };
+
     struct SeparateWork {
         std::string name_;
         std::vector<std::string> names_responsible_employees_;
         std::optional<Date> date_deadline_;
         std::optional<std::string> info_;
+        StatusComplet status_complet_;
+
     };
 
     // Оплаты
