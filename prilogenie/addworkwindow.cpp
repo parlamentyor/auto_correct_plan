@@ -14,12 +14,120 @@ AddWorkWindow::AddWorkWindow(std::shared_ptr<app::App> app,
     , pool_work_(pool_work)
     , date_({QDate::currentDate().day(),
              QDate::currentDate().month(),
-             QDate::currentDate().year()}){
+             QDate::currentDate().year()})
+    , index_(-1) {
     ui->setupUi(this);    
     setWindowTitle("Добавление работы");
 
     ui->de_deadline_data->setDate(QDate::currentDate());
     ui->de_deadline_data->setDisplayFormat("dd.MM.yyyy");
+
+    ui->pb_correct->setVisible(false);
+
+    SetCompleter(ui->le_name, app_->GetBaseWork());
+    SetCompleter(ui->le_responsible_employee_1, app_->GetBaseEmployee());
+    SetCompleter(ui->le_responsible_employee_2, app_->GetBaseEmployee());
+    SetCompleter(ui->le_responsible_employee_3, app_->GetBaseEmployee());
+    SetCompleter(ui->le_responsible_employee_4, app_->GetBaseEmployee());
+    SetCompleter(ui->le_responsible_employee_5, app_->GetBaseEmployee());
+
+    connect(ui->de_deadline_data, &QDateEdit::dateChanged,
+            this, &AddWorkWindow::on_de_deadline_data_dateChanged);
+}
+
+AddWorkWindow::AddWorkWindow(std::shared_ptr<app::App> app,
+                             std::optional<std::vector<model::SeparateWork> > &pool_work,
+                             int pos,
+                             QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::AddWorkWindow)
+    , app_(app)
+    , pool_work_(pool_work)
+    , index_(pos) {
+    ui->setupUi(this);
+    setWindowTitle("Корректировка работы");
+
+    model::SeparateWork work = pool_work_.value()[index_];
+
+    if (work.date_deadline_.has_value()) {
+        date_ = work.date_deadline_.value();
+        QDate date = QDate(date_.value().year_, date_.value().month_, date_.value().day_);
+        ui->de_deadline_data->setDate(date);
+
+    }
+    else {
+        date_= std::nullopt;
+        ui->de_deadline_data->setDate(QDate());
+        ui->pb_edit_deadline_data->setEnabled(false);
+        ui->de_deadline_data->setEnabled(false);
+        ui->cb_with_deadline_data->setCheckState(Qt::CheckState::Checked);
+    }
+
+    ui->de_deadline_data->setDisplayFormat("dd.MM.yyyy");
+
+    ui->le_name->setText(QString::fromStdString(work.name_));
+
+    size_t count_employees = work.names_responsible_employees_.size();
+    switch (count_employees) {
+        case 0:
+            break;
+        case 1: {
+            ui->le_responsible_employee_1->setText(QString::fromStdString(work.names_responsible_employees_[0]));
+            break;
+        }
+        case 2: {
+            ui->pb_add_employee_2->setEnabled(true);
+            ui->le_responsible_employee_2->setEnabled(true);
+            ui->le_responsible_employee_1->setText(QString::fromStdString(work.names_responsible_employees_[0]));
+            ui->le_responsible_employee_2->setText(QString::fromStdString(work.names_responsible_employees_[1]));
+            break;
+        }
+        case 3: {
+            ui->pb_add_employee_2->setEnabled(true);
+            ui->pb_add_employee_3->setEnabled(true);
+            ui->le_responsible_employee_2->setEnabled(true);
+            ui->le_responsible_employee_3->setEnabled(true);
+            ui->le_responsible_employee_1->setText(QString::fromStdString(work.names_responsible_employees_[0]));
+            ui->le_responsible_employee_2->setText(QString::fromStdString(work.names_responsible_employees_[1]));
+            ui->le_responsible_employee_3->setText(QString::fromStdString(work.names_responsible_employees_[2]));
+            break;
+        }
+        case 4: {
+            ui->pb_add_employee_2->setEnabled(true);
+            ui->pb_add_employee_3->setEnabled(true);
+            ui->pb_add_employee_4->setEnabled(true);
+            ui->le_responsible_employee_2->setEnabled(true);
+            ui->le_responsible_employee_3->setEnabled(true);
+            ui->le_responsible_employee_4->setEnabled(true);
+            ui->le_responsible_employee_1->setText(QString::fromStdString(work.names_responsible_employees_[0]));
+            ui->le_responsible_employee_2->setText(QString::fromStdString(work.names_responsible_employees_[1]));
+            ui->le_responsible_employee_3->setText(QString::fromStdString(work.names_responsible_employees_[2]));
+            ui->le_responsible_employee_3->setText(QString::fromStdString(work.names_responsible_employees_[3]));
+            break;
+        }
+        case 5: {
+            ui->pb_add_employee_2->setEnabled(true);
+            ui->pb_add_employee_3->setEnabled(true);
+            ui->pb_add_employee_4->setEnabled(true);
+            ui->pb_add_employee_5->setEnabled(true);
+            ui->le_responsible_employee_2->setEnabled(true);
+            ui->le_responsible_employee_3->setEnabled(true);
+            ui->le_responsible_employee_4->setEnabled(true);
+            ui->le_responsible_employee_5->setEnabled(true);
+            ui->le_responsible_employee_1->setText(QString::fromStdString(work.names_responsible_employees_[0]));
+            ui->le_responsible_employee_2->setText(QString::fromStdString(work.names_responsible_employees_[1]));
+            ui->le_responsible_employee_3->setText(QString::fromStdString(work.names_responsible_employees_[2]));
+            ui->le_responsible_employee_3->setText(QString::fromStdString(work.names_responsible_employees_[3]));
+            ui->le_responsible_employee_3->setText(QString::fromStdString(work.names_responsible_employees_[4]));
+            break;
+        }
+    }
+
+    if (work.info_.has_value()) {
+        ui->le_info->setText(QString::fromStdString(work.info_.value()));
+    }
+
+    ui->pb_add_work->setVisible(false);
 
     SetCompleter(ui->le_name, app_->GetBaseWork());
     SetCompleter(ui->le_responsible_employee_1, app_->GetBaseEmployee());
@@ -209,5 +317,49 @@ void AddWorkWindow::on_cb_with_deadline_data_stateChanged(int arg1)
                  QDate::currentDate().year()};
         ui->de_deadline_data->setDate(QDate::currentDate());
     }
+}
+
+
+void AddWorkWindow::on_pb_correct_clicked() {
+    if (ui->le_name->text().isEmpty()) {
+        QMessageBox::warning(this, "Добавление работы", "Отсутстует наименование работы!");
+        return;
+    }
+
+    if (ui->cb_with_deadline_data->isChecked() == true && ui->le_info->text().isEmpty()) {
+        QMessageBox::warning(this, "Добавление работы", "Необходимо в поле Дополнительная информация указать причину отсутствия даты исполнения работы");
+        return;
+    }
+
+    std::vector<std::string> employees;
+    if (!(ui->le_responsible_employee_1->text().isEmpty())) {
+        employees.push_back(ui->le_responsible_employee_1->text().toStdString());
+    }
+    if (!(ui->le_responsible_employee_2->text().isEmpty())) {
+        employees.push_back(ui->le_responsible_employee_2->text().toStdString());
+    }
+    if (!(ui->le_responsible_employee_3->text().isEmpty())) {
+        employees.push_back(ui->le_responsible_employee_3->text().toStdString());
+    }
+    if (!(ui->le_responsible_employee_4->text().isEmpty())) {
+        employees.push_back(ui->le_responsible_employee_4->text().toStdString());
+    }
+    if (!(ui->le_responsible_employee_5->text().isEmpty())) {
+        employees.push_back(ui->le_responsible_employee_5->text().toStdString());
+    }
+
+    if (employees.empty()) {
+        QMessageBox::warning(this, "Добавление работы", "Ниодного работника не добавлено!");
+        return;
+    }
+
+    pool_work_.value()[index_].name_ = ui->le_name->text().toStdString();
+    pool_work_.value()[index_].names_responsible_employees_ = std::move(employees);
+    pool_work_.value()[index_].date_deadline_ = date_;
+    pool_work_.value()[index_].info_ = ui->le_info->text().toStdString();
+
+    emit UpdateTable();
+
+    QMessageBox::information(this, "Изменени работы", "Работа именена!");
 }
 

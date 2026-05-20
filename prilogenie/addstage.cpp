@@ -331,6 +331,7 @@ void AddStage::on_pb_payments_clicked() {
     emit EditPaymentsInStage(payments_);
 }
 
+
 void AddStage::ShowContextMenu(const QPoint &pos) {
     // pos - это координаты клика относительно виджета tableWidget.
     // Чтобы узнать, по какой именно ячейке кликнули, используем itemAt().
@@ -341,42 +342,53 @@ void AddStage::ShowContextMenu(const QPoint &pos) {
         return;
     }
 
-    // Сохраняем строку, чтобы потом знать, над чем производить действие
-    int row = item->row();
+    // Сохраняем строку, чтобы потом производить действия над ней
+    int index = item->row();
 
     // Создаем и настраиваем меню
     QMenu menu;
-    QAction* actionEdit = menu.addAction("Редактировать работу");
-    QAction* actionDone = menu.addAction("Работа выполнена");
-    QAction* actionDelete = menu.addAction("Удалить работу");
+    QAction* action_edit = menu.addAction("Редактировать работу");
+    QAction* action_complet = menu.addAction("Изменить статус выполнения");
+    QAction* action_delete = menu.addAction("Удалить работу");
 
     // Показываем меню в точке клика. mapToGlobal преобразует локальные координаты в глобальные.
     QAction* selectedAction = menu.exec(ui->table_work->mapToGlobal(pos));
 
-    if (selectedAction == actionEdit) {
-        qDebug() << "Редактируем строку" << row;
-        // Здесь код для редактирования...
+    if (selectedAction == action_edit) {
+        emit EditWork(pool_work_, index);
     }
-    else if (selectedAction == actionDelete) {
-        pool_work_.value().erase(pool_work_.value().begin() + row);
-        if (pool_work_.value().empty()) {
-            pool_work_ = std::nullopt;
-        }
-        UpdateTableWorkInStage();
+    else if (selectedAction == action_delete) {
+        on_ActionDelete(index);
+    }
+    else if (selectedAction == action_complet) {
+        on_ActionComplet(index);
+    }
+    UpdateTableWorkInStage();
+}
 
+void AddStage::on_ActionDelete(int index) {
+    pool_work_.value().erase(pool_work_.value().begin() + index);
+    if (pool_work_.value().empty()) {
+        pool_work_ = std::nullopt;
     }
-    else if (selectedAction == actionDone) {
+}
+
+void AddStage::on_ActionComplet(int index) {
+    if (!(pool_work_.value()[index].status_complet_.is_complet_)) {
         model::Date date = {QDate::currentDate().day(),
                             QDate::currentDate().month(),
                             QDate::currentDate().year()};
-        pool_work_.value()[row].status_complet_ = {true, date};
+        pool_work_.value()[index].status_complet_ = {true, date};
         QString qstr = QString("Выполнена\n%1.%2.%3")
                            .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().year(), 4, 10, QChar('0'));
         std::string str_info = qstr.toStdString();
-        pool_work_.value()[row].info_ = str_info;
-        UpdateTableWorkInStage();
+        pool_work_.value()[index].info_ = str_info;
+    }
+    else {
+        pool_work_.value()[index].status_complet_ = {false, std::nullopt};
+        pool_work_.value()[index].info_ = std::nullopt;
     }
 }
 

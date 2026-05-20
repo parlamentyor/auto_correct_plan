@@ -17,8 +17,15 @@ class AddWorkWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    // Конструктор для создания и добавления новой работы
     explicit AddWorkWindow(std::shared_ptr<app::App> app,
                            std::optional<std::vector<model::SeparateWork>>& pool_work,
+                           QWidget *parent = nullptr);
+
+    // Конструктор для редактирования работы
+    explicit AddWorkWindow(std::shared_ptr<app::App> app,
+                           std::optional<std::vector<model::SeparateWork>>& pool_work,
+                           int pos,
                            QWidget *parent = nullptr);
     ~AddWorkWindow();
 
@@ -38,12 +45,15 @@ private slots:
 
     void on_cb_with_deadline_data_stateChanged(int arg1);
 
+    void on_pb_correct_clicked();
+
 private:
     Ui::AddWorkWindow *ui;
 
     std::shared_ptr<app::App> app_;
     std::optional<std::vector<model::SeparateWork>>& pool_work_;
     std::optional<model::Date> date_;
+    int index_;
 
     void SetCompleter(QLineEdit *le, const std::set<std::string>& base);
 };

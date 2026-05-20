@@ -35,6 +35,8 @@ private slots:
                                  std::optional<std::vector<model::Expenses>>& expenses);
     void onAddExpensesInStage(std::optional<std::vector<model::Expenses>>& expenses);
     void onEditPayments(std::optional<std::vector<model::Payment>> &payments);
+    void onEditWork(std::optional<std::vector<model::SeparateWork>>& pool_work,
+                    int pos);
 
 private:
     std::shared_ptr<app::App> app_;

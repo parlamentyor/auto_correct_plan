@@ -109,6 +109,7 @@ void WindowManager::onAddStageInContract(std::optional<std::vector<model::Stage>
         connect(add_stage_, &AddStage::AddWorkInStage, this, &WindowManager::onAddWorkInStage);
         connect(add_stage_, &AddStage::AddExpensesInStage, this, &WindowManager::onAddExpensesInStage);
         connect(add_stage_, &AddStage::EditPaymentsInStage, this, &WindowManager::onEditPayments);
+        connect(add_stage_, &AddStage::EditWork, this, &WindowManager::onEditWork);
         connect(add_stage_, &QObject::destroyed, this, [this]() {
             add_stage_ = nullptr;
         });
@@ -179,5 +180,20 @@ void WindowManager::onEditPayments(std::optional<std::vector<model::Payment>> &p
         //                this, &WindowManager::onUpdateTable);
     }
     payments_window_->show();
+}
+
+void WindowManager::onEditWork(std::optional<std::vector<model::SeparateWork> > &pool_work, int pos) {
+    if (!add_work_window_) {
+        add_work_window_ = new AddWorkWindow(app_, pool_work, pos);
+        add_work_window_->setAttribute(Qt::WA_DeleteOnClose);
+        connect(add_work_window_, &QObject::destroyed, this, [this]() {
+            add_work_window_ = nullptr;
+        });
+
+        // Соединяем сигнал со слотом менеджера для обновления таблицы в окне добавления этапа
+        connect(add_work_window_, &AddWorkWindow::UpdateTable,
+                this, &WindowManager::onUpdateTableWorkInStage);
+    }
+    add_work_window_->show();
 }
 

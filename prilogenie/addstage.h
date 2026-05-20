@@ -28,6 +28,8 @@ signals:
     void AddWorkInStage(std::optional<std::vector<model::SeparateWork>>& pool_work);
     void AddExpensesInStage(std::optional<std::vector<model::Expenses>>& expenses);
     void EditPaymentsInStage(std::optional<std::vector<model::Payment>>& payments);
+    void EditWork(std::optional<std::vector<model::SeparateWork>>& pool_work,
+                  int pos);
 
 public slots:
     void toUpdateTableWorkInStage();
@@ -44,6 +46,8 @@ private slots:
     void on_de_deadline_data_dateChanged(const QDate &date);
     void on_pb_expenses_clicked();
     void on_pb_payments_clicked();
+    void on_ActionDelete(int index);
+    void on_ActionComplet(int index);
 
     void ShowContextMenu(const QPoint& pos);
 
