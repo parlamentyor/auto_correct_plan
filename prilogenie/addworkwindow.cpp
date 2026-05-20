@@ -5,6 +5,8 @@
 #include <QCompleter>
 #include <QCalendarWidget>
 
+using namespace std::string_literals;
+
 AddWorkWindow::AddWorkWindow(std::shared_ptr<app::App> app,
                              std::optional<std::vector<model::SeparateWork>>& pool_work,
                              QWidget *parent)
@@ -123,10 +125,12 @@ AddWorkWindow::AddWorkWindow(std::shared_ptr<app::App> app,
         }
     }
 
+// Не будем давать возможность тереть информацию, только добавлять
+/*
     if (work.info_.has_value()) {
         ui->le_info->setText(QString::fromStdString(work.info_.value()));
     }
-
+*/
     ui->pb_add_work->setVisible(false);
 
     SetCompleter(ui->le_name, app_->GetBaseWork());
@@ -146,12 +150,12 @@ AddWorkWindow::~AddWorkWindow() {
 
 void AddWorkWindow::on_pb_add_work_clicked() {
     if (ui->le_name->text().isEmpty()) {
-        QMessageBox::warning(this, "Добавление работы", "Отсутстует наименование работы!");
+        QMessageBox::warning(this, "Добавление работы", "Отсутствует наименование работы!");
         return;
     }
 
     if (ui->cb_with_deadline_data->isChecked() == true && ui->le_info->text().isEmpty()) {
-        QMessageBox::warning(this, "Добавление работы", "Необходимо в поле Дополнительная информация указать причину отсутствия даты исполнения работы");
+        QMessageBox::warning(this, "Добавление работы", "Добавьте в поле Дополнительная информация причину отсутствия даты исполнения работы");
         return;
     }
 
@@ -173,7 +177,7 @@ void AddWorkWindow::on_pb_add_work_clicked() {
     }
 
     if (employees.empty()) {
-        QMessageBox::warning(this, "Добавление работы", "Ниодного работника не добавлено!");
+        QMessageBox::warning(this, "Добавление работы", "Ни одного работника не добавлено!");
         return;
     }
 
@@ -328,7 +332,7 @@ void AddWorkWindow::on_pb_correct_clicked() {
     }
 
     if (ui->cb_with_deadline_data->isChecked() == true && ui->le_info->text().isEmpty()) {
-        QMessageBox::warning(this, "Изменение работы", "Необходимо в поле Дополнительная информация указать причину отсутствия даты исполнения работы");
+        QMessageBox::warning(this, "Изменение работы", "Добавьте в поле Дополнительная информация причину отсутствия даты исполнения работы");
         return;
     }
 
@@ -350,14 +354,16 @@ void AddWorkWindow::on_pb_correct_clicked() {
     }
 
     if (employees.empty()) {
-        QMessageBox::warning(this, "Изменение работы", "Ниодного работника не добавлено!");
+        QMessageBox::warning(this, "Изменение работы", "Ни одного работника не добавлено!");
         return;
     }
 
     pool_work_.value()[index_].name_ = ui->le_name->text().toStdString();
     pool_work_.value()[index_].names_responsible_employees_ = std::move(employees);
     pool_work_.value()[index_].date_deadline_ = date_;
-    pool_work_.value()[index_].info_ = ui->le_info->text().toStdString();
+    if (!(ui->le_info->text().isEmpty())) {
+        pool_work_.value()[index_].info_ = pool_work_.value()[index_].info_.value() + "\n\n"  + ui->le_info->text().toStdString();
+    }
 
     emit UpdateTable();
 
