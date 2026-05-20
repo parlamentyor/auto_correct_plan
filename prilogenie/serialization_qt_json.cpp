@@ -84,6 +84,39 @@ namespace serialization {
         return status_complet;
     }
 
+
+    QJsonObject SerializeStatusActual(const model::StatusActual &status_actual) {
+        QJsonObject obj;
+        obj["is_no_actual"] = status_actual.is_no_aclual_;
+
+        if (status_actual.date_no_aclual_.has_value()) {
+            obj["date_no_actual"] = SerializeDate(status_actual.date_no_aclual_.value());
+        }
+
+        if (status_actual.info_.has_value()) {
+            obj["info"] = QString::fromStdString(status_actual.info_.value());
+        }
+
+        return obj;
+    }
+
+
+    model::StatusActual DeserializeStatusAntual(const QJsonObject &obj) {
+        model::StatusActual status_actual;
+        status_actual.is_no_aclual_ = obj["is_no_actual"].toBool();
+
+        if (obj.contains("date_no_actual") && !obj["date_no_actual"].isNull()) {
+            status_actual.date_no_aclual_ = DeserializeDate(obj["date_no_actual_"].toObject());
+        }
+
+        if (obj.contains("info") && !obj["info"].isNull()) {
+            status_actual.info_ = obj["info"].toString().toStdString();
+        }
+
+        return status_actual;
+    }
+
+
     // Свободные функции для сериализации SeparateWork
     QJsonObject SerializeSeparateWork(const model::SeparateWork& work) {
         QJsonObject obj;
@@ -104,6 +137,7 @@ namespace serialization {
         }
 
         obj["status_complet"] = SerializeStatusComplet(work.status_complet_);
+        obj["status_actual"] = SerializeStatusActual(work.status_actual_);
 
         return obj;
     }
@@ -126,6 +160,7 @@ namespace serialization {
         }
 
         work.status_complet_ = DeserializeStatusComplet(obj["status_complet"].toObject());
+        work.status_actual_ = DeserializeStatusAntual(obj["status_actual"].toObject());
 
         return work;
     }

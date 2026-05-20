@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QCalendarWidget>
 #include <QCompleter>
+#include <QInputDialog>
 
 AddStage::AddStage(std::shared_ptr<app::App> app,
                    std::optional<std::vector<model::Stage>> &pool_stage, QWidget *parent)
@@ -63,12 +64,13 @@ void AddStage::on_pb_add_work_att_as_clicked() {
     model::Date date_razrab_PIM = {11, 11, 2026};
     model::Date date_att_as = {12, 12, 2026};
     model::Date date_razrab_doc = {1, 2, 2027};
-    model::SeparateWork razrab_PIM {"Разработка ПиМ", {"Пупкин С.С."}, date_razrab_PIM, "По готовности объекта", {false, std::nullopt}};
-    model::SeparateWork att_as {"Аттестация АС", {"Суходрищев В.В."}, date_att_as, std::nullopt, {false, std::nullopt}};
+    model::SeparateWork razrab_PIM {"Разработка ПиМ", {"Пупкин С.С."}, date_razrab_PIM, "По готовности объекта", {false, std::nullopt}, {false, std::nullopt, std::nullopt}};
+    model::SeparateWork att_as {"Аттестация АС", {"Суходрищев В.В."}, date_att_as, std::nullopt, {false, std::nullopt}, {false, std::nullopt, std::nullopt}};
     model::SeparateWork razrab_doc {"Разработка документации после аттестационных испытаний с учетом погрешности, которая появляется в связи с долгой засухой",
                                     {"Суходрищев В.В.", "Пупкин С.С.", "Касторкин А.А."},
                                     date_razrab_doc, "может быть выполним когда-нибудь",
-                                    {false, std::nullopt}};
+                                    {false, std::nullopt},
+                                    {false, std::nullopt, std::nullopt}};
 
     if (!pool_work_.has_value()) {
         pool_work_ = std::vector<model::SeparateWork>{};
@@ -214,7 +216,10 @@ void AddStage::UpdateTableWorkInStage() {
             details::AddSeparateWorkToTable(ui->table_work, work);
             int row = ui->table_work->rowCount() - 1;
             if (work.status_complet_.is_complet_) {
-                SetRowBackgroundColor(row, QColor(144, 238, 144));  //Светло-зеленый, Qt::lightGray - Светло-серый
+                SetRowBackgroundColor(row, QColor(144, 238, 144));  //Светло-зеленый
+            }
+            if (work.status_actual_.is_no_aclual_) {
+                SetRowBackgroundColor(row, Qt::lightGray);  //Светло-серый
             }
         }
     }
@@ -348,8 +353,9 @@ void AddStage::ShowContextMenu(const QPoint &pos) {
     // Создаем и настраиваем меню
     QMenu menu;
     QAction* action_edit = menu.addAction("Редактировать работу");
-    QAction* action_complet = menu.addAction("Изменить статус выполнения");
     QAction* action_delete = menu.addAction("Удалить работу");
+    QAction* action_complet = menu.addAction("Изменить статус выполнения");
+    QAction* action_actual = menu.addAction("Изменить статус актуальности");
 
     // Показываем меню в точке клика. mapToGlobal преобразует локальные координаты в глобальные.
     QAction* selectedAction = menu.exec(ui->table_work->mapToGlobal(pos));
@@ -362,6 +368,9 @@ void AddStage::ShowContextMenu(const QPoint &pos) {
     }
     else if (selectedAction == action_complet) {
         on_ActionComplet(index);
+    }
+    else if (selectedAction == action_actual) {
+        on_ActionActual(index);
     }
     UpdateTableWorkInStage();
 }
@@ -388,6 +397,38 @@ void AddStage::on_ActionComplet(int index) {
     }
     else {
         pool_work_.value()[index].status_complet_ = {false, std::nullopt};
+        pool_work_.value()[index].info_ = std::nullopt;
+    }
+}
+
+void AddStage::on_ActionActual(int index) {
+    if (!(pool_work_.value()[index].status_actual_.is_no_aclual_)) {
+        bool ok;
+        QString text = QInputDialog::getText(
+            nullptr,
+            "Изменение статуса актуальности",
+            "Введите причину изменения статуса актуальности:",
+            QLineEdit::Normal,
+            "",
+            &ok
+            );
+
+        if (ok && !text.isEmpty()) {
+            model::Date date = {QDate::currentDate().day(),
+                                QDate::currentDate().month(),
+                                QDate::currentDate().year()};
+            pool_work_.value()[index].status_actual_ = {true, date, text.toStdString()};
+            QString qstr = QString("Неактуальна\n%1.%2.%3\n%4")
+                               .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
+                               .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
+                               .arg(QDate::currentDate().year(), 4, 10, QChar('0'))
+                               .arg(QString::fromStdString(text.toStdString()));
+            std::string str_info = qstr.toStdString();
+            pool_work_.value()[index].info_ = str_info;
+        }
+    }
+    else {
+        pool_work_.value()[index].status_actual_ = {false, std::nullopt, std::nullopt};
         pool_work_.value()[index].info_ = std::nullopt;
     }
 }

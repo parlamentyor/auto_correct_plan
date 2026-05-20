@@ -68,12 +68,19 @@ namespace model {
         std::optional<Date> date_complet_;
     };
 
+    struct StatusActual {
+        bool is_no_aclual_;
+        std::optional<Date> date_no_aclual_;
+        std::optional<std::string> info_;
+    };
+
     struct SeparateWork {
         std::string name_;
         std::vector<std::string> names_responsible_employees_;
         std::optional<Date> date_deadline_;
         std::optional<std::string> info_;
         StatusComplet status_complet_;
+        StatusActual status_actual_;
 
     };
 

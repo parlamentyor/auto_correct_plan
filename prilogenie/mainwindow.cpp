@@ -70,13 +70,14 @@ void MainWindow::on_pb_add_work_att_as_clicked()
     model::Date date_razrab_PIM = {11, 11, 2026};
     model::Date date_att_as = {12, 12, 2026};
     model::Date date_razrab_doc = {1, 2, 2027};
-    model::SeparateWork razrab_PIM {"Разработка ПиМ", {"Пупкин С.С."}, date_razrab_PIM, "По готовности объекта", {false, std::nullopt}};
-    model::SeparateWork att_as {"Аттестация АС", {"Суходрищев В.В."}, date_att_as, std::nullopt, {false, std::nullopt}};
+    model::SeparateWork razrab_PIM {"Разработка ПиМ", {"Пупкин С.С."}, date_razrab_PIM, "По готовности объекта", {false, std::nullopt}, {false, std::nullopt, std::nullopt}};
+    model::SeparateWork att_as {"Аттестация АС", {"Суходрищев В.В."}, date_att_as, std::nullopt, {false, std::nullopt}, {false, std::nullopt, std::nullopt}};
     model::SeparateWork razrab_doc {"Разработка документации после аттестационных испытаний с учетом погрешности, которая появляется в связи с долгой засухой",
                                     {"Суходрищев В.В.", "Пупкин С.С.", "Касторкин А.А."},
                                     date_razrab_doc,
                                     "может быть выполним когда-нибудь",
-                                    {false, std::nullopt}};
+                                    {false, std::nullopt},
+                                    {false, std::nullopt, std::nullopt}};
 
     if (!pool_work_.has_value()) {
         pool_work_ = std::vector<model::SeparateWork>{};

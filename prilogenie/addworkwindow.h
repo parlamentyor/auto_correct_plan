@@ -39,12 +39,9 @@ private slots:
     void on_pb_add_employee_3_clicked();
     void on_pb_add_employee_4_clicked();
     void on_pb_add_employee_5_clicked();
-
     void on_pb_edit_deadline_data_clicked();
     void on_de_deadline_data_dateChanged(const QDate &date);
-
     void on_cb_with_deadline_data_stateChanged(int arg1);
-
     void on_pb_correct_clicked();
 
 private:

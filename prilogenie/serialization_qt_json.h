@@ -20,6 +20,9 @@ namespace serialization {
     QJsonObject SerializeStatusComplet(const model::StatusComplet& status_complet);
     model::StatusComplet DeserializeStatusComplet(const QJsonObject& obj);
 
+    QJsonObject SerializeStatusActual(const model::StatusActual& status_actual);
+    model::StatusActual DeserializeStatusAntual(const QJsonObject& obj);
+
     QJsonObject SerializeSeparateWork(const model::SeparateWork& work);
     model::SeparateWork DeserializeSeparateWork(const QJsonObject& obj);
 

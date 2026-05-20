@@ -48,6 +48,7 @@ private slots:
     void on_pb_payments_clicked();
     void on_ActionDelete(int index);
     void on_ActionComplet(int index);
+    void on_ActionActual(int index);
 
     void ShowContextMenu(const QPoint& pos);
 
