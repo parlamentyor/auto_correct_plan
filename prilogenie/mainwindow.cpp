@@ -28,6 +28,7 @@ MainWindow::MainWindow(std::shared_ptr<app::App> app, QWidget *parent)
     ui->setupUi(this);
     setWindowTitle("Добавление договора");
     SetCompleter(ui->le_responsible_employee, app_->GetBaseEmployee());
+    SetCompleter(ui->le_name_organization, app_->GetBaseOrganizations());
 
     ui->de_contract_data->setDate(QDate::currentDate());
     ui->de_contract_data->setDisplayFormat("dd.MM.yyyy");
@@ -141,6 +142,7 @@ void MainWindow::on_pb_add_contract_clicked() {
 
     AddWorkInBase();
     AddExpenseInBase();
+    AddOrganizationInBase();
 
     app_->AddContract(std::move(new_contract));
 
@@ -155,6 +157,15 @@ void MainWindow::on_chb_stage_stateChanged(int arg1)
     ui->sb_price_ruble->setEnabled(!arg1);
     ui->sb_price_other_department_kop->setEnabled(!arg1);
     ui->sb_price_other_department_ruble->setEnabled(!arg1);
+
+// Возможно лишняя проверка так как возможность отключить этапность пропадает после добавления этапа
+// Возможно понадобится, когда реализую удаление этапов
+/*
+    if (!arg1 && pool_stage_.has_value()) {
+        pool_stage_ = std::nullopt;
+        UpdateTable();
+    }
+*/
 }
 
 
@@ -180,8 +191,8 @@ void MainWindow::SetTableProperties(QTableWidget* table) {
     table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
-void MainWindow::UpdateTable()
-{
+void MainWindow::UpdateTable() {
+    BuildVirtualRows();
     // Отключаем сигнал временно, чтобы избежать рекурсии
     ui->table_work->blockSignals(true);
     ui->table_work->setRowCount(0);
@@ -189,10 +200,16 @@ void MainWindow::UpdateTable()
     if (pool_stage_.has_value()) {
         for (const auto& stage : pool_stage_.value()) {
             details::AddStageToTable(ui->table_work, stage);
+            if (stage.pool_work_.has_value()) {
+                for (const auto& work : stage.pool_work_.value()) {
+                    details::AddSeparateWorkToTable(ui->table_work, work);
+                }
+            }
         }
     }
 
     if (pool_work_.has_value()) {
+        details::AddHeaderToTable(ui->table_work, "Работы вне этапа");
         for (const auto& work : pool_work_.value()) {
             details::AddSeparateWorkToTable(ui->table_work, work);
         }
@@ -430,6 +447,12 @@ void MainWindow::AddExpenseInBase() {
     }
 }
 
+void MainWindow::AddOrganizationInBase() {
+    if (!(ui->le_name_organization->text().isEmpty())) {
+        app_->AddBaseOrganizations(ui->le_name_organization->text().toStdString());
+    }
+}
+
 void MainWindow::SetCompleter(QLineEdit *le, const std::set<std::string> &base) {
     // 1. Наша база слов для автодополнения le_name
     QStringList base_qsl;
@@ -447,7 +470,6 @@ void MainWindow::SetCompleter(QLineEdit *le, const std::set<std::string> &base) 
     le->setCompleter(completer);
 }
 
-
 void MainWindow::on_pb_expenses_clicked() {
     emit AddExpensesInContract(app_, expenses_);
 }
@@ -455,5 +477,65 @@ void MainWindow::on_pb_expenses_clicked() {
 
 void MainWindow::on_pb_payments_clicked() {
     emit EditPaymentsInContract(payments_);
+}
+
+
+void MainWindow::on_chb_nds_stateChanged(int arg1) {
+    if (arg1) {
+        ui->sb_stavka_nds->setEnabled(true);
+        ui->sb_stavka_nds->setValue(22);
+    }
+    else {
+        ui->sb_stavka_nds->setEnabled(false);
+        ui->sb_stavka_nds->setValue(0);
+    }
+}
+
+
+
+
+MainWindow::ItemInfo MainWindow::GetItemInfo(int virtualRow) const {
+    if (virtualRow >= 0 && virtualRow < static_cast<int>(virtualRows_.size())) {
+        return virtualRows_[virtualRow].info;
+    }
+    //    return {ItemInfo::Type::HeaderRow, -1, -1, -1}; //Возможно и не нужно это
+}
+
+void MainWindow::BuildVirtualRows() const {
+    virtualRows_.clear();
+    int globalRow = 0;
+//    int subCounter = 1; // для нумерации работ без этапов
+
+    // Отображаем этапы
+    if (pool_stage_.has_value()) {
+        const auto& stages = pool_stage_.value();
+        for (size_t stageIdx = 0; stageIdx < stages.size(); ++stageIdx) {
+            // Строка этапа
+            virtualRows_.push_back({{ItemInfo::Type::StageRow,
+                                     static_cast<int>(stageIdx), -1, globalRow++}});
+
+            // Отображаем работы этапа
+            if (stages[stageIdx].pool_work_.has_value()) {
+                const auto& works = stages[stageIdx].pool_work_.value();
+                for (size_t workIdx = 0; workIdx < works.size(); ++workIdx) {
+                    virtualRows_.push_back({{ItemInfo::Type::WorkRow,
+                                             static_cast<int>(stageIdx),
+                                             static_cast<int>(workIdx), globalRow++}});
+                }
+            }
+//            subCounter = stages.size() + 1;
+        }
+    }
+
+    // Отображаем работы контракта (без этапов)
+    if (pool_work_.has_value()) {
+        virtualRows_.push_back({{ItemInfo::Type::WorkRow, -1, -1, globalRow++}});
+        const auto& works = pool_work_.value();
+        for (size_t workIdx = 0; workIdx < works.size(); ++workIdx) {
+            virtualRows_.push_back({{ItemInfo::Type::WorkRow,
+                                     -1,
+                                     static_cast<int>(workIdx), globalRow++}});
+        }
+    }
 }
 

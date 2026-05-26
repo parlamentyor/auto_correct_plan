@@ -33,6 +33,9 @@ namespace app {
         void AddBaseExpenses(const std::string& new_expenses);
         const std::set<std::string>& GetBaseExpenses() const;
 
+        void AddBaseOrganizations(const std::string& new_organization);
+        const std::set<std::string>& GetBaseOrganizations() const;
+
     private:
         std::map<std::string, model::User> users_; // ключ имя; потом перейти на unordered_map; потом поменять на указатель на User; потом подтянуть базу данных с уже созданными users
         model::DocumentPlanMonth doc_plan_month_;
@@ -41,8 +44,9 @@ namespace app {
 
         std::set<std::string> base_works_;
         std::set<std::string> base_employees_;
-        std::set<std::string>::iterator it_base_employees_ = base_employees_.begin();
+        std::set<std::string>::iterator it_base_employees_ = base_employees_.begin(); // проверить, а я его вообще где-то использую???
         std::set<std::string> base_expenses_;
+        std::set<std::string> base_names_organizations_;
     };
 
 

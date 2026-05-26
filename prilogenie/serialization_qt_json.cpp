@@ -592,6 +592,13 @@ namespace serialization {
         }
         root_object["base_expenses"] = base_expenses_array;
 
+        // Сохраняем base_names_organizations_
+        QJsonArray base_names_organizations_array;
+        for (const auto& base_name_organization : app->GetBaseOrganizations()) {
+            base_names_organizations_array.append(QString::fromStdString(base_name_organization));
+        }
+        root_object["base_names_organizations"] = base_names_organizations_array;
+
         QFile file(filename);
         if (!file.open(QIODevice::WriteOnly)) {
             return false;
@@ -670,6 +677,14 @@ namespace serialization {
             }
         }
 
-            return true;
+        // Загружаем base_names_organizations_
+        if (root_object.contains("base_names_organizations")) {
+            QJsonArray base_names_organizations_array = root_object["base_names_organizations"].toArray();
+            for (const auto& item : base_names_organizations_array) {
+                app->AddBaseOrganizations(item.toString().toStdString());
+            }
+        }
+
+        return true;
     }
 }   // namespace serialization

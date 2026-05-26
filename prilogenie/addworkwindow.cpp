@@ -181,11 +181,17 @@ void AddWorkWindow::on_pb_add_work_clicked() {
         return;
     }
 
+    QString qstr = QString("Создана %1.%2.%3\n\n")
+                       .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
+                       .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
+                       .arg(QDate::currentDate().year(), 4, 10, QChar('0'));
+    std::string str_info = qstr.toStdString() + ui->le_info->text().toStdString();
+
     model::SeparateWork new_work{
         .name_ = ui->le_name->text().toStdString(),
         .names_responsible_employees_ = std::move(employees),
         .date_deadline_ = date_,
-        .info_ = ui->le_info->text().toStdString(),
+        .info_ = str_info,
         .status_complet_ = {false, std::nullopt},
         .status_actual_ = {false, std::nullopt, std::nullopt}};
 

@@ -101,7 +101,7 @@ namespace details {
         // Заполняем первый столбец (name_)
 //        table->setItem(rowCount, 0,
 //                       new QTableWidgetItem(QString::fromStdString(stage.name_full_.value_or(""))));
-        QTableWidgetItem* nameItem = new QTableWidgetItem(QString::fromStdString(stage.name_full_.value_or("")));
+        QTableWidgetItem* nameItem = new QTableWidgetItem(QString("Этап %1\n%2").arg(stage.number_).arg(QString::fromStdString(stage.name_full_.value_or(""))));
         nameItem->setFlags(nameItem->flags() | Qt::ItemIsEditable);
         table->setItem(rowCount, 0, nameItem);
 
@@ -132,6 +132,20 @@ namespace details {
         QTableWidgetItem* infoItem = new QTableWidgetItem(QString::fromStdString(stage.info_.value_or("")));
         infoItem->setFlags(infoItem->flags() | Qt::ItemIsEditable);
         table->setItem(rowCount, 4, infoItem);
+
+        SetRowBold(table, rowCount);
+    }
+
+    inline void AddHeaderToTable(QTableWidget* table, std::string name_header) {
+        // Получаем текущее количество строк
+        int rowCount = table->rowCount();
+
+        // Добавляем новую строку
+        table->insertRow(rowCount);
+
+        QTableWidgetItem* nameItem = new QTableWidgetItem(QString::fromStdString(name_header));
+        nameItem->setFlags(nameItem->flags() | Qt::ItemIsEditable);
+        table->setItem(rowCount, 0, nameItem);
 
         SetRowBold(table, rowCount);
     }

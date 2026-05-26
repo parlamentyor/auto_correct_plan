@@ -51,6 +51,8 @@ private slots:
     void on_pb_expenses_clicked();
     void on_pb_payments_clicked();
 
+    void on_chb_nds_stateChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
     std::shared_ptr<app::App> app_;
@@ -66,6 +68,29 @@ private:
     void UpdateDate(std::optional<model::Date>& date, QDateEdit *de);
     void AddWorkInBase();
     void AddExpenseInBase();
+    void AddOrganizationInBase();
     void SetCompleter(QLineEdit *le, const std::set<std::string>& base);
+
+
+
+    // Получить оригинальные данные по виртуальному индексу
+    struct ItemInfo {
+        enum class Type { HeaderRow, StageRow, WorkRow };
+        Type type;
+        int stageIndex;
+        int workIndex;
+        int virtualRow;
+    };
+
+    ItemInfo GetItemInfo(int virtualRow) const;
+
+    // Структура для хранения информации о виртуальных строках
+    struct VirtualRow {
+        ItemInfo info;
+    };
+
+    mutable std::vector<VirtualRow> virtualRows_;
+    void BuildVirtualRows() const;
+
 };
 #endif // MAINWINDOW_H

@@ -76,4 +76,12 @@ const std::set<std::string> &app::App::GetBaseExpenses() const {
     return base_expenses_;
 }
 
+void app::App::AddBaseOrganizations(const std::string &new_organization) {
+    base_names_organizations_.insert(new_organization);
+}
+
+const std::set<std::string> &app::App::GetBaseOrganizations() const {
+    return base_names_organizations_;
+}
+
 
