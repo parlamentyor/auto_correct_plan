@@ -66,9 +66,16 @@ private:
     void SetTableProperties(QTableWidget* table);
     void UpdateTable();
     void UpdateDate(std::optional<model::Date>& date, QDateEdit *de);
+
+    model::Price MakePriceContract() const;
+    model::Price MakePriceOtherDepartmentContract() const;
+    void UpdatePrice();
+    void UpdatePriceOtherDepartment();
+
     void AddWorkInBase();
     void AddExpenseInBase();
     void AddOrganizationInBase();
+
     void SetCompleter(QLineEdit *le, const std::set<std::string>& base);
 
 

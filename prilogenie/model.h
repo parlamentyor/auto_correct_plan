@@ -17,9 +17,34 @@ namespace model {
     };
 
     struct Price {
+        Price& operator+=(const Price& other_price);
         int ruble_;
         int kop_;
+// НА БУДУЩЕЕ ЗАПИЛИТЬ КОСТРУКТОР И НОРМАЛИЗАЦИЮ С УЧЁТОМ ТОГО, ЧТО КОПЕЕК БОЛЬШЕ 100 НЕ БЫВАЕТ
+/*
+        // Конструктор для удобства
+        Price(int ruble = 0, int kop = 0) : ruble_(ruble), kop_(kop) {
+            normalize();
+        }
+
+    private:
+        // Вспомогательный метод для нормализации (100 коп = 1 руб)
+        void normalize() {
+            if (kop_ >= 100 || kop_ < 0) {
+                int total_kop = ruble_ * 100 + kop_;
+                ruble_ = total_kop / 100;
+                kop_ = total_kop % 100;
+                // Обработка отрицательных значений
+                if (kop_ < 0) {
+                    kop_ += 100;
+                    ruble_ -= 1;
+                }
+            }
+        }
+*/
     };
+
+    Price operator+(const Price& lhs, const Price& rhs);
 
     // Подрядчик
     struct Contractor {
@@ -231,7 +256,7 @@ namespace model {
         std::optional<Date> date_;
 //        std::unordered_map<int, std::string> id_number_; //на будущее для осуществления быстрого поиска
 //        std::unordered_map<std::string, int> number_id; //на будущее для осуществления быстрого поиска
-        std::optional<std::string> name_organization_; // подумать (протестировать) как будет работать с русским алфавитом
+        std::optional<std::string> name_organization_;
         std::optional<std::string> name_short_;
         std::optional<std::string> name_full_;
         std::optional<Date> date_deadline_;

@@ -107,6 +107,9 @@ void MainWindow::on_pb_add_contract_clicked() {
         type = model::TypeContract::BEK;
     }
 
+    model::Price price = MakePriceContract();
+    model::Price price_other_department = MakePriceOtherDepartmentContract();
+
     model::Contract new_contract {
         ui->le_number->text().toStdString(),
         contract_date_,
@@ -115,8 +118,8 @@ void MainWindow::on_pb_add_contract_clicked() {
         ui->le_name_full->text().toStdString(),
         deadline_date_,
         ui->le_responsible_employee->text().toStdString(),
-        {ui->sb_price_ruble->value(), ui->sb_price_kop->value()},
-        {ui->sb_price_other_department_ruble->value(), ui->sb_price_other_department_kop->value()},
+        price,
+        price_other_department,
         ui->chb_nds->isChecked(),
         ui->sb_stavka_nds->value(),
         type,
@@ -218,6 +221,9 @@ void MainWindow::UpdateTable() {
     SetTableProperties(ui->table_work);
     // Включаем сигналы обратно, чтобы изменения в таблице сразу заносились в работы/этапы
     ui->table_work->blockSignals(false);
+
+    UpdatePrice();
+    UpdatePriceOtherDepartment();
 }
 
 void MainWindow::on_pb_add_work_clicked() {
@@ -411,6 +417,46 @@ void MainWindow::UpdateDate(std::optional<model::Date>& date, QDateEdit *de) {
     dialog->deleteLater();
 }
 
+model::Price MainWindow::MakePriceContract() const {
+    model::Price price {0,0};
+    if (pool_stage_.has_value()) {
+        for (const auto& stage : pool_stage_.value()) {
+            price += stage.price_;
+        }
+    }
+    else {
+        price.kop_ = ui->sb_price_kop->value();
+        price.ruble_ = ui->sb_price_ruble->value();
+    }
+    return price;
+}
+
+model::Price MainWindow::MakePriceOtherDepartmentContract() const {
+    model::Price price {0,0};
+    if (pool_stage_.has_value()) {
+        for (const auto& stage : pool_stage_.value()) {
+            price += stage.price_other_department_;
+        }
+    }
+    else {
+        price.kop_ = ui->sb_price_other_department_kop->value();
+        price.ruble_ = ui->sb_price_other_department_ruble->value();
+    }
+    return price;
+}
+
+void MainWindow::UpdatePrice() {
+    model::Price price = MakePriceContract();
+    ui->sb_price_kop->setValue(price.kop_);
+    ui->sb_price_ruble->setValue(price.ruble_);
+}
+
+void MainWindow::UpdatePriceOtherDepartment() {
+    model::Price price = MakePriceOtherDepartmentContract();
+    ui->sb_price_other_department_kop->setValue(price.kop_);
+    ui->sb_price_other_department_ruble->setValue(price.ruble_);
+}
+
 void MainWindow::AddWorkInBase() {
     if (pool_stage_.has_value()) {
         for (const auto& stage : pool_stage_.value()) {
@@ -471,12 +517,22 @@ void MainWindow::SetCompleter(QLineEdit *le, const std::set<std::string> &base) 
 }
 
 void MainWindow::on_pb_expenses_clicked() {
-    emit AddExpensesInContract(app_, expenses_);
+    if (ui->chb_stage->isChecked()) {
+        QMessageBox::warning(this, "Ошибка", "В договоре есть этапы!\nДобавляйте затраты в соответствующих этапах выполнения работы.");
+    }
+    else {
+        emit AddExpensesInContract(app_, expenses_);
+    }
 }
 
 
 void MainWindow::on_pb_payments_clicked() {
-    emit EditPaymentsInContract(payments_);
+    if (ui->chb_stage->isChecked()) {
+        QMessageBox::warning(this, "Ошибка", "В договоре есть этапы!\nДобавляйте оплаты в соответствующих этапах выполнения работы.");
+    }
+    else {
+        emit EditPaymentsInContract(payments_);
+    }
 }
 
 

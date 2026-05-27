@@ -20,3 +20,22 @@ bool model::DocumentImpl::HasValuePath() const
 {
     return path_.has_value();
 }
+
+
+model::Price& model::Price::operator+=(const Price &other_price) {
+    ruble_ += other_price.ruble_;
+    kop_ += other_price.kop_;
+
+    // Простая нормализация
+    if (kop_ >= 100) {
+        ruble_ += kop_ / 100;
+        kop_ %= 100;
+    }
+    return *this;
+}
+
+model::Price model::operator+(const Price &lhs, const Price &rhs) {
+    model::Price result = lhs;
+    result += rhs;
+    return result;
+}
