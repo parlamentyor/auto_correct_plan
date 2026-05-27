@@ -97,7 +97,7 @@ bool ContractModel::markContractAsCompleted(int contractIndex) {
         return false;
     }
 
-    contracts_[contractIndex].is_complet_ = true;
+    contracts_[contractIndex].status_complet_.is_complet_ = true;
 
     // Обновляем все строки, связанные с этим контрактом
     for (int row = 0; row < static_cast<int>(virtualRows_.size()); ++row) {
@@ -116,7 +116,7 @@ bool ContractModel::isContractCompleted(int contractIndex) const {
     if (contractIndex < 0 || contractIndex >= static_cast<int>(contracts_.size())) {
         return false;
     }
-    return contracts_[contractIndex].is_complet_;
+    return contracts_[contractIndex].status_complet_.is_complet_;
 }
 
 QVariant ContractModel::headerData(int section, Qt::Orientation orientation, int role) const {

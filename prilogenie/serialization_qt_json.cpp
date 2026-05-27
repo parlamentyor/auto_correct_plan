@@ -237,7 +237,8 @@ namespace serialization {
             obj["info"] = QString::fromStdString(stage.info_.value());
         }
 
-        obj["is_complet"] = stage.is_complet_;
+        obj["status_complet"] = SerializeStatusComplet(stage.status_complet_);
+        obj["status_actual"] = SerializeStatusActual(stage.status_actual_);
         obj["is_paid"] = stage.is_paid_;
 
         if (stage.payments_.has_value()) {
@@ -310,7 +311,8 @@ namespace serialization {
             stage.info_ = obj["info"].toString().toStdString();
         }
 
-        stage.is_complet_ = obj["is_complet"].toBool();
+        stage.status_complet_ = DeserializeStatusComplet(obj["status_complet"].toObject());
+        stage.status_actual_ = DeserializeStatusAntual(obj["status_actual"].toObject());
         stage.is_paid_ = obj["is_paid"].toBool();
 
         if (obj.contains("payments") && !obj["payments"].isNull()) {
@@ -405,7 +407,8 @@ namespace serialization {
             obj["pool_stage"] = pool_stage;
         }
 
-        obj["is_complet"] = contract.is_complet_;
+        obj["status_complet"] = SerializeStatusComplet(contract.status_complet_);
+        obj["status_actual"] = SerializeStatusActual(contract.status_actual_);
         obj["is_paid"] = contract.is_paid_;
 
         if (contract.payments_.has_value()) {
@@ -500,7 +503,8 @@ namespace serialization {
             }
         }
 
-        contract.is_complet_ = obj["is_complet"].toBool();
+        contract.status_complet_ = DeserializeStatusComplet(obj["status_complet"].toObject());
+        contract.status_actual_ = DeserializeStatusAntual(obj["status_actual"].toObject());
         contract.is_paid_ = obj["is_paid"].toBool();
 
         if (obj.contains("payments") && !obj["payments"].isNull()) {

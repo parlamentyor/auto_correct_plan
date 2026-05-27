@@ -46,14 +46,14 @@ namespace model {
 
     Price operator+(const Price& lhs, const Price& rhs);
 
-    // Подрядчик
+    // Подрядчик   -----  пока не использую
     struct Contractor {
         int id_;
         std::string name_;
         static int id_counter_;
     };
 
-    // Заказчик
+    // Заказчик   -----  пока не использую
     struct Customer {
         int id_;
         std::string name_;
@@ -135,7 +135,8 @@ namespace model {
 //        TypeContract type_;
         std::optional<std::vector<SeparateWork>> pool_work_;
         std::optional<std::string> info_;
-        bool is_complet_;
+        StatusComplet status_complet_;
+        StatusActual status_actual_;
         bool is_paid_;
         std::optional<std::vector<Payment>> payments_;
         std::optional<std::vector<Expenses>> expenses_;
@@ -165,7 +166,8 @@ namespace model {
             std::optional<std::vector<SeparateWork>> pool_work,
             std::optional<std::string> info,
             std::optional<std::vector<Stage>> pool_stage,
-            bool is_complet,
+            StatusComplet status_complet,
+            StatusActual status_actual,
             bool is_paid,
             std::optional<std::vector<Payment>> payments,
             std::optional<std::vector<Expenses>> expenses,
@@ -187,7 +189,8 @@ namespace model {
             , pool_work(std::move(pool_work))
             , info_(std::move(info))
             , pool_stage_(std::move(pool_stage))
-            , is_complet_(is_complet)
+            , status_complet_(std::move(status_complet))
+            , status_actual_(std::move(status_actual))
             , is_paid_(is_paid)
             , payments_(std::move(payments))
             , expenses_(std::move(expenses))
@@ -213,7 +216,8 @@ namespace model {
             , id_(other.id_)
             , info_(std::move(other.info_))
             , pool_stage_(std::move(other.pool_stage_))
-            , is_complet_(other.is_complet_)
+            , status_complet_(std::move(other.status_complet_))
+            , status_actual_(std::move(other.status_actual_))
             , is_paid_(other.is_paid_)
             , payments_(std::move(other.payments_))
             , expenses_(std::move(other.expenses_))
@@ -239,7 +243,8 @@ namespace model {
                 id_ = other.id_;
                 info_ = std::move(other.info_);
                 pool_stage_ = std::move(other.pool_stage_);
-                is_complet_ = other.is_complet_;
+                status_complet_ = std::move(other.status_complet_);
+                status_actual_ = std::move(other.status_actual_);
                 is_paid_ = other.is_paid_;
                 payments_ = std::move(other.payments_);
                 expenses_ = std::move(other.expenses_);
@@ -272,7 +277,8 @@ namespace model {
         std::optional<std::string> info_;
 
         std::optional<std::vector<Stage>> pool_stage_;
-        bool is_complet_;
+        StatusComplet status_complet_;
+        StatusActual status_actual_;
         bool is_paid_;
         std::optional<std::vector<Payment>> payments_;
         std::optional<std::vector<Expenses>> expenses_;
