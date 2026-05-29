@@ -6,6 +6,8 @@
 
 #include <QJsonObject>
 
+#include <memory>
+
 namespace serialization {
 
     QJsonObject SerializeDate(const model::Date& date);
@@ -35,8 +37,8 @@ namespace serialization {
     QJsonObject SerializeStage(const model::Stage& stage);
     model::Stage DeserializeStage(const QJsonObject& obj);
 
-    QJsonObject DerializeContract(const model::Contract& contract);
-    model::Contract DeserializeContract(const QJsonObject& obj);
+    QJsonObject DerializeContract(const std::shared_ptr<model::Contract>& contract);
+    std::shared_ptr<model::Contract> DeserializeContract(const QJsonObject& obj);
 
     QJsonObject SerializeUser(const model::User& user);
     model::User DeserializeUser(const QJsonObject& obj);

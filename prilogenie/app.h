@@ -4,6 +4,7 @@
 #include"model.h"
 
 #include <map>
+#include <memory>
 #include <set>
 
 namespace app {
@@ -16,8 +17,9 @@ namespace app {
         const std::string& GetActivUserName() const;
         void AddUser(const std::string& login, const std::string& pass);
         const std::map<std::string, model::User>& GetUsers() const;
-        void AddContract(model::Contract&& contract);
-        const std::vector<model::Contract>& GetContracts() const;
+
+        void AddContract(std::shared_ptr<model::Contract>);
+        const std::vector<std::shared_ptr<model::Contract>>& GetContracts() const;
 
         void SetPathPlanMonth(const std::string& s_path);
         std::string GetPathPlanMonth() const;
@@ -40,7 +42,7 @@ namespace app {
         std::map<std::string, model::User> users_; // ключ имя; потом перейти на unordered_map; потом поменять на указатель на User; потом подтянуть базу данных с уже созданными users
         model::DocumentPlanMonth doc_plan_month_;
         std::string active_user_name_;
-        std::vector<model::Contract> contracts_;
+        std::vector<std::shared_ptr<model::Contract>> contracts_;
 
         std::set<std::string> base_works_;
         std::set<std::string> base_employees_;

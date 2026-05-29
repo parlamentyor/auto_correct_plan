@@ -12,6 +12,7 @@
 #include <windows.h>
 #include <string>
 #include <filesystem>
+#include <memory>
 
 /*
 // Создаем папку "save", если ее нет, и создаём путь к файлу
@@ -301,7 +302,7 @@ inline void SetRepeteMainRow(QAxObject* table) {
 }
 
 // Функция создания таблицы
-inline void CraeteTable(QAxObject* selection, QAxObject* document, const std::vector<model::Contract>& contracts) {
+inline void CraeteTable(QAxObject* selection, QAxObject* document, const std::vector<std::shared_ptr<model::Contract>>& contracts) {
     // Явно получаем Range-объект из Selection
     // Это самый надежный способ получить "место" для вставки
     QAxObject* range = selection->querySubObject("Range");
@@ -355,7 +356,7 @@ inline void CraeteTable(QAxObject* selection, QAxObject* document, const std::ve
     }
 }
 
-inline void CreateDocxWithWord(const std::vector<model::Contract>& contracts) {
+inline void CreateDocxWithWord(const std::vector<std::shared_ptr<model::Contract>>& contracts) {
 
     QString doc_path_qstr = QString::fromStdString(details::CreatePathDokument("save", "month_plan.docx"));
 

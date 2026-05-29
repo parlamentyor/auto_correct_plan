@@ -4,7 +4,7 @@
 #include <QBrush>
 #include <QDebug>
 
-ContractModel::ContractModel(std::vector<model::Contract>& contracts, QObject* parent)
+ContractModel::ContractModel(std::vector<std::shared_ptr<model::Contract>>& contracts, QObject* parent)
     : QAbstractTableModel(parent)
     , contracts_(contracts) {
     buildVirtualRows();
@@ -34,8 +34,8 @@ void ContractModel::buildVirtualRows() const {
         int subCounter = 1; // для нумерации работ без этапов
 
         // Отображаем этапы
-        if (contract.pool_stage_.has_value()) {
-            const auto& stages = contract.pool_stage_.value();
+        if (contract->pool_stage_.has_value()) {
+            const auto& stages = contract->pool_stage_.value();
             for (size_t stageIdx = 0; stageIdx < stages.size(); ++stageIdx) {
                 // Строка этапа
                 virtualRows_.push_back({{ItemInfo::Type::StageRow,
@@ -57,8 +57,8 @@ void ContractModel::buildVirtualRows() const {
         }
 
         // Отображаем работы контракта (без этапов)
-        if (contract.pool_work.has_value()) {
-            const auto& works = contract.pool_work.value();
+        if (contract->pool_work.has_value()) {
+            const auto& works = contract->pool_work.value();
             for (size_t workIdx = 0; workIdx < works.size(); ++workIdx) {
                 virtualRows_.push_back({{ItemInfo::Type::WorkRow,
                                          static_cast<int>(contractIdx),
@@ -97,7 +97,7 @@ bool ContractModel::markContractAsCompleted(int contractIndex) {
         return false;
     }
 
-    contracts_[contractIndex].status_complet_.is_complet_ = true;
+    contracts_[contractIndex]->status_complet_.is_complet_ = true;
 
     // Обновляем все строки, связанные с этим контрактом
     for (int row = 0; row < static_cast<int>(virtualRows_.size()); ++row) {
@@ -116,7 +116,7 @@ bool ContractModel::isContractCompleted(int contractIndex) const {
     if (contractIndex < 0 || contractIndex >= static_cast<int>(contracts_.size())) {
         return false;
     }
-    return contracts_[contractIndex].status_complet_.is_complet_;
+    return contracts_[contractIndex]->status_complet_.is_complet_;
 }
 
 QVariant ContractModel::headerData(int section, Qt::Orientation orientation, int role) const {
@@ -192,9 +192,9 @@ QVariant ContractModel::getContractHeaderData(const ItemInfo& info, int column, 
     switch (role) {
     case Qt::DisplayRole: {
         QString headerText;
-        if (contract.name_organization_.has_value() && contract.name_short_.has_value()) {
-            headerText = QString::fromStdString(contract.name_organization_.value() +
-                                                " (" + contract.name_short_.value() + ")");
+        if (contract->name_organization_.has_value() && contract->name_short_.has_value()) {
+            headerText = QString::fromStdString(contract->name_organization_.value() +
+                                                " (" + contract->name_short_.value() + ")");
         }
         return headerText;
     }
@@ -230,27 +230,27 @@ QVariant ContractModel::getContractRowData(const ItemInfo& info, int column, int
     if (role == Qt::DisplayRole) {
         switch (column) {
         case 0: return QString::number(info.contractIndex + 1);
-        case 1: return contract.name_full_.has_value() ?
-                       QString::fromStdString(contract.name_full_.value()) : "";
+        case 1: return contract->name_full_.has_value() ?
+                       QString::fromStdString(contract->name_full_.value()) : "";
         case 2: {
-            if (contract.number_.has_value() && contract.date_.has_value()) {
+            if (contract->number_.has_value() && contract->date_.has_value()) {
                 return QString("Договор № %1 от %2")
-                    .arg(QString::fromStdString(contract.number_.value()))
-                    .arg(formatDate(contract.date_.value()));
+                    .arg(QString::fromStdString(contract->number_.value()))
+                    .arg(formatDate(contract->date_.value()));
             }
             return "";
         }
         case 3: {
-            if (contract.date_deadline_.has_value()) {
-                return formatDate(contract.date_deadline_.value());
+            if (contract->date_deadline_.has_value()) {
+                return formatDate(contract->date_deadline_.value());
             }
             return "";
         }
-        case 4: return contract.name_responsible_employee_.has_value() ?
-                       QString::fromStdString(contract.name_responsible_employee_.value()) : "";
+        case 4: return contract->name_responsible_employee_.has_value() ?
+                       QString::fromStdString(contract->name_responsible_employee_.value()) : "";
         case 5: return ""; // Срок исполнения для контракта не указан
-        case 6: return contract.info_.has_value() ?
-                       QString::fromStdString(contract.info_.value()) : "";
+        case 6: return contract->info_.has_value() ?
+                       QString::fromStdString(contract->info_.value()) : "";
         default: return QVariant();
         }
     }
@@ -271,9 +271,9 @@ QVariant ContractModel::getContractRowData(const ItemInfo& info, int column, int
 
 QVariant ContractModel::getStageRowData(const ItemInfo& info, int column, int role) const {
     const auto& contract = contracts_[info.contractIndex];
-    if (!contract.pool_stage_.has_value()) return QVariant();
+    if (!contract->pool_stage_.has_value()) return QVariant();
 
-    const auto& stages = contract.pool_stage_.value();
+    const auto& stages = contract->pool_stage_.value();
     if (info.stageIndex >= static_cast<int>(stages.size())) return QVariant();
 
     const auto& stage = stages[info.stageIndex];
@@ -320,8 +320,8 @@ QVariant ContractModel::getWorkRowData(const ItemInfo& info, int column, int rol
     QString prefix;
 
     // Определяем, откуда брать работу (из этапа или из контракта)
-    if (info.stageIndex >= 0 && contract.pool_stage_.has_value()) {
-        const auto& stages = contract.pool_stage_.value();
+    if (info.stageIndex >= 0 && contract->pool_stage_.has_value()) {
+        const auto& stages = contract->pool_stage_.value();
         if (info.stageIndex < static_cast<int>(stages.size()) &&
             stages[info.stageIndex].pool_work_.has_value()) {
             const auto& works = stages[info.stageIndex].pool_work_.value();
@@ -333,14 +333,14 @@ QVariant ContractModel::getWorkRowData(const ItemInfo& info, int column, int rol
                              .arg(info.workIndex + 1);
             }
         }
-    } else if (contract.pool_work.has_value()) {
-        const auto& works = contract.pool_work.value();
+    } else if (contract->pool_work.has_value()) {
+        const auto& works = contract->pool_work.value();
         if (info.workIndex < static_cast<int>(works.size())) {
             work = &works[info.workIndex];
 
             // Вычисляем номер для работы контракта
-            int stageCount = contract.pool_stage_.has_value() ?
-                                 contract.pool_stage_.value().size() : 0;
+            int stageCount = contract->pool_stage_.has_value() ?
+                                 contract->pool_stage_.value().size() : 0;
             prefix = QString("%1.%2")
                          .arg(info.contractIndex + 1)
                          .arg(stageCount + info.workIndex + 1);

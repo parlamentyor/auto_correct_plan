@@ -153,7 +153,7 @@ void WorkWindow::AddMainTable() {
 */
 
 // по новому
-    auto& contracts = const_cast<std::vector<model::Contract>&>(app_->GetContracts()); // нужно переделать и просто добавить в app_ метод выдачи неконстантной ссылки
+    auto& contracts = const_cast<std::vector<std::shared_ptr<model::Contract>>&>(app_->GetContracts()); // нужно переделать и просто добавить в app_ метод выдачи неконстантной ссылки
 
     // Создаем модель и представление
     model_ = new ContractModel(contracts, this);
@@ -230,7 +230,7 @@ void WorkWindow::onTableViewCustomContextMenuRequested(const QPoint& pos) {
     const auto& contracts = app_->GetContracts();
     if (currentContextMenuRow_ >= 0 &&
         currentContextMenuRow_ < static_cast<int>(contracts.size()) &&
-        contracts[currentContextMenuRow_].status_complet_.is_complet_) {
+        contracts[currentContextMenuRow_]->status_complet_.is_complet_) {
             completeAction->setEnabled(false);
             completeAction->setText("Уже выполнен");
     }

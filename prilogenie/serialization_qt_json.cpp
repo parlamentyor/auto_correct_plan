@@ -87,7 +87,7 @@ namespace serialization {
 
     QJsonObject SerializeStatusActual(const model::StatusActual &status_actual) {
         QJsonObject obj;
-        obj["is_no_actual"] = status_actual.is_no_aclual_;
+        obj["is_no_actual"] = status_actual.is_no_actual_;
 
         if (status_actual.date_no_aclual_.has_value()) {
             obj["date_no_actual"] = SerializeDate(status_actual.date_no_aclual_.value());
@@ -103,7 +103,7 @@ namespace serialization {
 
     model::StatusActual DeserializeStatusAntual(const QJsonObject &obj) {
         model::StatusActual status_actual;
-        status_actual.is_no_aclual_ = obj["is_no_actual"].toBool();
+        status_actual.is_no_actual_ = obj["is_no_actual"].toBool();
 
         if (obj.contains("date_no_actual") && !obj["date_no_actual"].isNull()) {
             status_actual.date_no_aclual_ = DeserializeDate(obj["date_no_actual_"].toObject());
@@ -343,191 +343,191 @@ namespace serialization {
     }
 
     // Свободные функции для сериализации Contract
-    QJsonObject SerializeContract(const model::Contract& contract) {
+    QJsonObject SerializeContract(const std::shared_ptr<model::Contract>& contract) {
         QJsonObject obj;
 
         // optional поля
-        if (contract.number_.has_value()) {
-            obj["number"] = QString::fromStdString(contract.number_.value());
+        if (contract->number_.has_value()) {
+            obj["number"] = QString::fromStdString(contract->number_.value());
         }
 
-        if (contract.date_.has_value()) {
-            obj["date"] = SerializeDate(contract.date_.value());
+        if (contract->date_.has_value()) {
+            obj["date"] = SerializeDate(contract->date_.value());
         }
 
 
-        if (contract.name_organization_.has_value()) {
-            obj["name_organization"] = QString::fromStdString(contract.name_organization_.value());
+        if (contract->name_organization_.has_value()) {
+            obj["name_organization"] = QString::fromStdString(contract->name_organization_.value());
         }
 
-        if (contract.name_short_.has_value()) {
-            obj["name_short"] = QString::fromStdString(contract.name_short_.value());
+        if (contract->name_short_.has_value()) {
+            obj["name_short"] = QString::fromStdString(contract->name_short_.value());
         }
 
-        if (contract.name_full_.has_value()) {
-            obj["name_full"] = QString::fromStdString(contract.name_full_.value());
+        if (contract->name_full_.has_value()) {
+            obj["name_full"] = QString::fromStdString(contract->name_full_.value());
         }
 
-        if (contract.date_deadline_.has_value()) {
-            obj["date_deadline"] = SerializeDate(contract.date_deadline_.value());
+        if (contract->date_deadline_.has_value()) {
+            obj["date_deadline"] = SerializeDate(contract->date_deadline_.value());
         }
 
-        if (contract.name_responsible_employee_.has_value()) {
-            obj["name_responsible_employee"] = QString::fromStdString(contract.name_responsible_employee_.value());
+        if (contract->name_responsible_employee_.has_value()) {
+            obj["name_responsible_employee"] = QString::fromStdString(contract->name_responsible_employee_.value());
         }
 
-        obj["price"] = SerializePrice(contract.price_);
-        obj["price_other_department"] = SerializePrice(contract.price_other_department_);
-        obj["with_nds"] = contract.with_nds_;
-        obj["stavka_nds"] = contract.stavka_nds_;
-        obj["type"] = SerializeTypeContract(contract.type_);
-        obj["with_stage"] = contract.with_stage_;
+        obj["price"] = SerializePrice(contract->price_);
+        obj["price_other_department"] = SerializePrice(contract->price_other_department_);
+        obj["with_nds"] = contract->with_nds_;
+        obj["stavka_nds"] = contract->stavka_nds_;
+        obj["type"] = SerializeTypeContract(contract->type_);
+        obj["with_stage"] = contract->with_stage_;
 
         // Сохраняем вектор SeparateWork
-        if (contract.pool_work.has_value()) {
+        if (contract->pool_work.has_value()) {
             QJsonArray pool_array;
-            for (const auto& work : contract.pool_work.value()) {
+            for (const auto& work : contract->pool_work.value()) {
                 pool_array.append(SerializeSeparateWork(work));
             }
             obj["pool_work"] = pool_array;
         }
 
         // вот тут есть вопросики - у меня static int id_counter_, которая ++ при создании объекта......подумать как себя будет вести при серриализации
-        obj["id"] = contract.id_;
-        if (contract.info_.has_value()) {
-            obj["info"] = QString::fromStdString(contract.info_.value());
+        obj["id"] = contract->id_;
+        if (contract->info_.has_value()) {
+            obj["info"] = QString::fromStdString(contract->info_.value());
         }
 
-        if (contract.pool_stage_.has_value()) {
+        if (contract->pool_stage_.has_value()) {
             QJsonArray pool_stage;
-            for (const auto& stage : contract.pool_stage_.value()) {
+            for (const auto& stage : contract->pool_stage_.value()) {
                 pool_stage.append(SerializeStage(stage));
             }
 
             obj["pool_stage"] = pool_stage;
         }
 
-        obj["status_complet"] = SerializeStatusComplet(contract.status_complet_);
-        obj["status_actual"] = SerializeStatusActual(contract.status_actual_);
-        obj["is_paid"] = contract.is_paid_;
+        obj["status_complet"] = SerializeStatusComplet(contract->status_complet_);
+        obj["status_actual"] = SerializeStatusActual(contract->status_actual_);
+        obj["is_paid"] = contract->is_paid_;
 
-        if (contract.payments_.has_value()) {
+        if (contract->payments_.has_value()) {
             QJsonArray payments;
-            for (const auto& payment : contract.payments_.value()) {
+            for (const auto& payment : contract->payments_.value()) {
                 payments.append(SerializePayment(payment));
             }
 
             obj["payments"] = payments;
         }
 
-        if (contract.expenses_.has_value()) {
+        if (contract->expenses_.has_value()) {
             QJsonArray expenses;
-            for (const auto& expens : contract.expenses_.value()) {
+            for (const auto& expens : contract->expenses_.value()) {
                 expenses.append(SerializeExpenses(expens));
             }
 
             obj["expenses"] = expenses;
         }
-        if (contract.status_payment_.has_value()) {
-            obj["status_payment"] = QString::fromStdString(contract.status_payment_.value());
+        if (contract->status_payment_.has_value()) {
+            obj["status_payment"] = QString::fromStdString(contract->status_payment_.value());
         }
 
         return obj;
     }
 
-    model::Contract DeserializeContract(const QJsonObject& obj) {
-        model::Contract contract;
+    std::shared_ptr<model::Contract> DeserializeContract(const QJsonObject& obj) {
+        std::shared_ptr<model::Contract> contract = std::make_shared<model::Contract>();
 
         if (obj.contains("number") && !obj["number"].isNull()) {
-            contract.number_ = obj["number"].toString().toStdString();
+            contract->number_ = obj["number"].toString().toStdString();
         }
 
         if (obj.contains("date") && !obj["date"].isNull()) {
-            contract.date_ = DeserializeDate(obj["date"].toObject());
+            contract->date_ = DeserializeDate(obj["date"].toObject());
         }
 
         if (obj.contains("name_organization") && !obj["name_organization"].isNull()) {
-            contract.name_organization_ = obj["name_organization"].toString().toStdString();
+            contract->name_organization_ = obj["name_organization"].toString().toStdString();
         }
 
         if (obj.contains("name_short") && !obj["name_short"].isNull()) {
-            contract.name_short_ = obj["name_short"].toString().toStdString();
+            contract->name_short_ = obj["name_short"].toString().toStdString();
         }
 
         if (obj.contains("name_full") && !obj["name_full"].isNull()) {
-            contract.name_full_ = obj["name_full"].toString().toStdString();
+            contract->name_full_ = obj["name_full"].toString().toStdString();
         }
 
         if (obj.contains("date_deadline") && !obj["date_deadline"].isNull()) {
-            contract.date_deadline_ = DeserializeDate(obj["date_deadline"].toObject());
+            contract->date_deadline_ = DeserializeDate(obj["date_deadline"].toObject());
         }
 
         if (obj.contains("name_responsible_employee") && !obj["name_responsible_employee"].isNull()) {
-            contract.name_responsible_employee_ = obj["name_responsible_employee"].toString().toStdString();
+            contract->name_responsible_employee_ = obj["name_responsible_employee"].toString().toStdString();
         }
 
-        contract.price_ = DeserializePrice(obj["price"].toObject());
-        contract.price_other_department_ = DeserializePrice(obj["price_other_department"].toObject());
-        contract.with_nds_ = obj["with_nds"].toBool();
-        contract.stavka_nds_ = obj["stavka_nds"].toInt();
-        contract.type_ = DeserializeTypeContract(obj["type"].toString());
-        contract.with_stage_ = obj["with_stage"].toBool();
+        contract->price_ = DeserializePrice(obj["price"].toObject());
+        contract->price_other_department_ = DeserializePrice(obj["price_other_department"].toObject());
+        contract->with_nds_ = obj["with_nds"].toBool();
+        contract->stavka_nds_ = obj["stavka_nds"].toInt();
+        contract->type_ = DeserializeTypeContract(obj["type"].toString());
+        contract->with_stage_ = obj["with_stage"].toBool();
 
         if (obj.contains("pool_work") && !obj["pool_work"].isNull()) {
             QJsonArray pool_array = obj["pool_work"].toArray();
-            if (!contract.pool_work.has_value()) {
-                contract.pool_work = std::vector<model::SeparateWork>{};
+            if (!contract->pool_work.has_value()) {
+                contract->pool_work = std::vector<model::SeparateWork>{};
             }
             for (const auto& item : pool_array) {
-                contract.pool_work.value().push_back(DeserializeSeparateWork(item.toObject()));
+                contract->pool_work.value().push_back(DeserializeSeparateWork(item.toObject()));
             }
         }
 
-        contract.id_ = obj["id"].toInt();
+        contract->id_ = obj["id"].toInt();
 
         // Обновляем статический счетчик (придется сделать дружественную функцию или публичный метод)
         // Временное решение - через указатель на статическую переменную
         // Лучше добавить публичный статический метод в Contract, но это потребует изменения класса
 
         if (obj.contains("info") && !obj["info"].isNull()) {
-            contract.info_ = obj["info"].toString().toStdString();
+            contract->info_ = obj["info"].toString().toStdString();
         }
 
         if (obj.contains("pool_stage") && !obj["pool_stage"].isNull()) {
             QJsonArray pool_stage = obj["pool_stage"].toArray();
-            if (!contract.pool_stage_.has_value()) {
-                contract.pool_stage_ = std::vector<model::Stage>{};
+            if (!contract->pool_stage_.has_value()) {
+                contract->pool_stage_ = std::vector<model::Stage>{};
             }
             for (const auto& item : pool_stage) {
-                contract.pool_stage_.value().push_back(DeserializeStage(item.toObject()));
+                contract->pool_stage_.value().push_back(DeserializeStage(item.toObject()));
             }
         }
 
-        contract.status_complet_ = DeserializeStatusComplet(obj["status_complet"].toObject());
-        contract.status_actual_ = DeserializeStatusAntual(obj["status_actual"].toObject());
-        contract.is_paid_ = obj["is_paid"].toBool();
+        contract->status_complet_ = DeserializeStatusComplet(obj["status_complet"].toObject());
+        contract->status_actual_ = DeserializeStatusAntual(obj["status_actual"].toObject());
+        contract->is_paid_ = obj["is_paid"].toBool();
 
         if (obj.contains("payments") && !obj["payments"].isNull()) {
             QJsonArray payments = obj["payments"].toArray();
-            if (!contract.payments_.has_value()) {
-                contract.payments_ = std::vector<model::Payment>{};
+            if (!contract->payments_.has_value()) {
+                contract->payments_ = std::vector<model::Payment>{};
             }
             for (const auto& item : payments) {
-                contract.payments_.value().push_back(DeserializePayment(item.toObject()));
+                contract->payments_.value().push_back(DeserializePayment(item.toObject()));
             }
         }
 
         if (obj.contains("expenses") && !obj["expenses"].isNull()) {
             QJsonArray expenses = obj["expenses"].toArray();
-            if (!contract.expenses_.has_value()) {
-                contract.expenses_ = std::vector<model::Expenses>{};
+            if (!contract->expenses_.has_value()) {
+                contract->expenses_ = std::vector<model::Expenses>{};
             }
             for (const auto& item : expenses) {
-                contract.expenses_.value().push_back(DeserializeExpenses(item.toObject()));
+                contract->expenses_.value().push_back(DeserializeExpenses(item.toObject()));
             }
         }
         if (obj.contains("status_payment") && !obj["status_payment"].isNull()) {
-            contract.status_payment_ = obj["status_payment"].toString().toStdString();
+            contract->status_payment_ = obj["status_payment"].toString().toStdString();
         }
 
         return contract;

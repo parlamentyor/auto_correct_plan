@@ -10,7 +10,7 @@ class ContractModel : public QAbstractTableModel {
     Q_OBJECT
 
 public:
-    explicit ContractModel(std::vector<model::Contract>& contracts, QObject* parent = nullptr);
+    explicit ContractModel(std::vector<std::shared_ptr<model::Contract>>& contracts, QObject* parent = nullptr);
 
     // Базовые методы модели
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -42,7 +42,7 @@ public:
     void refreshModel();
 
 private:
-    std::vector<model::Contract>& contracts_;
+    std::vector<std::shared_ptr<model::Contract>>& contracts_;
 
     // Структура для хранения информации о виртуальных строках
     struct VirtualRow {

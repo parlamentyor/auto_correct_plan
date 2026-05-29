@@ -27,11 +27,11 @@ const std::map<std::string, model::User> &app::App::GetUsers() const {
     return users_;
 }
 
-void app::App::AddContract(model::Contract&& contract) {
-    contracts_.push_back(std::move(contract));
+void app::App::AddContract(std::shared_ptr<model::Contract> contract) {
+    contracts_.push_back(contract);
 }
 
-const std::vector<model::Contract> &app::App::GetContracts() const {
+const std::vector<std::shared_ptr<model::Contract>>& app::App::GetContracts() const {
     return contracts_;
 }
 

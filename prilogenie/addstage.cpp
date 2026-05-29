@@ -19,9 +19,11 @@ AddStage::AddStage(std::shared_ptr<app::App> app,
              QDate::currentDate().year()})
     , app_(app)
     , expenses_(std::nullopt)
-    , payments_(std::nullopt) {
+    , payments_(std::nullopt)
+    , index_(-1) {
     ui->setupUi(this);
     setWindowTitle("Добавление этапа");
+    ui->pb_correct->setVisible(false);
     SetCompleter(ui->le_responsible_employee, app_->GetBaseEmployee());
 
     ui->de_deadline_data->setDate(QDate::currentDate());
@@ -50,7 +52,59 @@ AddStage::AddStage(std::shared_ptr<app::App> app,
     connect(ui->table_work, &QTableWidget::customContextMenuRequested,
             this, &AddStage::ShowContextMenu);
 }
+/*
+AddStage::AddStage(std::shared_ptr<app::App> app,
+                   std::optional<std::vector<model::Stage> > &pool_stage,
+                   int index,
+                   QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::AddStage)
+    , pool_stage_(pool_stage)
+    , pool_work_(pool_stage.value()[])
+    , date_({QDate::currentDate().day(),
+             QDate::currentDate().month(),
+             QDate::currentDate().year()})
+    , app_(app)
+    , expenses_(std::nullopt)
+    , payments_(std::nullopt) {
+    ui->setupUi(this);
+    setWindowTitle("Добавление этапа");
+    ui->pb_correct->setVisible(false);
+    SetCompleter(ui->le_responsible_employee, app_->GetBaseEmployee());
 
+    ui->de_deadline_data->setDate(QDate::currentDate());
+    ui->de_deadline_data->setDisplayFormat("dd.MM.yyyy");
+    connect(ui->de_deadline_data, &QDateEdit::dateChanged,
+            this, &AddStage::on_de_deadline_data_dateChanged);
+
+    // Подключаем сигнал изменения ячейки таблицы
+    connect(ui->table_work, &QTableWidget::cellChanged,
+            this, &AddStage::on_table_work_cellChanged);
+
+    SetTableProperties(ui->table_work);
+
+
+    pool_work_ =
+
+
+
+
+    if (!pool_stage_.has_value()) {
+        ui->le_number->setText("1");
+    }
+    else {
+        ui->le_number->setText(QString::number(pool_stage_.value().size() + 1));
+    }
+
+    // Для контекстного меню
+    // 1. Включаем политику, разрешающую генерацию сигнала при запросе контекстного меню
+    ui->table_work->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    // 2. Подключаем сигнал к нашему слоту
+    connect(ui->table_work, &QTableWidget::customContextMenuRequested,
+            this, &AddStage::ShowContextMenu);
+}
+*/
 AddStage::~AddStage()
 {
     delete ui;
@@ -220,7 +274,7 @@ void AddStage::UpdateTableWorkInStage() {
             if (work.status_complet_.is_complet_) {
                 SetRowBackgroundColor(row, QColor(144, 238, 144));  //Светло-зеленый
             }
-            if (work.status_actual_.is_no_aclual_) {
+            if (work.status_actual_.is_no_actual_) {
                 SetRowBackgroundColor(row, Qt::lightGray);  //Светло-серый
             }
         }
@@ -365,7 +419,7 @@ void AddStage::ShowContextMenu(const QPoint &pos) {
         action_actual->setEnabled(false);
     }
 
-    if (pool_work_.value()[index].status_actual_.is_no_aclual_) {
+    if (pool_work_.value()[index].status_actual_.is_no_actual_) {
         action_edit->setEnabled(false);
         action_delete->setEnabled(false);
         action_complet->setEnabled(false);
@@ -421,7 +475,7 @@ void AddStage::on_ActionComplet(int index) {
 }
 
 void AddStage::on_ActionActual(int index) {
-    if (!(pool_work_.value()[index].status_actual_.is_no_aclual_)) {
+    if (!(pool_work_.value()[index].status_actual_.is_no_actual_)) {
         bool ok;
         QString text = QInputDialog::getText(
             nullptr,

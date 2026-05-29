@@ -20,7 +20,12 @@ class AddStage : public QMainWindow
 
 public:
     explicit AddStage(std::shared_ptr<app::App> app,
-                      std::optional<std::vector<model::Stage>> &pool_stage, QWidget *parent = nullptr);
+                      std::optional<std::vector<model::Stage>> &pool_stage,
+                      QWidget *parent = nullptr);
+    explicit AddStage(std::shared_ptr<app::App> app,
+                      std::optional<std::vector<model::Stage>> &pool_stage,
+                      int index,
+                      QWidget *parent = nullptr);
     ~AddStage();
 
 signals:
@@ -60,6 +65,7 @@ private:
     std::shared_ptr<app::App> app_;
     std::optional<std::vector<model::Expenses>> expenses_;
     std::optional<std::vector<model::Payment>> payments_;
+    int index_;
 
     void SetTableProperties(QTableWidget* table);
     void UpdateTableWorkInStage();

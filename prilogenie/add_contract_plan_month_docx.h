@@ -16,7 +16,7 @@
 
 class WordDocxEditor {
 public:
-    static bool updateContractDocx(const QString& filePath, const model::Contract& contract) {
+    static bool updateContractDocx(const QString& filePath, const std::shared_ptr<model::Contract>& contract) {
         QAxObject* word = nullptr;
         QAxObject* documents = nullptr;
         QAxObject* document = nullptr;
@@ -108,7 +108,7 @@ public:
     }
 
 
-    static void modifyThirdTable(QAxObject* table, const model::Contract& contract) {
+    static void modifyThirdTable(QAxObject* table, const std::shared_ptr<model::Contract>& contract) {
         // Получаем объект Rows
         QAxObject* rows = table->querySubObject("Rows");
         if (!rows || rows->isNull()) {
@@ -122,7 +122,7 @@ public:
         LOG("Текущее количество строк в таблице: ", rowCount);
 
         // Добавляем новые строки в конец таблицы
-        int newRowsCount = contract.pool_work.value().size() + 2;
+        int newRowsCount = contract->pool_work.value().size() + 2;
         LOG("Добавляем строк: ", newRowsCount);
 
             for (int i = 0; i < newRowsCount; ++i) {
@@ -144,8 +144,8 @@ public:
         fillSecondRow(table, contract, startRow + 1, rowCount);
 
         // 3. Строки для pool_work
-        for (int i = 0; i < contract.pool_work.value().size(); ++i) {
-            fillWorkRow(table, contract.pool_work.value()[i],
+        for (int i = 0; i < contract->pool_work.value().size(); ++i) {
+            fillWorkRow(table, contract->pool_work.value()[i],
                         startRow + 2 + i, i + 1);
         }
 
@@ -153,7 +153,7 @@ public:
     }
 
 private:
-    static void fillFirstRow(QAxObject* table, const model::Contract& contract, int row) {
+    static void fillFirstRow(QAxObject* table, const std::shared_ptr<model::Contract>& contract, int row) {
         LOG("Заполняем первую строку (объединенную): ", row);
 
         // Получаем ячейки для объединения
@@ -182,8 +182,8 @@ private:
 //        shadingCell->setProperty("Texture", 0); // wdTextureNone - сплошная заливка
 
         // Формируем текст
-        QString text = QString::fromStdString(contract.name_organization_.value_or("")) +
-                       " (" + QString::fromStdString(contract.name_short_.value_or("")) + ")";
+        QString text = QString::fromStdString(contract->name_organization_.value_or("")) +
+                       " (" + QString::fromStdString(contract->name_short_.value_or("")) + ")";
         LOG("Сформированный текст для вставки в объеденённую ячейку: ", text.toStdString());
 
         // Устанавливаем текст
@@ -201,7 +201,7 @@ private:
         delete endCell;
     }
 
-    static void fillSecondRow(QAxObject* table, const model::Contract& contract, int row, int totalRows) {
+    static void fillSecondRow(QAxObject* table, const std::shared_ptr<model::Contract>& contract, int row, int totalRows) {
         LOG("Заполняем вторую строку (основные данные): ", row);
 
         // Заполняем каждую ячейку
@@ -224,34 +224,34 @@ private:
 
             switch (col) {
             case 1: // Номер
-                text = QString::number(totalRows - contract.pool_work.value().size() - 1);
+                text = QString::number(totalRows - contract->pool_work.value().size() - 1);
                 alignment = 0; // left
                 break;
 
             case 2: // name_full_
-                text = QString::fromStdString(contract.name_full_.value_or(""));
+                text = QString::fromStdString(contract->name_full_.value_or(""));
                 alignment = 0; // left
                 break;
 
             case 3: // Договор
                 text = QString("Договор № %1 от %2")
-                           .arg(QString::fromStdString(contract.number_.value_or("")))
-                           .arg(details::FormatDate(contract.date_.value()));
+                           .arg(QString::fromStdString(contract->number_.value_or("")))
+                           .arg(details::FormatDate(contract->date_.value()));
                 alignment = 1; // center
                 break;
 
             case 4: // date_deadline_
-                text = details::FormatDate(contract.date_deadline_.value());
+                text = details::FormatDate(contract->date_deadline_.value());
                 alignment = 1; // center
                 break;
 
             case 5: // name_responsible_employee_
-                text = QString::fromStdString(contract.name_responsible_employee_.value_or(""));
+                text = QString::fromStdString(contract->name_responsible_employee_.value_or(""));
                 alignment = 1; // center
                 break;
 
             case 7: // info_
-                text = QString::fromStdString(contract.info_.value_or(""));
+                text = QString::fromStdString(contract->info_.value_or(""));
                 alignment = 1; // center
                 break;
 
@@ -402,7 +402,7 @@ private:
 };
 
 // Основная функция для вызова
-inline bool updateContractDocument(const QString& filePath, const model::Contract& contract) {
+inline bool updateContractDocument(const QString& filePath, const std::shared_ptr<model::Contract>& contract) {
     return WordDocxEditor::updateContractDocx(filePath, contract);
 }
 

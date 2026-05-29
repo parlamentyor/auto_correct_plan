@@ -89,12 +89,12 @@ namespace model {
     };
 
     struct StatusComplet {
-        bool is_complet_;
+        bool is_complet_ = false;
         std::optional<Date> date_complet_;
     };
 
     struct StatusActual {
-        bool is_no_aclual_;
+        bool is_no_actual_ = false;
         std::optional<Date> date_no_aclual_;
         std::optional<std::string> info_;
     };

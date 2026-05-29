@@ -268,7 +268,7 @@
       <item>
        <widget class="QLabel" name="lb_status_payment">
         <property name="text">
-         <string>Состояние оплаты</string>
+         <string>Условия оплаты</string>
         </property>
        </widget>
       </item>
@@ -359,6 +359,13 @@
        <widget class="QPushButton" name="pb_add_stage">
         <property name="text">
          <string>Добавить этап</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pb_correct">
+        <property name="text">
+         <string>Внести изменения</string>
         </property>
        </widget>
       </item>

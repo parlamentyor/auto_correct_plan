@@ -135,8 +135,10 @@ void MainWindow::on_pb_add_contract_clicked() {
         ui->le_status_payment->text().toStdString()
     };
 
+    auto new_contract_ptr = std::make_shared<model::Contract>(std::move(new_contract));
+
     if (app_->HasValuePathPlanMonth()) {
-        if (updateContractDocument(QString::fromStdString(app_->GetPathPlanMonth()), new_contract)) {
+        if (updateContractDocument(QString::fromStdString(app_->GetPathPlanMonth()), new_contract_ptr)) {
             qDebug() << "Документ успешно обновлен!";
         }
         else {
@@ -148,7 +150,7 @@ void MainWindow::on_pb_add_contract_clicked() {
     AddExpenseInBase();
     AddOrganizationInBase();
 
-    app_->AddContract(std::move(new_contract));
+    app_->AddContract(new_contract_ptr);
 
     QMessageBox::information(this, "Добавление договора", "Договор добавлен!");
 }
