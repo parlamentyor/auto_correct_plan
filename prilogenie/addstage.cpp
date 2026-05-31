@@ -9,7 +9,8 @@
 #include <QInputDialog>
 
 AddStage::AddStage(std::shared_ptr<app::App> app,
-                   std::optional<std::vector<model::Stage>> &pool_stage, QWidget *parent)
+                   std::optional<std::vector<model::Stage>>& pool_stage,
+                   QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::AddStage)
     , pool_stage_(pool_stage)

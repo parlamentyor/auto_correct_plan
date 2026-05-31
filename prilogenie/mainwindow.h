@@ -17,7 +17,8 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(std::shared_ptr<app::App> app, QWidget *parent = nullptr);
+    MainWindow(std::shared_ptr<app::App> app,
+               QWidget *parent = nullptr);
     ~MainWindow();
 
 signals:
@@ -56,13 +57,13 @@ private slots:
 private:
     Ui::MainWindow *ui;
     std::shared_ptr<app::App> app_;
-    std::optional<std::vector<model::SeparateWork>> pool_work_;
-    std::optional<std::vector<model::Stage>> pool_stage_;
+    std::shared_ptr<model::Contract> contract_;
+//    std::optional<std::vector<model::SeparateWork>> pool_work_;
+//    std::optional<std::vector<model::Stage>> pool_stage_;
     std::optional<model::Date> contract_date_;
     std::optional<model::Date> deadline_date_;
-    std::optional<std::vector<model::Expenses>> expenses_;
-    std::optional<std::vector<model::Payment>> payments_;
-
+//    std::optional<std::vector<model::Expenses>> expenses_;
+//    std::optional<std::vector<model::Payment>> payments_;
     void SetTableProperties(QTableWidget* table);
     void UpdateTable();
     void UpdateDate(std::optional<model::Date>& date, QDateEdit *de);

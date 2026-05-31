@@ -15,18 +15,21 @@ MainWindow::MainWindow(std::shared_ptr<app::App> app, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , app_(app)
-    , pool_work_(std::nullopt)
-    , pool_stage_(std::nullopt)
+    , contract_(std::make_shared<model::Contract>())
+//    , pool_work_(std::nullopt)
+//    , pool_stage_(std::nullopt)
     , contract_date_({QDate::currentDate().day(),
-             QDate::currentDate().month(),
-             QDate::currentDate().year()})
+                      QDate::currentDate().month(),
+                      QDate::currentDate().year()})
     , deadline_date_({QDate::currentDate().day(),
-             QDate::currentDate().month(),
-             QDate::currentDate().year()})
-    , expenses_(std::nullopt)
-    , payments_(std::nullopt) {
+                      QDate::currentDate().month(),
+                      QDate::currentDate().year()})
+//    , expenses_(std::nullopt)
+//    , payments_(std::nullopt)
+    {
     ui->setupUi(this);
     setWindowTitle("Добавление договора");
+
     SetCompleter(ui->le_responsible_employee, app_->GetBaseEmployee());
     SetCompleter(ui->le_name_organization, app_->GetBaseOrganizations());
 
@@ -80,12 +83,12 @@ void MainWindow::on_pb_add_work_att_as_clicked()
                                     {false, std::nullopt},
                                     {false, std::nullopt, std::nullopt}};
 
-    if (!pool_work_.has_value()) {
-        pool_work_ = std::vector<model::SeparateWork>{};
+    if (!(contract_->pool_work.has_value())) {
+        contract_->pool_work = std::vector<model::SeparateWork>{};
     }
-    pool_work_.value().push_back(razrab_PIM);
-    pool_work_.value().push_back(att_as);
-    pool_work_.value().push_back(razrab_doc);
+    contract_->pool_work.value().push_back(razrab_PIM);
+    contract_->pool_work.value().push_back(att_as);
+    contract_->pool_work.value().push_back(razrab_doc);
 
     UpdateTable();
 }
@@ -109,7 +112,7 @@ void MainWindow::on_pb_add_contract_clicked() {
 
     model::Price price = MakePriceContract();
     model::Price price_other_department = MakePriceOtherDepartmentContract();
-
+/*
     model::Contract new_contract {
         ui->le_number->text().toStdString(),
         contract_date_,
@@ -136,9 +139,28 @@ void MainWindow::on_pb_add_contract_clicked() {
     };
 
     auto new_contract_ptr = std::make_shared<model::Contract>(std::move(new_contract));
+*/
+    contract_->number_ = ui->le_number->text().toStdString();
+    contract_->date_ = contract_date_;
+    contract_->name_organization_ = ui->le_name_organization->text().toStdString();
+    contract_->name_short_ = ui->le_name_short->text().toStdString();
+    contract_->name_full_ = ui->le_name_full->text().toStdString();
+    contract_->date_deadline_ = deadline_date_;
+    contract_->name_responsible_employee_ = ui->le_responsible_employee->text().toStdString();
+    contract_->price_ = price;
+    contract_->price_other_department_ = price_other_department;
+    contract_->with_nds_ = ui->chb_nds->isChecked();
+    contract_->stavka_nds_ = ui->sb_stavka_nds->value();
+    contract_->type_ = type;
+    contract_->with_stage_ = ui->chb_stage->isChecked();
+    contract_->info_ = ui->le_info->text().toStdString();
+    contract_->status_complet_ = {false, std::nullopt};
+    contract_->status_actual_ = {false, std::nullopt, std::nullopt};
+    contract_->is_paid_ = false;
+    contract_->status_payment_ = ui->le_status_payment->text().toStdString();
 
     if (app_->HasValuePathPlanMonth()) {
-        if (updateContractDocument(QString::fromStdString(app_->GetPathPlanMonth()), new_contract_ptr)) {
+        if (updateContractDocument(QString::fromStdString(app_->GetPathPlanMonth()), contract_)) {
             qDebug() << "Документ успешно обновлен!";
         }
         else {
@@ -150,7 +172,7 @@ void MainWindow::on_pb_add_contract_clicked() {
     AddExpenseInBase();
     AddOrganizationInBase();
 
-    app_->AddContract(new_contract_ptr);
+    app_->AddContract(contract_);
 
     QMessageBox::information(this, "Добавление договора", "Договор добавлен!");
 }
@@ -179,7 +201,7 @@ void MainWindow::on_pb_add_stage_clicked()
 {
     ui->chb_stage->setEnabled(false);
 
-    emit AddStageInContract(pool_stage_);
+    emit AddStageInContract(contract_->pool_stage_);
 }
 
 void MainWindow::SetTableProperties(QTableWidget* table) {
@@ -203,8 +225,8 @@ void MainWindow::UpdateTable() {
     ui->table_work->blockSignals(true);
     ui->table_work->setRowCount(0);
 
-    if (pool_stage_.has_value()) {
-        for (const auto& stage : pool_stage_.value()) {
+    if (contract_->pool_stage_.has_value()) {
+        for (const auto& stage : contract_->pool_stage_.value()) {
             details::AddStageToTable(ui->table_work, stage);
             if (stage.pool_work_.has_value()) {
                 for (const auto& work : stage.pool_work_.value()) {
@@ -214,9 +236,9 @@ void MainWindow::UpdateTable() {
         }
     }
 
-    if (pool_work_.has_value()) {
+    if (contract_->pool_work.has_value()) {
         details::AddHeaderToTable(ui->table_work, "Работы вне этапа");
-        for (const auto& work : pool_work_.value()) {
+        for (const auto& work : contract_->pool_work.value()) {
             details::AddSeparateWorkToTable(ui->table_work, work);
         }
     }
@@ -230,7 +252,7 @@ void MainWindow::UpdateTable() {
 }
 
 void MainWindow::on_pb_add_work_clicked() {
-    emit AddWorkInContract(app_, pool_work_);
+    emit AddWorkInContract(app_, contract_->pool_work);
 }
 
 void MainWindow::on_table_work_cellChanged(int row, int column) {
@@ -238,13 +260,13 @@ void MainWindow::on_table_work_cellChanged(int row, int column) {
     ui->table_work->blockSignals(true);
 
     // Проверяем, что pool_work_ инициализирован и row в пределах
-    if (!pool_work_.has_value() || row >= static_cast<int>(pool_work_->size())) {
+    if (!contract_->pool_work.has_value() || row >= static_cast<int>(contract_->pool_work->size())) {
         ui->table_work->blockSignals(false);
         return;
     }
 
     // Получаем текущий элемент
-    model::SeparateWork& work = (*pool_work_)[row];
+    model::SeparateWork& work = (contract_->pool_work.value())[row];
     QTableWidgetItem* item = ui->table_work->item(row, column);
 
     if (!item) {
@@ -422,8 +444,8 @@ void MainWindow::UpdateDate(std::optional<model::Date>& date, QDateEdit *de) {
 
 model::Price MainWindow::MakePriceContract() const {
     model::Price price {0,0};
-    if (pool_stage_.has_value()) {
-        for (const auto& stage : pool_stage_.value()) {
+    if (contract_->pool_stage_.has_value()) {
+        for (const auto& stage : contract_->pool_stage_.value()) {
             price += stage.price_;
         }
     }
@@ -436,8 +458,8 @@ model::Price MainWindow::MakePriceContract() const {
 
 model::Price MainWindow::MakePriceOtherDepartmentContract() const {
     model::Price price {0,0};
-    if (pool_stage_.has_value()) {
-        for (const auto& stage : pool_stage_.value()) {
+    if (contract_->pool_stage_.has_value()) {
+        for (const auto& stage : contract_->pool_stage_.value()) {
             price += stage.price_other_department_;
         }
     }
@@ -461,8 +483,8 @@ void MainWindow::UpdatePriceOtherDepartment() {
 }
 
 void MainWindow::AddWorkInBase() {
-    if (pool_stage_.has_value()) {
-        for (const auto& stage : pool_stage_.value()) {
+    if (contract_->pool_stage_.has_value()) {
+        for (const auto& stage : contract_->pool_stage_.value()) {
             if (stage.pool_work_.has_value()) {
                 for (const auto& work : stage.pool_work_.value()) {
                     app_->AddBaseWork(work.name_);
@@ -471,16 +493,16 @@ void MainWindow::AddWorkInBase() {
         }
     }
 
-    if (pool_work_.has_value()) {
-        for (const auto& work : pool_work_.value()) {
+    if (contract_->pool_work.has_value()) {
+        for (const auto& work : contract_->pool_work.value()) {
             app_->AddBaseWork(work.name_);
         }
     }
 }
 
 void MainWindow::AddExpenseInBase() {
-    if (pool_stage_.has_value()) {
-        for (const auto& stage : pool_stage_.value()) {
+    if (contract_->pool_stage_.has_value()) {
+        for (const auto& stage : contract_->pool_stage_.value()) {
             if (stage.expenses_.has_value()) {
                 for (const auto& expense : stage.expenses_.value()) {
                     app_->AddBaseExpenses(expense.name_);
@@ -489,8 +511,8 @@ void MainWindow::AddExpenseInBase() {
         }
     }
 
-    if (expenses_.has_value()) {
-        for (const auto& expense : expenses_.value()) {
+    if (contract_->expenses_.has_value()) {
+        for (const auto& expense : contract_->expenses_.value()) {
             app_->AddBaseExpenses(expense.name_);
         }
     }
@@ -524,7 +546,7 @@ void MainWindow::on_pb_expenses_clicked() {
         QMessageBox::warning(this, "Ошибка", "В договоре есть этапы!\nДобавляйте затраты в соответствующих этапах выполнения работы.");
     }
     else {
-        emit AddExpensesInContract(app_, expenses_);
+        emit AddExpensesInContract(app_, contract_->expenses_);
     }
 }
 
@@ -534,7 +556,7 @@ void MainWindow::on_pb_payments_clicked() {
         QMessageBox::warning(this, "Ошибка", "В договоре есть этапы!\nДобавляйте оплаты в соответствующих этапах выполнения работы.");
     }
     else {
-        emit EditPaymentsInContract(payments_);
+        emit EditPaymentsInContract(contract_->payments_);
     }
 }
 
@@ -566,8 +588,8 @@ void MainWindow::BuildVirtualRows() const {
 //    int subCounter = 1; // для нумерации работ без этапов
 
     // Отображаем этапы
-    if (pool_stage_.has_value()) {
-        const auto& stages = pool_stage_.value();
+    if (contract_->pool_stage_.has_value()) {
+        const auto& stages = contract_->pool_stage_.value();
         for (size_t stageIdx = 0; stageIdx < stages.size(); ++stageIdx) {
             // Строка этапа
             virtualRows_.push_back({{ItemInfo::Type::StageRow,
@@ -587,9 +609,9 @@ void MainWindow::BuildVirtualRows() const {
     }
 
     // Отображаем работы контракта (без этапов)
-    if (pool_work_.has_value()) {
+    if (contract_->pool_work.has_value()) {
         virtualRows_.push_back({{ItemInfo::Type::WorkRow, -1, -1, globalRow++}});
-        const auto& works = pool_work_.value();
+        const auto& works = contract_->pool_work.value();
         for (size_t workIdx = 0; workIdx < works.size(); ++workIdx) {
             virtualRows_.push_back({{ItemInfo::Type::WorkRow,
                                      -1,
