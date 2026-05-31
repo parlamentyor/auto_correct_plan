@@ -43,8 +43,8 @@ void ContractModel::buildVirtualRows() const {
                                          static_cast<int>(stageIdx), -1, globalRow++}});
 
                 // Отображаем работы этапа
-                if (stages[stageIdx].pool_work_.has_value()) {
-                    const auto& works = stages[stageIdx].pool_work_.value();
+                if (stages[stageIdx]->pool_work_.has_value()) {
+                    const auto& works = stages[stageIdx]->pool_work_.value();
                     for (size_t workIdx = 0; workIdx < works.size(); ++workIdx) {
                         virtualRows_.push_back({{ItemInfo::Type::WorkRow,
                                                  static_cast<int>(contractIdx),
@@ -287,14 +287,14 @@ QVariant ContractModel::getStageRowData(const ItemInfo& info, int column, int ro
     if (role == Qt::DisplayRole) {
         switch (column) {
         case 0: return QString("%1.%2").arg(info.contractIndex + 1).arg(info.stageIndex + 1);
-        case 1: return stage.name_full_.has_value() ?
-                       QString("Этап №%1 %2").arg(stage.number_).arg(QString::fromStdString(stage.name_full_.value())) : "";
-        case 3: return stage.date_deadline_.has_value() ?
-                       formatDate(stage.date_deadline_.value()) : "";
-        case 4: return stage.name_responsible_employee_.has_value() ?
-                       QString::fromStdString(stage.name_responsible_employee_.value()) : "";
-        case 6: return stage.info_.has_value() ?
-                       QString::fromStdString(stage.info_.value()) : "";
+        case 1: return stage->name_full_.has_value() ?
+                       QString("Этап №%1 %2").arg(stage->number_).arg(QString::fromStdString(stage->name_full_.value())) : "";
+        case 3: return stage->date_deadline_.has_value() ?
+                       formatDate(stage->date_deadline_.value()) : "";
+        case 4: return stage->name_responsible_employee_.has_value() ?
+                       QString::fromStdString(stage->name_responsible_employee_.value()) : "";
+        case 6: return stage->info_.has_value() ?
+                       QString::fromStdString(stage->info_.value()) : "";
         default: return QVariant();
         }
     }
@@ -323,8 +323,8 @@ QVariant ContractModel::getWorkRowData(const ItemInfo& info, int column, int rol
     if (info.stageIndex >= 0 && contract->pool_stage_.has_value()) {
         const auto& stages = contract->pool_stage_.value();
         if (info.stageIndex < static_cast<int>(stages.size()) &&
-            stages[info.stageIndex].pool_work_.has_value()) {
-            const auto& works = stages[info.stageIndex].pool_work_.value();
+            stages[info.stageIndex]->pool_work_.has_value()) {
+            const auto& works = stages[info.stageIndex]->pool_work_.value();
             if (info.workIndex < static_cast<int>(works.size())) {
                 work = &works[info.workIndex];
                 prefix = QString("%1.%2.%3")

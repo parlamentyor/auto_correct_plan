@@ -29,7 +29,7 @@ private slots:
     void onAddWorkInStage(std::optional<std::vector<model::SeparateWork>>& pool_work);
     void onUpdateTableWorkInStage();
     void onAppAboutToQuit();
-    void onAddStageInContract(std::optional<std::vector<model::Stage>>& pool_stage);
+    void onAddStageInContract(std::optional<std::vector<std::shared_ptr<model::Stage>>>& pool_stage);
     void onUpdateTable();
     void onAddExpensesInContract(std::shared_ptr<app::App> app,
                                  std::optional<std::vector<model::Expenses>>& expenses);

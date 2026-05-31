@@ -266,10 +266,10 @@ namespace serialization {
         return obj;
     }
 
-    model::Stage DeserializeStage(const QJsonObject &obj) {
-        model::Stage stage;
+    std::shared_ptr<model::Stage> DeserializeStage(const QJsonObject &obj) {
+        std::shared_ptr<model::Stage> stage = std::make_shared<model::Stage>();
 
-        stage.number_ = obj["number"].toInt();
+        stage->number_ = obj["number"].toInt();
 /*
         if (obj.contains("name_organization") && !obj["name_organization"].isNull()) {
             stage.name_organization_ = obj["name_organization"].toString().toStdString();
@@ -280,63 +280,63 @@ namespace serialization {
         }
 */
         if (obj.contains("name_full") && !obj["name_full"].isNull()) {
-            stage.name_full_ = obj["name_full"].toString().toStdString();
+            stage->name_full_ = obj["name_full"].toString().toStdString();
         }
 
         if (obj.contains("date_deadline") && !obj["date_deadline"].isNull()) {
-            stage.date_deadline_ = DeserializeDate(obj["date_deadline"].toObject());
+            stage->date_deadline_ = DeserializeDate(obj["date_deadline"].toObject());
         }
 
         if (obj.contains("name_responsible_employee") && !obj["name_responsible_employee"].isNull()) {
-            stage.name_responsible_employee_ = obj["name_responsible_employee"].toString().toStdString();
+            stage->name_responsible_employee_ = obj["name_responsible_employee"].toString().toStdString();
         }
 
-        stage.price_ = DeserializePrice(obj["price"].toObject());
-        stage.price_other_department_ = DeserializePrice(obj["price_other_department"].toObject());
+        stage->price_ = DeserializePrice(obj["price"].toObject());
+        stage->price_other_department_ = DeserializePrice(obj["price_other_department"].toObject());
 //        stage.with_nds_ = obj["with_nds"].toBool();
 //        stage.stavka_nds_ = obj["stavka_nds"].toInt();
 //        stage.type_ = DeserializeTypeContract(obj["type"].toString());
 
         if (obj.contains("pool_work") && !obj["pool_work"].isNull()) {
             QJsonArray pool_array = obj["pool_work"].toArray();
-            if (!stage.pool_work_.has_value()) {
-                stage.pool_work_ = std::vector<model::SeparateWork>{};
+            if (!stage->pool_work_.has_value()) {
+                stage->pool_work_ = std::vector<model::SeparateWork>{};
             }
             for (const auto& item : pool_array) {
-                stage.pool_work_.value().push_back(DeserializeSeparateWork(item.toObject()));
+                stage->pool_work_.value().push_back(DeserializeSeparateWork(item.toObject()));
             }
         }
 
         if (obj.contains("info") && !obj["info"].isNull()) {
-            stage.info_ = obj["info"].toString().toStdString();
+            stage->info_ = obj["info"].toString().toStdString();
         }
 
-        stage.status_complet_ = DeserializeStatusComplet(obj["status_complet"].toObject());
-        stage.status_actual_ = DeserializeStatusAntual(obj["status_actual"].toObject());
-        stage.is_paid_ = obj["is_paid"].toBool();
+        stage->status_complet_ = DeserializeStatusComplet(obj["status_complet"].toObject());
+        stage->status_actual_ = DeserializeStatusAntual(obj["status_actual"].toObject());
+        stage->is_paid_ = obj["is_paid"].toBool();
 
         if (obj.contains("payments") && !obj["payments"].isNull()) {
             QJsonArray payments = obj["payments"].toArray();
-            if (!stage.payments_.has_value()) {
-                stage.payments_ = std::vector<model::Payment>{};
+            if (!stage->payments_.has_value()) {
+                stage->payments_ = std::vector<model::Payment>{};
             }
             for (const auto& item : payments) {
-                stage.payments_.value().push_back(DeserializePayment(item.toObject()));
+                stage->payments_.value().push_back(DeserializePayment(item.toObject()));
             }
         }
 
         if (obj.contains("expenses") && !obj["expenses"].isNull()) {
             QJsonArray expenses = obj["expenses"].toArray();
-            if (!stage.expenses_.has_value()) {
-                stage.expenses_ = std::vector<model::Expenses>{};
+            if (!stage->expenses_.has_value()) {
+                stage->expenses_ = std::vector<model::Expenses>{};
             }
             for (const auto& item : expenses) {
-                stage.expenses_.value().push_back(DeserializeExpenses(item.toObject()));
+                stage->expenses_.value().push_back(DeserializeExpenses(item.toObject()));
             }
         }
 
         if (obj.contains("status_payment") && !obj["status_payment"].isNull()) {
-            stage.status_payment_ = obj["status_payment"].toString().toStdString();
+            stage->status_payment_ = obj["status_payment"].toString().toStdString();
         }
 
         return stage;
@@ -401,7 +401,7 @@ namespace serialization {
         if (contract->pool_stage_.has_value()) {
             QJsonArray pool_stage;
             for (const auto& stage : contract->pool_stage_.value()) {
-                pool_stage.append(SerializeStage(stage));
+                pool_stage.append(SerializeStage(*stage));
             }
 
             obj["pool_stage"] = pool_stage;
@@ -496,10 +496,10 @@ namespace serialization {
         if (obj.contains("pool_stage") && !obj["pool_stage"].isNull()) {
             QJsonArray pool_stage = obj["pool_stage"].toArray();
             if (!contract->pool_stage_.has_value()) {
-                contract->pool_stage_ = std::vector<model::Stage>{};
+                contract->pool_stage_ = std::vector<std::shared_ptr<model::Stage>>{};
             }
             for (const auto& item : pool_stage) {
-                contract->pool_stage_.value().push_back(DeserializeStage(item.toObject()));
+                contract->pool_stage_->push_back(DeserializeStage(item.toObject()));
             }
         }
 

@@ -165,7 +165,7 @@ namespace model {
             bool with_stage,
             std::optional<std::vector<SeparateWork>> pool_work,
             std::optional<std::string> info,
-            std::optional<std::vector<Stage>> pool_stage,
+            std::optional<std::vector<std::shared_ptr<Stage>>> pool_stage,
             StatusComplet status_complet,
             StatusActual status_actual,
             bool is_paid,
@@ -276,7 +276,7 @@ namespace model {
         int id_ = ++id_counter_;
         std::optional<std::string> info_;
 
-        std::optional<std::vector<Stage>> pool_stage_;
+        std::optional<std::vector<std::shared_ptr<Stage>>> pool_stage_;
         StatusComplet status_complet_;
         StatusActual status_actual_;
         bool is_paid_;

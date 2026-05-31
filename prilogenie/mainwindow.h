@@ -22,7 +22,7 @@ public:
     ~MainWindow();
 
 signals:
-    void AddStageInContract(std::optional<std::vector<model::Stage>>& pool_stage);
+    void AddStageInContract(std::optional<std::vector<std::shared_ptr<model::Stage>>>& pool_stage);
     void AddWorkInContract(std::shared_ptr<app::App> app,
                            std::optional<std::vector<model::SeparateWork>>& pool_work);
     void AddExpensesInContract(std::shared_ptr<app::App> app,

@@ -20,10 +20,10 @@ class AddStage : public QMainWindow
 
 public:
     explicit AddStage(std::shared_ptr<app::App> app,
-                      std::optional<std::vector<model::Stage>> &pool_stage,
+                      std::optional<std::vector<std::shared_ptr<model::Stage>>> &pool_stage,
                       QWidget *parent = nullptr);
     explicit AddStage(std::shared_ptr<app::App> app,
-                      std::optional<std::vector<model::Stage>> &pool_stage,
+                      std::optional<std::vector<std::shared_ptr<model::Stage>>> &pool_stage,
                       int index,
                       QWidget *parent = nullptr);
     ~AddStage();
@@ -59,12 +59,13 @@ private slots:
 
 private:
     Ui::AddStage *ui;
-    std::optional<std::vector<model::Stage>>& pool_stage_;
-    std::optional<std::vector<model::SeparateWork>> pool_work_;
+    std::optional<std::vector<std::shared_ptr<model::Stage>>>& pool_stage_;
+    std::shared_ptr<model::Stage> stage_;
+//    std::optional<std::vector<model::SeparateWork>> pool_work_;
     std::optional<model::Date> date_;
     std::shared_ptr<app::App> app_;
-    std::optional<std::vector<model::Expenses>> expenses_;
-    std::optional<std::vector<model::Payment>> payments_;
+//    std::optional<std::vector<model::Expenses>> expenses_;
+//    std::optional<std::vector<model::Payment>> payments_;
     int index_;
 
     void SetTableProperties(QTableWidget* table);

@@ -227,9 +227,9 @@ void MainWindow::UpdateTable() {
 
     if (contract_->pool_stage_.has_value()) {
         for (const auto& stage : contract_->pool_stage_.value()) {
-            details::AddStageToTable(ui->table_work, stage);
-            if (stage.pool_work_.has_value()) {
-                for (const auto& work : stage.pool_work_.value()) {
+            details::AddStageToTable(ui->table_work, *stage);
+            if (stage->pool_work_.has_value()) {
+                for (const auto& work : stage->pool_work_.value()) {
                     details::AddSeparateWorkToTable(ui->table_work, work);
                 }
             }
@@ -446,7 +446,7 @@ model::Price MainWindow::MakePriceContract() const {
     model::Price price {0,0};
     if (contract_->pool_stage_.has_value()) {
         for (const auto& stage : contract_->pool_stage_.value()) {
-            price += stage.price_;
+            price += stage->price_;
         }
     }
     else {
@@ -460,7 +460,7 @@ model::Price MainWindow::MakePriceOtherDepartmentContract() const {
     model::Price price {0,0};
     if (contract_->pool_stage_.has_value()) {
         for (const auto& stage : contract_->pool_stage_.value()) {
-            price += stage.price_other_department_;
+            price += stage->price_other_department_;
         }
     }
     else {
@@ -485,8 +485,8 @@ void MainWindow::UpdatePriceOtherDepartment() {
 void MainWindow::AddWorkInBase() {
     if (contract_->pool_stage_.has_value()) {
         for (const auto& stage : contract_->pool_stage_.value()) {
-            if (stage.pool_work_.has_value()) {
-                for (const auto& work : stage.pool_work_.value()) {
+            if (stage->pool_work_.has_value()) {
+                for (const auto& work : stage->pool_work_.value()) {
                     app_->AddBaseWork(work.name_);
                 }
             }
@@ -503,8 +503,8 @@ void MainWindow::AddWorkInBase() {
 void MainWindow::AddExpenseInBase() {
     if (contract_->pool_stage_.has_value()) {
         for (const auto& stage : contract_->pool_stage_.value()) {
-            if (stage.expenses_.has_value()) {
-                for (const auto& expense : stage.expenses_.value()) {
+            if (stage->expenses_.has_value()) {
+                for (const auto& expense : stage->expenses_.value()) {
                     app_->AddBaseExpenses(expense.name_);
                 }
             }
@@ -596,8 +596,8 @@ void MainWindow::BuildVirtualRows() const {
                                      static_cast<int>(stageIdx), -1, globalRow++}});
 
             // Отображаем работы этапа
-            if (stages[stageIdx].pool_work_.has_value()) {
-                const auto& works = stages[stageIdx].pool_work_.value();
+            if (stages[stageIdx]->pool_work_.has_value()) {
+                const auto& works = stages[stageIdx]->pool_work_.value();
                 for (size_t workIdx = 0; workIdx < works.size(); ++workIdx) {
                     virtualRows_.push_back({{ItemInfo::Type::WorkRow,
                                              static_cast<int>(stageIdx),

@@ -102,7 +102,7 @@ void WindowManager::onAppAboutToQuit() {
     }
 }
 
-void WindowManager::onAddStageInContract(std::optional<std::vector<model::Stage>> &pool_stage) {
+void WindowManager::onAddStageInContract(std::optional<std::vector<std::shared_ptr<model::Stage>>> &pool_stage) {
     if (!add_stage_) {
         add_stage_ = new AddStage(app_, pool_stage);
         add_stage_->setAttribute(Qt::WA_DeleteOnClose);

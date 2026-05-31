@@ -9,18 +9,19 @@
 #include <QInputDialog>
 
 AddStage::AddStage(std::shared_ptr<app::App> app,
-                   std::optional<std::vector<model::Stage>>& pool_stage,
+                   std::optional<std::vector<std::shared_ptr<model::Stage>>>& pool_stage,
                    QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::AddStage)
     , pool_stage_(pool_stage)
-    , pool_work_(std::nullopt)
+    , stage_(std::make_shared<model::Stage>())
+//    , pool_work_(std::nullopt)
     , date_({QDate::currentDate().day(),
              QDate::currentDate().month(),
              QDate::currentDate().year()})
     , app_(app)
-    , expenses_(std::nullopt)
-    , payments_(std::nullopt)
+//    , expenses_(std::nullopt)
+//    , payments_(std::nullopt)
     , index_(-1) {
     ui->setupUi(this);
     setWindowTitle("Добавление этапа");
@@ -128,17 +129,18 @@ void AddStage::on_pb_add_work_att_as_clicked() {
                                     {false, std::nullopt},
                                     {false, std::nullopt, std::nullopt}};
 
-    if (!pool_work_.has_value()) {
-        pool_work_ = std::vector<model::SeparateWork>{};
+    if (!stage_->pool_work_.has_value()) {
+        stage_->pool_work_ = std::vector<model::SeparateWork>{};
     }
-    pool_work_.value().push_back(razrab_PIM);
-    pool_work_.value().push_back(att_as);
-    pool_work_.value().push_back(razrab_doc);
+    stage_->pool_work_.value().push_back(razrab_PIM);
+    stage_->pool_work_.value().push_back(att_as);
+    stage_->pool_work_.value().push_back(razrab_doc);
 
     UpdateTableWorkInStage();
 }
 
 void AddStage::on_pb_add_stage_clicked() {
+/*
     model::Stage new_stage {
         ui->le_number->text().toInt(),
         ui->le_name_full->text().toStdString(),
@@ -155,12 +157,25 @@ void AddStage::on_pb_add_stage_clicked() {
         expenses_,
         ui->le_status_payment->text().toStdString()
     };
-
+*/
     if (!pool_stage_.has_value()) {
-        pool_stage_ = std::vector<model::Stage>{};
+        pool_stage_ = std::vector<std::shared_ptr<model::Stage>>{};
     }
 
-    pool_stage_.value().push_back(std::move(new_stage));
+    stage_->number_ = ui->le_number->text().toInt();
+    stage_->name_full_ = ui->le_name_full->text().toStdString();
+    stage_->date_deadline_ = date_;
+    stage_->name_responsible_employee_ = ui->le_responsible_employee->text().toStdString();
+    stage_->price_ = {ui->sb_price_ruble->value(), ui->sb_price_kop->value()};
+    stage_->price_other_department_ = {ui->sb_price_other_department_ruble->value(), ui->sb_price_other_department_kop->value()};
+    stage_->info_ = ui->le_info->text().toStdString();
+    stage_->status_complet_ = {false, std::nullopt};
+    stage_->status_actual_ = {false, std::nullopt, std::nullopt};
+    stage_->is_paid_ = false;
+    stage_->status_payment_ = ui->le_status_payment->text().toStdString();
+
+//    pool_stage_.value().push_back(std::move(new_stage));
+    pool_stage_.value().push_back(stage_);
 
     emit UpdateTable();
 
@@ -172,7 +187,7 @@ void AddStage::on_cb_correct_number_stateChanged(int arg1) {
 }
 
 void AddStage::on_pb_add_work_clicked() {
-    emit AddWorkInStage(pool_work_);
+    emit AddWorkInStage(stage_->pool_work_);
 }
 
 void AddStage::on_table_work_cellChanged(int row, int column)
@@ -181,13 +196,13 @@ void AddStage::on_table_work_cellChanged(int row, int column)
     ui->table_work->blockSignals(true);
 
     // Проверяем, что pool_work_ инициализирован и row в пределах
-    if (!pool_work_.has_value() || row >= static_cast<int>(pool_work_->size())) {
+    if (!stage_->pool_work_.has_value() || row >= static_cast<int>(stage_->pool_work_->size())) {
         ui->table_work->blockSignals(false);
         return;
     }
 
     // Получаем текущий элемент
-    model::SeparateWork& work = (*pool_work_)[row];
+    model::SeparateWork& work = (*stage_->pool_work_)[row];
     QTableWidgetItem* item = ui->table_work->item(row, column);
 
     if (!item) {
@@ -268,8 +283,8 @@ void AddStage::UpdateTableWorkInStage() {
     ui->table_work->blockSignals(true);
     ui->table_work->setRowCount(0);
 
-    if (pool_work_.has_value()) {
-        for (const auto& work : pool_work_.value()) {
+    if (stage_->pool_work_.has_value()) {
+        for (const auto& work : stage_->pool_work_.value()) {
             details::AddSeparateWorkToTable(ui->table_work, work);
             int row = ui->table_work->rowCount() - 1;
             if (work.status_complet_.is_complet_) {
@@ -385,12 +400,12 @@ void AddStage::on_cb_with_deadline_data_stateChanged(int arg1)
 }
 
 void AddStage::on_pb_expenses_clicked() {
-    emit AddExpensesInStage(expenses_);
+    emit AddExpensesInStage(stage_->expenses_);
 }
 
 
 void AddStage::on_pb_payments_clicked() {
-    emit EditPaymentsInStage(payments_);
+    emit EditPaymentsInStage(stage_->payments_);
 }
 
 
@@ -414,13 +429,13 @@ void AddStage::ShowContextMenu(const QPoint &pos) {
     QAction* action_complet = menu.addAction("Изменить статус выполнения");
     QAction* action_actual = menu.addAction("Изменить статус актуальности");
 
-    if (pool_work_.value()[index].status_complet_.is_complet_) {
+    if (stage_->pool_work_.value()[index].status_complet_.is_complet_) {
         action_edit->setEnabled(false);
         action_delete->setEnabled(false);
         action_actual->setEnabled(false);
     }
 
-    if (pool_work_.value()[index].status_actual_.is_no_actual_) {
+    if (stage_->pool_work_.value()[index].status_actual_.is_no_actual_) {
         action_edit->setEnabled(false);
         action_delete->setEnabled(false);
         action_complet->setEnabled(false);
@@ -430,7 +445,7 @@ void AddStage::ShowContextMenu(const QPoint &pos) {
     QAction* selectedAction = menu.exec(ui->table_work->mapToGlobal(pos));
 
     if (selectedAction == action_edit) {
-        emit EditWork(pool_work_, index);
+        emit EditWork(stage_->pool_work_, index);
     }
     else if (selectedAction == action_delete) {
         on_ActionDelete(index);
@@ -445,38 +460,38 @@ void AddStage::ShowContextMenu(const QPoint &pos) {
 }
 
 void AddStage::on_ActionDelete(int index) {
-    pool_work_.value().erase(pool_work_.value().begin() + index);
-    if (pool_work_.value().empty()) {
-        pool_work_ = std::nullopt;
+    stage_->pool_work_.value().erase(stage_->pool_work_.value().begin() + index);
+    if (stage_->pool_work_.value().empty()) {
+        stage_->pool_work_ = std::nullopt;
     }
 }
 
 void AddStage::on_ActionComplet(int index) {
-    if (!(pool_work_.value()[index].status_complet_.is_complet_)) {
+    if (!(stage_->pool_work_.value()[index].status_complet_.is_complet_)) {
         model::Date date = {QDate::currentDate().day(),
                             QDate::currentDate().month(),
                             QDate::currentDate().year()};
-        pool_work_.value()[index].status_complet_ = {true, date};
+        stage_->pool_work_.value()[index].status_complet_ = {true, date};
         QString qstr = QString("\n\nВыполнена %1.%2.%3")
                            .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().year(), 4, 10, QChar('0'));
         std::string str_info = qstr.toStdString();
-        pool_work_.value()[index].info_ = pool_work_.value()[index].info_.value() + str_info;
+        stage_->pool_work_.value()[index].info_ = stage_->pool_work_.value()[index].info_.value() + str_info;
     }
     else {
-        pool_work_.value()[index].status_complet_ = {false, std::nullopt};
+        stage_->pool_work_.value()[index].status_complet_ = {false, std::nullopt};
         QString qstr = QString("\n\nВернули в работу %1.%2.%3")
                            .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().year(), 4, 10, QChar('0'));
         std::string str_info = qstr.toStdString();
-        pool_work_.value()[index].info_ = pool_work_.value()[index].info_.value() + str_info;
+        stage_->pool_work_.value()[index].info_ = stage_->pool_work_.value()[index].info_.value() + str_info;
     }
 }
 
 void AddStage::on_ActionActual(int index) {
-    if (!(pool_work_.value()[index].status_actual_.is_no_actual_)) {
+    if (!(stage_->pool_work_.value()[index].status_actual_.is_no_actual_)) {
         bool ok;
         QString text = QInputDialog::getText(
             nullptr,
@@ -491,24 +506,24 @@ void AddStage::on_ActionActual(int index) {
             model::Date date = {QDate::currentDate().day(),
                                 QDate::currentDate().month(),
                                 QDate::currentDate().year()};
-            pool_work_.value()[index].status_actual_ = {true, date, text.toStdString()};
+            stage_->pool_work_.value()[index].status_actual_ = {true, date, text.toStdString()};
             QString qstr = QString("\n\nНеактуальна %1.%2.%3\n%4")
                                .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                                .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
                                .arg(QDate::currentDate().year(), 4, 10, QChar('0'))
                                .arg(QString::fromStdString(text.toStdString()));
             std::string str_info = qstr.toStdString();
-            pool_work_.value()[index].info_ = pool_work_.value()[index].info_.value() + str_info;
+            stage_->pool_work_.value()[index].info_ = stage_->pool_work_.value()[index].info_.value() + str_info;
         }
     }
     else {
-        pool_work_.value()[index].status_actual_ = {false, std::nullopt, std::nullopt};
+        stage_->pool_work_.value()[index].status_actual_ = {false, std::nullopt, std::nullopt};
         QString qstr = QString("\n\nВернули в работу %1.%2.%3")
                            .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().year(), 4, 10, QChar('0'));
         std::string str_info = qstr.toStdString();
-        pool_work_.value()[index].info_ = pool_work_.value()[index].info_.value() + str_info;
+        stage_->pool_work_.value()[index].info_ = stage_->pool_work_.value()[index].info_.value() + str_info;
     }
 }
 

@@ -35,7 +35,7 @@ namespace serialization {
     model::Expenses DeserializeExpenses(const QJsonObject& obj);
 
     QJsonObject SerializeStage(const model::Stage& stage);
-    model::Stage DeserializeStage(const QJsonObject& obj);
+    std::shared_ptr<model::Stage> DeserializeStage(const QJsonObject& obj);
 
     QJsonObject DerializeContract(const std::shared_ptr<model::Contract>& contract);
     std::shared_ptr<model::Contract> DeserializeContract(const QJsonObject& obj);
