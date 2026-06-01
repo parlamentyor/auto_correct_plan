@@ -26,7 +26,7 @@ namespace serialization {
     model::StatusActual DeserializeStatusAntual(const QJsonObject& obj);
 
     QJsonObject SerializeSeparateWork(const model::SeparateWork& work);
-    model::SeparateWork DeserializeSeparateWork(const QJsonObject& obj);
+    std::shared_ptr<model::SeparateWork> DeserializeSeparateWork(const QJsonObject& obj);
 
     QJsonObject SerializePayment(const model::Payment& payment);
     model::Payment DeserializePayment(const QJsonObject& obj);

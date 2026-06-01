@@ -15,13 +15,10 @@ AddStage::AddStage(std::shared_ptr<app::App> app,
     , ui(new Ui::AddStage)
     , pool_stage_(pool_stage)
     , stage_(std::make_shared<model::Stage>())
-//    , pool_work_(std::nullopt)
     , date_({QDate::currentDate().day(),
              QDate::currentDate().month(),
              QDate::currentDate().year()})
     , app_(app)
-//    , expenses_(std::nullopt)
-//    , payments_(std::nullopt)
     , index_(-1) {
     ui->setupUi(this);
     setWindowTitle("Добавление этапа");
@@ -120,17 +117,27 @@ void AddStage::on_pb_add_work_att_as_clicked() {
     model::Date date_razrab_PIM = {11, 11, 2026};
     model::Date date_att_as = {12, 12, 2026};
     model::Date date_razrab_doc = {1, 2, 2027};
-    model::SeparateWork razrab_PIM {"Разработка ПиМ", {"Пупкин С.С."}, date_razrab_PIM, "По готовности объекта", {false, std::nullopt}, {false, std::nullopt, std::nullopt}};
-    model::SeparateWork att_as {"Аттестация АС", {"Суходрищев В.В."}, date_att_as, "", {false, std::nullopt}, {false, std::nullopt, std::nullopt}};
-    model::SeparateWork razrab_doc {"Разработка документации после аттестационных испытаний с учетом погрешности, которая появляется в связи с долгой засухой",
-                                    {"Суходрищев В.В.", "Пупкин С.С.", "Касторкин А.А."},
-                                    date_razrab_doc,
-                                    "может быть выполним когда-нибудь",
-                                    {false, std::nullopt},
-                                    {false, std::nullopt, std::nullopt}};
+    std::shared_ptr<model::SeparateWork> razrab_PIM = std::make_shared<model::SeparateWork>(model::SeparateWork{"Разработка ПиМ",
+                                                                                                                {"Пупкин С.С."},
+                                                                                                                date_razrab_PIM,
+                                                                                                                "По готовности объекта",
+                                                                                                                {false, std::nullopt},
+                                                                                                                {false, std::nullopt, std::nullopt}});
+    std::shared_ptr<model::SeparateWork> att_as = std::make_shared<model::SeparateWork>(model::SeparateWork{"Аттестация АС",
+                                                                                                            {"Суходрищев В.В."},
+                                                                                                            date_att_as,
+                                                                                                            "",
+                                                                                                            {false, std::nullopt},
+                                                                                                            {false, std::nullopt, std::nullopt}});
+    std::shared_ptr<model::SeparateWork> razrab_doc = std::make_shared<model::SeparateWork>(model::SeparateWork{"Разработка документации после аттестационных испытаний с учетом погрешности, которая появляется в связи с долгой засухой",
+                                                                                                                {"Суходрищев В.В.", "Пупкин С.С.", "Касторкин А.А."},
+                                                                                                                date_razrab_doc,
+                                                                                                                "может быть выполним когда-нибудь",
+                                                                                                                {false, std::nullopt},
+                                                                                                                {false, std::nullopt, std::nullopt}});
 
     if (!stage_->pool_work_.has_value()) {
-        stage_->pool_work_ = std::vector<model::SeparateWork>{};
+        stage_->pool_work_ = std::vector<std::shared_ptr<model::SeparateWork>>{};
     }
     stage_->pool_work_.value().push_back(razrab_PIM);
     stage_->pool_work_.value().push_back(att_as);
@@ -140,24 +147,7 @@ void AddStage::on_pb_add_work_att_as_clicked() {
 }
 
 void AddStage::on_pb_add_stage_clicked() {
-/*
-    model::Stage new_stage {
-        ui->le_number->text().toInt(),
-        ui->le_name_full->text().toStdString(),
-        date_,
-        ui->le_responsible_employee->text().toStdString(),
-        {ui->sb_price_ruble->value(), ui->sb_price_kop->value()},
-        {ui->sb_price_other_department_ruble->value(), ui->sb_price_other_department_kop->value()},
-        pool_work_,
-        ui->le_info->text().toStdString(),
-        {false, std::nullopt},
-        {false, std::nullopt, std::nullopt},
-        false,
-        payments_,
-        expenses_,
-        ui->le_status_payment->text().toStdString()
-    };
-*/
+
     if (!pool_stage_.has_value()) {
         pool_stage_ = std::vector<std::shared_ptr<model::Stage>>{};
     }
@@ -174,7 +164,6 @@ void AddStage::on_pb_add_stage_clicked() {
     stage_->is_paid_ = false;
     stage_->status_payment_ = ui->le_status_payment->text().toStdString();
 
-//    pool_stage_.value().push_back(std::move(new_stage));
     pool_stage_.value().push_back(stage_);
 
     emit UpdateTable();
@@ -202,7 +191,7 @@ void AddStage::on_table_work_cellChanged(int row, int column)
     }
 
     // Получаем текущий элемент
-    model::SeparateWork& work = (*stage_->pool_work_)[row];
+    model::SeparateWork& work = *(stage_->pool_work_.value())[row];
     QTableWidgetItem* item = ui->table_work->item(row, column);
 
     if (!item) {
@@ -285,12 +274,12 @@ void AddStage::UpdateTableWorkInStage() {
 
     if (stage_->pool_work_.has_value()) {
         for (const auto& work : stage_->pool_work_.value()) {
-            details::AddSeparateWorkToTable(ui->table_work, work);
+            details::AddSeparateWorkToTable(ui->table_work, *work);
             int row = ui->table_work->rowCount() - 1;
-            if (work.status_complet_.is_complet_) {
+            if (work->status_complet_.is_complet_) {
                 SetRowBackgroundColor(row, QColor(144, 238, 144));  //Светло-зеленый
             }
-            if (work.status_actual_.is_no_actual_) {
+            if (work->status_actual_.is_no_actual_) {
                 SetRowBackgroundColor(row, Qt::lightGray);  //Светло-серый
             }
         }
@@ -429,13 +418,13 @@ void AddStage::ShowContextMenu(const QPoint &pos) {
     QAction* action_complet = menu.addAction("Изменить статус выполнения");
     QAction* action_actual = menu.addAction("Изменить статус актуальности");
 
-    if (stage_->pool_work_.value()[index].status_complet_.is_complet_) {
+    if (stage_->pool_work_.value()[index]->status_complet_.is_complet_) {
         action_edit->setEnabled(false);
         action_delete->setEnabled(false);
         action_actual->setEnabled(false);
     }
 
-    if (stage_->pool_work_.value()[index].status_actual_.is_no_actual_) {
+    if (stage_->pool_work_.value()[index]->status_actual_.is_no_actual_) {
         action_edit->setEnabled(false);
         action_delete->setEnabled(false);
         action_complet->setEnabled(false);
@@ -467,31 +456,31 @@ void AddStage::on_ActionDelete(int index) {
 }
 
 void AddStage::on_ActionComplet(int index) {
-    if (!(stage_->pool_work_.value()[index].status_complet_.is_complet_)) {
+    if (!(stage_->pool_work_.value()[index]->status_complet_.is_complet_)) {
         model::Date date = {QDate::currentDate().day(),
                             QDate::currentDate().month(),
                             QDate::currentDate().year()};
-        stage_->pool_work_.value()[index].status_complet_ = {true, date};
+        stage_->pool_work_.value()[index]->status_complet_ = {true, date};
         QString qstr = QString("\n\nВыполнена %1.%2.%3")
                            .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().year(), 4, 10, QChar('0'));
         std::string str_info = qstr.toStdString();
-        stage_->pool_work_.value()[index].info_ = stage_->pool_work_.value()[index].info_.value() + str_info;
+        stage_->pool_work_.value()[index]->info_ = stage_->pool_work_.value()[index]->info_.value() + str_info;
     }
     else {
-        stage_->pool_work_.value()[index].status_complet_ = {false, std::nullopt};
+        stage_->pool_work_.value()[index]->status_complet_ = {false, std::nullopt};
         QString qstr = QString("\n\nВернули в работу %1.%2.%3")
                            .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().year(), 4, 10, QChar('0'));
         std::string str_info = qstr.toStdString();
-        stage_->pool_work_.value()[index].info_ = stage_->pool_work_.value()[index].info_.value() + str_info;
+        stage_->pool_work_.value()[index]->info_ = stage_->pool_work_.value()[index]->info_.value() + str_info;
     }
 }
 
 void AddStage::on_ActionActual(int index) {
-    if (!(stage_->pool_work_.value()[index].status_actual_.is_no_actual_)) {
+    if (!(stage_->pool_work_.value()[index]->status_actual_.is_no_actual_)) {
         bool ok;
         QString text = QInputDialog::getText(
             nullptr,
@@ -506,24 +495,24 @@ void AddStage::on_ActionActual(int index) {
             model::Date date = {QDate::currentDate().day(),
                                 QDate::currentDate().month(),
                                 QDate::currentDate().year()};
-            stage_->pool_work_.value()[index].status_actual_ = {true, date, text.toStdString()};
+            stage_->pool_work_.value()[index]->status_actual_ = {true, date, text.toStdString()};
             QString qstr = QString("\n\nНеактуальна %1.%2.%3\n%4")
                                .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                                .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
                                .arg(QDate::currentDate().year(), 4, 10, QChar('0'))
                                .arg(QString::fromStdString(text.toStdString()));
             std::string str_info = qstr.toStdString();
-            stage_->pool_work_.value()[index].info_ = stage_->pool_work_.value()[index].info_.value() + str_info;
+            stage_->pool_work_.value()[index]->info_ = stage_->pool_work_.value()[index]->info_.value() + str_info;
         }
     }
     else {
-        stage_->pool_work_.value()[index].status_actual_ = {false, std::nullopt, std::nullopt};
+        stage_->pool_work_.value()[index]->status_actual_ = {false, std::nullopt, std::nullopt};
         QString qstr = QString("\n\nВернули в работу %1.%2.%3")
                            .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().year(), 4, 10, QChar('0'));
         std::string str_info = qstr.toStdString();
-        stage_->pool_work_.value()[index].info_ = stage_->pool_work_.value()[index].info_.value() + str_info;
+        stage_->pool_work_.value()[index]->info_ = stage_->pool_work_.value()[index]->info_.value() + str_info;
     }
 }
 

@@ -8,7 +8,7 @@
 using namespace std::string_literals;
 
 AddWorkWindow::AddWorkWindow(std::shared_ptr<app::App> app,
-                             std::optional<std::vector<model::SeparateWork>>& pool_work,
+                             std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work,
                              QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::AddWorkWindow)
@@ -17,7 +17,8 @@ AddWorkWindow::AddWorkWindow(std::shared_ptr<app::App> app,
     , date_({QDate::currentDate().day(),
              QDate::currentDate().month(),
              QDate::currentDate().year()})
-    , index_(-1) {
+    , index_(-1)
+    , work_(std::make_shared<model::SeparateWork>()){
     ui->setupUi(this);    
     setWindowTitle("Добавление работы");
 
@@ -38,21 +39,22 @@ AddWorkWindow::AddWorkWindow(std::shared_ptr<app::App> app,
 }
 
 AddWorkWindow::AddWorkWindow(std::shared_ptr<app::App> app,
-                             std::optional<std::vector<model::SeparateWork> > &pool_work,
+                             std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work,
                              int pos,
                              QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::AddWorkWindow)
     , app_(app)
     , pool_work_(pool_work)
-    , index_(pos) {
+    , index_(pos)
+    , work_(pool_work_.value()[index_]) {
     ui->setupUi(this);
     setWindowTitle("Корректировка работы");
 
-    model::SeparateWork work = pool_work_.value()[index_];
+//    model::SeparateWork work = pool_work_.value()[index_];
 
-    if (work.date_deadline_.has_value()) {
-        date_ = work.date_deadline_.value();
+    if (work_->date_deadline_.has_value()) {
+        date_ = work_->date_deadline_.value();
         QDate date = QDate(date_.value().year_, date_.value().month_, date_.value().day_);
         ui->de_deadline_data->setDate(date);
 
@@ -67,21 +69,21 @@ AddWorkWindow::AddWorkWindow(std::shared_ptr<app::App> app,
 
     ui->de_deadline_data->setDisplayFormat("dd.MM.yyyy");
 
-    ui->le_name->setText(QString::fromStdString(work.name_));
+    ui->le_name->setText(QString::fromStdString(work_->name_));
 
-    size_t count_employees = work.names_responsible_employees_.size();
+    size_t count_employees = work_->names_responsible_employees_.size();
     switch (count_employees) {
         case 0:
             break;
         case 1: {
-            ui->le_responsible_employee_1->setText(QString::fromStdString(work.names_responsible_employees_[0]));
+            ui->le_responsible_employee_1->setText(QString::fromStdString(work_->names_responsible_employees_[0]));
             break;
         }
         case 2: {
             ui->pb_add_employee_2->setEnabled(true);
             ui->le_responsible_employee_2->setEnabled(true);
-            ui->le_responsible_employee_1->setText(QString::fromStdString(work.names_responsible_employees_[0]));
-            ui->le_responsible_employee_2->setText(QString::fromStdString(work.names_responsible_employees_[1]));
+            ui->le_responsible_employee_1->setText(QString::fromStdString(work_->names_responsible_employees_[0]));
+            ui->le_responsible_employee_2->setText(QString::fromStdString(work_->names_responsible_employees_[1]));
             break;
         }
         case 3: {
@@ -89,9 +91,9 @@ AddWorkWindow::AddWorkWindow(std::shared_ptr<app::App> app,
             ui->pb_add_employee_3->setEnabled(true);
             ui->le_responsible_employee_2->setEnabled(true);
             ui->le_responsible_employee_3->setEnabled(true);
-            ui->le_responsible_employee_1->setText(QString::fromStdString(work.names_responsible_employees_[0]));
-            ui->le_responsible_employee_2->setText(QString::fromStdString(work.names_responsible_employees_[1]));
-            ui->le_responsible_employee_3->setText(QString::fromStdString(work.names_responsible_employees_[2]));
+            ui->le_responsible_employee_1->setText(QString::fromStdString(work_->names_responsible_employees_[0]));
+            ui->le_responsible_employee_2->setText(QString::fromStdString(work_->names_responsible_employees_[1]));
+            ui->le_responsible_employee_3->setText(QString::fromStdString(work_->names_responsible_employees_[2]));
             break;
         }
         case 4: {
@@ -101,10 +103,10 @@ AddWorkWindow::AddWorkWindow(std::shared_ptr<app::App> app,
             ui->le_responsible_employee_2->setEnabled(true);
             ui->le_responsible_employee_3->setEnabled(true);
             ui->le_responsible_employee_4->setEnabled(true);
-            ui->le_responsible_employee_1->setText(QString::fromStdString(work.names_responsible_employees_[0]));
-            ui->le_responsible_employee_2->setText(QString::fromStdString(work.names_responsible_employees_[1]));
-            ui->le_responsible_employee_3->setText(QString::fromStdString(work.names_responsible_employees_[2]));
-            ui->le_responsible_employee_3->setText(QString::fromStdString(work.names_responsible_employees_[3]));
+            ui->le_responsible_employee_1->setText(QString::fromStdString(work_->names_responsible_employees_[0]));
+            ui->le_responsible_employee_2->setText(QString::fromStdString(work_->names_responsible_employees_[1]));
+            ui->le_responsible_employee_3->setText(QString::fromStdString(work_->names_responsible_employees_[2]));
+            ui->le_responsible_employee_3->setText(QString::fromStdString(work_->names_responsible_employees_[3]));
             break;
         }
         case 5: {
@@ -116,11 +118,11 @@ AddWorkWindow::AddWorkWindow(std::shared_ptr<app::App> app,
             ui->le_responsible_employee_3->setEnabled(true);
             ui->le_responsible_employee_4->setEnabled(true);
             ui->le_responsible_employee_5->setEnabled(true);
-            ui->le_responsible_employee_1->setText(QString::fromStdString(work.names_responsible_employees_[0]));
-            ui->le_responsible_employee_2->setText(QString::fromStdString(work.names_responsible_employees_[1]));
-            ui->le_responsible_employee_3->setText(QString::fromStdString(work.names_responsible_employees_[2]));
-            ui->le_responsible_employee_3->setText(QString::fromStdString(work.names_responsible_employees_[3]));
-            ui->le_responsible_employee_3->setText(QString::fromStdString(work.names_responsible_employees_[4]));
+            ui->le_responsible_employee_1->setText(QString::fromStdString(work_->names_responsible_employees_[0]));
+            ui->le_responsible_employee_2->setText(QString::fromStdString(work_->names_responsible_employees_[1]));
+            ui->le_responsible_employee_3->setText(QString::fromStdString(work_->names_responsible_employees_[2]));
+            ui->le_responsible_employee_3->setText(QString::fromStdString(work_->names_responsible_employees_[3]));
+            ui->le_responsible_employee_3->setText(QString::fromStdString(work_->names_responsible_employees_[4]));
             break;
         }
     }
@@ -186,7 +188,7 @@ void AddWorkWindow::on_pb_add_work_clicked() {
                        .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
                        .arg(QDate::currentDate().year(), 4, 10, QChar('0'));
     std::string str_info = qstr.toStdString() + ui->le_info->text().toStdString();
-
+/*
     model::SeparateWork new_work{
         .name_ = ui->le_name->text().toStdString(),
         .names_responsible_employees_ = std::move(employees),
@@ -194,12 +196,19 @@ void AddWorkWindow::on_pb_add_work_clicked() {
         .info_ = str_info,
         .status_complet_ = {false, std::nullopt},
         .status_actual_ = {false, std::nullopt, std::nullopt}};
+*/
+    work_->name_ = ui->le_name->text().toStdString();
+    work_->names_responsible_employees_ = std::move(employees);
+    work_->date_deadline_ = date_;
+    work_->info_ = str_info;
+    work_->status_complet_ = {false, std::nullopt};
+    work_->status_actual_ = {false, std::nullopt, std::nullopt};
 
     // Добавляем в pool_work_
     if (!pool_work_.has_value()) {
-        pool_work_ = std::vector<model::SeparateWork>();
+        pool_work_ = std::vector<std::shared_ptr<model::SeparateWork>>();
     }
-    pool_work_->push_back(new_work);
+    pool_work_->push_back(work_);
 
     emit UpdateTable();
 
@@ -364,11 +373,11 @@ void AddWorkWindow::on_pb_correct_clicked() {
         return;
     }
 
-    pool_work_.value()[index_].name_ = ui->le_name->text().toStdString();
-    pool_work_.value()[index_].names_responsible_employees_ = std::move(employees);
-    pool_work_.value()[index_].date_deadline_ = date_;
+    pool_work_.value()[index_]->name_ = ui->le_name->text().toStdString();
+    pool_work_.value()[index_]->names_responsible_employees_ = std::move(employees);
+    pool_work_.value()[index_]->date_deadline_ = date_;
     if (!(ui->le_info->text().isEmpty())) {
-        pool_work_.value()[index_].info_ = pool_work_.value()[index_].info_.value() + "\n\n"  + ui->le_info->text().toStdString();
+        pool_work_.value()[index_]->info_ = pool_work_.value()[index_]->info_.value() + "\n\n"  + ui->le_info->text().toStdString();
     }
 
     emit UpdateTable();

@@ -326,7 +326,7 @@ QVariant ContractModel::getWorkRowData(const ItemInfo& info, int column, int rol
             stages[info.stageIndex]->pool_work_.has_value()) {
             const auto& works = stages[info.stageIndex]->pool_work_.value();
             if (info.workIndex < static_cast<int>(works.size())) {
-                work = &works[info.workIndex];
+                work = works[info.workIndex].get();
                 prefix = QString("%1.%2.%3")
                              .arg(info.contractIndex + 1)
                              .arg(info.stageIndex + 1)
@@ -336,7 +336,7 @@ QVariant ContractModel::getWorkRowData(const ItemInfo& info, int column, int rol
     } else if (contract->pool_work.has_value()) {
         const auto& works = contract->pool_work.value();
         if (info.workIndex < static_cast<int>(works.size())) {
-            work = &works[info.workIndex];
+            work = works[info.workIndex].get();
 
             // Вычисляем номер для работы контракта
             int stageCount = contract->pool_stage_.has_value() ?

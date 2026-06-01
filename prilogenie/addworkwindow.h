@@ -19,12 +19,12 @@ class AddWorkWindow : public QMainWindow
 public:
     // Конструктор для создания и добавления новой работы
     explicit AddWorkWindow(std::shared_ptr<app::App> app,
-                           std::optional<std::vector<model::SeparateWork>>& pool_work,
+                           std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work,
                            QWidget *parent = nullptr);
 
     // Конструктор для редактирования работы
     explicit AddWorkWindow(std::shared_ptr<app::App> app,
-                           std::optional<std::vector<model::SeparateWork>>& pool_work,
+                           std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work,
                            int pos,
                            QWidget *parent = nullptr);
     ~AddWorkWindow();
@@ -48,9 +48,10 @@ private:
     Ui::AddWorkWindow *ui;
 
     std::shared_ptr<app::App> app_;
-    std::optional<std::vector<model::SeparateWork>>& pool_work_;
+    std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work_;
     std::optional<model::Date> date_;
     int index_;
+    std::shared_ptr<model::SeparateWork> work_;
 
     void SetCompleter(QLineEdit *le, const std::set<std::string>& base);
 };

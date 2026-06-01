@@ -30,10 +30,10 @@ public:
 
 signals:
     void UpdateTable();
-    void AddWorkInStage(std::optional<std::vector<model::SeparateWork>>& pool_work);
+    void AddWorkInStage(std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work);
     void AddExpensesInStage(std::optional<std::vector<model::Expenses>>& expenses);
     void EditPaymentsInStage(std::optional<std::vector<model::Payment>>& payments);
-    void EditWork(std::optional<std::vector<model::SeparateWork>>& pool_work,
+    void EditWork(std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work,
                   int pos);
 
 public slots:
@@ -61,11 +61,9 @@ private:
     Ui::AddStage *ui;
     std::optional<std::vector<std::shared_ptr<model::Stage>>>& pool_stage_;
     std::shared_ptr<model::Stage> stage_;
-//    std::optional<std::vector<model::SeparateWork>> pool_work_;
     std::optional<model::Date> date_;
     std::shared_ptr<app::App> app_;
-//    std::optional<std::vector<model::Expenses>> expenses_;
-//    std::optional<std::vector<model::Payment>> payments_;
+
     int index_;
 
     void SetTableProperties(QTableWidget* table);

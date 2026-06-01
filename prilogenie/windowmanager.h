@@ -25,8 +25,8 @@ private slots:
     void onLoginSuccess();
     void onAddContract();
     void onAddWorkInContract(std::shared_ptr<app::App> app,
-                             std::optional<std::vector<model::SeparateWork>>& pool_work);
-    void onAddWorkInStage(std::optional<std::vector<model::SeparateWork>>& pool_work);
+                             std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work);
+    void onAddWorkInStage(std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work);
     void onUpdateTableWorkInStage();
     void onAppAboutToQuit();
     void onAddStageInContract(std::optional<std::vector<std::shared_ptr<model::Stage>>>& pool_stage);
@@ -35,7 +35,7 @@ private slots:
                                  std::optional<std::vector<model::Expenses>>& expenses);
     void onAddExpensesInStage(std::optional<std::vector<model::Expenses>>& expenses);
     void onEditPayments(std::optional<std::vector<model::Payment>> &payments);
-    void onEditWork(std::optional<std::vector<model::SeparateWork>>& pool_work,
+    void onEditWork(std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work,
                     int pos);
 
 private:

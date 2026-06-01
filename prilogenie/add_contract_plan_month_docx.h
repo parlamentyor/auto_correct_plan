@@ -145,7 +145,7 @@ public:
 
         // 3. Строки для pool_work
         for (int i = 0; i < contract->pool_work.value().size(); ++i) {
-            fillWorkRow(table, contract->pool_work.value()[i],
+            fillWorkRow(table, *(contract->pool_work.value()[i]),
                         startRow + 2 + i, i + 1);
         }
 

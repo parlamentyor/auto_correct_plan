@@ -50,7 +50,7 @@ void WindowManager::onAddContract() {
 }
 
 void WindowManager::onAddWorkInContract(std::shared_ptr<app::App> app,
-                                        std::optional<std::vector<model::SeparateWork>>& pool_work) {
+                                        std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work) {
     if (!add_work_window_) {
         add_work_window_ = new AddWorkWindow(app, pool_work);
         add_work_window_->setAttribute(Qt::WA_DeleteOnClose);
@@ -65,7 +65,7 @@ void WindowManager::onAddWorkInContract(std::shared_ptr<app::App> app,
     add_work_window_->show();
 }
 
-void WindowManager::onAddWorkInStage(std::optional<std::vector<model::SeparateWork> > &pool_work) {
+void WindowManager::onAddWorkInStage(std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work) {
     if (!add_work_window_) {
         add_work_window_ = new AddWorkWindow(app_, pool_work);
         add_work_window_->setAttribute(Qt::WA_DeleteOnClose);
@@ -182,7 +182,7 @@ void WindowManager::onEditPayments(std::optional<std::vector<model::Payment>> &p
     payments_window_->show();
 }
 
-void WindowManager::onEditWork(std::optional<std::vector<model::SeparateWork> > &pool_work, int pos) {
+void WindowManager::onEditWork(std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work, int pos) {
     if (!add_work_window_) {
         add_work_window_ = new AddWorkWindow(app_, pool_work, pos);
         add_work_window_->setAttribute(Qt::WA_DeleteOnClose);

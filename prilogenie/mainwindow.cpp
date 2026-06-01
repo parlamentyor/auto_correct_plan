@@ -16,17 +16,12 @@ MainWindow::MainWindow(std::shared_ptr<app::App> app, QWidget *parent)
     , ui(new Ui::MainWindow)
     , app_(app)
     , contract_(std::make_shared<model::Contract>())
-//    , pool_work_(std::nullopt)
-//    , pool_stage_(std::nullopt)
     , contract_date_({QDate::currentDate().day(),
                       QDate::currentDate().month(),
                       QDate::currentDate().year()})
     , deadline_date_({QDate::currentDate().day(),
                       QDate::currentDate().month(),
-                      QDate::currentDate().year()})
-//    , expenses_(std::nullopt)
-//    , payments_(std::nullopt)
-    {
+                      QDate::currentDate().year()}) {
     ui->setupUi(this);
     setWindowTitle("Добавление договора");
 
@@ -74,17 +69,27 @@ void MainWindow::on_pb_add_work_att_as_clicked()
     model::Date date_razrab_PIM = {11, 11, 2026};
     model::Date date_att_as = {12, 12, 2026};
     model::Date date_razrab_doc = {1, 2, 2027};
-    model::SeparateWork razrab_PIM {"Разработка ПиМ", {"Пупкин С.С."}, date_razrab_PIM, "По готовности объекта", {false, std::nullopt}, {false, std::nullopt, std::nullopt}};
-    model::SeparateWork att_as {"Аттестация АС", {"Суходрищев В.В."}, date_att_as, std::nullopt, {false, std::nullopt}, {false, std::nullopt, std::nullopt}};
-    model::SeparateWork razrab_doc {"Разработка документации после аттестационных испытаний с учетом погрешности, которая появляется в связи с долгой засухой",
-                                    {"Суходрищев В.В.", "Пупкин С.С.", "Касторкин А.А."},
-                                    date_razrab_doc,
-                                    "может быть выполним когда-нибудь",
-                                    {false, std::nullopt},
-                                    {false, std::nullopt, std::nullopt}};
+    std::shared_ptr<model::SeparateWork> razrab_PIM = std::make_shared<model::SeparateWork>(model::SeparateWork{"Разработка ПиМ",
+                                                                                                                {"Пупкин С.С."},
+                                                                                                                date_razrab_PIM,
+                                                                                                                "По готовности объекта",
+                                                                                                                {false, std::nullopt},
+                                                                                                                {false, std::nullopt, std::nullopt}});
+    std::shared_ptr<model::SeparateWork> att_as = std::make_shared<model::SeparateWork>(model::SeparateWork{"Аттестация АС",
+                                                                                                            {"Суходрищев В.В."},
+                                                                                                            date_att_as,
+                                                                                                            "",
+                                                                                                            {false, std::nullopt},
+                                                                                                            {false, std::nullopt, std::nullopt}});
+    std::shared_ptr<model::SeparateWork> razrab_doc = std::make_shared<model::SeparateWork>(model::SeparateWork{"Разработка документации после аттестационных испытаний с учетом погрешности, которая появляется в связи с долгой засухой",
+                                                                                                                {"Суходрищев В.В.", "Пупкин С.С.", "Касторкин А.А."},
+                                                                                                                date_razrab_doc,
+                                                                                                                "может быть выполним когда-нибудь",
+                                                                                                                {false, std::nullopt},
+                                                                                                                {false, std::nullopt, std::nullopt}});
 
     if (!(contract_->pool_work.has_value())) {
-        contract_->pool_work = std::vector<model::SeparateWork>{};
+        contract_->pool_work = std::vector<std::shared_ptr<model::SeparateWork>>{};
     }
     contract_->pool_work.value().push_back(razrab_PIM);
     contract_->pool_work.value().push_back(att_as);
@@ -112,34 +117,7 @@ void MainWindow::on_pb_add_contract_clicked() {
 
     model::Price price = MakePriceContract();
     model::Price price_other_department = MakePriceOtherDepartmentContract();
-/*
-    model::Contract new_contract {
-        ui->le_number->text().toStdString(),
-        contract_date_,
-        ui->le_name_organization->text().toStdString(),
-        ui->le_name_short->text().toStdString(),
-        ui->le_name_full->text().toStdString(),
-        deadline_date_,
-        ui->le_responsible_employee->text().toStdString(),
-        price,
-        price_other_department,
-        ui->chb_nds->isChecked(),
-        ui->sb_stavka_nds->value(),
-        type,
-        ui->chb_stage->isChecked(),
-        pool_work_,
-        ui->le_info->text().toStdString(),
-        pool_stage_,
-        {false, std::nullopt},
-        {false, std::nullopt, std::nullopt},
-        false,
-        payments_,
-        expenses_,
-        ui->le_status_payment->text().toStdString()
-    };
 
-    auto new_contract_ptr = std::make_shared<model::Contract>(std::move(new_contract));
-*/
     contract_->number_ = ui->le_number->text().toStdString();
     contract_->date_ = contract_date_;
     contract_->name_organization_ = ui->le_name_organization->text().toStdString();
@@ -230,7 +208,7 @@ void MainWindow::UpdateTable() {
             details::AddStageToTable(ui->table_work, *stage);
             if (stage->pool_work_.has_value()) {
                 for (const auto& work : stage->pool_work_.value()) {
-                    details::AddSeparateWorkToTable(ui->table_work, work);
+                    details::AddSeparateWorkToTable(ui->table_work, *work);
                 }
             }
         }
@@ -239,7 +217,7 @@ void MainWindow::UpdateTable() {
     if (contract_->pool_work.has_value()) {
         details::AddHeaderToTable(ui->table_work, "Работы вне этапа");
         for (const auto& work : contract_->pool_work.value()) {
-            details::AddSeparateWorkToTable(ui->table_work, work);
+            details::AddSeparateWorkToTable(ui->table_work, *work);
         }
     }
 
@@ -266,7 +244,7 @@ void MainWindow::on_table_work_cellChanged(int row, int column) {
     }
 
     // Получаем текущий элемент
-    model::SeparateWork& work = (contract_->pool_work.value())[row];
+    model::SeparateWork& work = *(contract_->pool_work.value())[row];
     QTableWidgetItem* item = ui->table_work->item(row, column);
 
     if (!item) {
@@ -487,7 +465,7 @@ void MainWindow::AddWorkInBase() {
         for (const auto& stage : contract_->pool_stage_.value()) {
             if (stage->pool_work_.has_value()) {
                 for (const auto& work : stage->pool_work_.value()) {
-                    app_->AddBaseWork(work.name_);
+                    app_->AddBaseWork(work->name_);
                 }
             }
         }
@@ -495,7 +473,7 @@ void MainWindow::AddWorkInBase() {
 
     if (contract_->pool_work.has_value()) {
         for (const auto& work : contract_->pool_work.value()) {
-            app_->AddBaseWork(work.name_);
+            app_->AddBaseWork(work->name_);
         }
     }
 }

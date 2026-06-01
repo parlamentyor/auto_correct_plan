@@ -133,7 +133,7 @@ namespace model {
 //        bool with_nds_;
 //        int stavka_nds_;
 //        TypeContract type_;
-        std::optional<std::vector<SeparateWork>> pool_work_;
+        std::optional<std::vector<std::shared_ptr<SeparateWork>>> pool_work_;
         std::optional<std::string> info_;
         StatusComplet status_complet_;
         StatusActual status_actual_;
@@ -163,7 +163,7 @@ namespace model {
             int stavka_nds,
             TypeContract type,
             bool with_stage,
-            std::optional<std::vector<SeparateWork>> pool_work,
+            std::optional<std::vector<std::shared_ptr<SeparateWork>>> pool_work,
             std::optional<std::string> info,
             std::optional<std::vector<std::shared_ptr<Stage>>> pool_stage,
             StatusComplet status_complet,
@@ -272,7 +272,7 @@ namespace model {
         int stavka_nds_;
         TypeContract type_;
         bool with_stage_;
-        std::optional<std::vector<SeparateWork>> pool_work;
+        std::optional<std::vector<std::shared_ptr<SeparateWork>>> pool_work;
         int id_ = ++id_counter_;
         std::optional<std::string> info_;
 

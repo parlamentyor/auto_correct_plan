@@ -142,25 +142,25 @@ namespace serialization {
         return obj;
     }
 
-    model::SeparateWork DeserializeSeparateWork(const QJsonObject& obj) {
-        model::SeparateWork work;
-        work.name_ = obj["name"].toString().toStdString();
+    std::shared_ptr<model::SeparateWork> DeserializeSeparateWork(const QJsonObject& obj) {
+        std::shared_ptr<model::SeparateWork> work = std::make_shared<model::SeparateWork>();
+        work->name_ = obj["name"].toString().toStdString();
 
         QJsonArray responsible_array = obj["names_responsible_employees"].toArray();
         for (const auto& item : responsible_array) {
-            work.names_responsible_employees_.push_back(item.toString().toStdString());
+            work->names_responsible_employees_.push_back(item.toString().toStdString());
         }
 
         if (obj.contains("date_deadline") && !obj["date_deadline"].isNull()) {
-            work.date_deadline_ = DeserializeDate(obj["date_deadline"].toObject());
+            work->date_deadline_ = DeserializeDate(obj["date_deadline"].toObject());
         }
 
         if (obj.contains("info") && !obj["info"].isNull()) {
-            work.info_ = obj["info"].toString().toStdString();
+            work->info_ = obj["info"].toString().toStdString();
         }
 
-        work.status_complet_ = DeserializeStatusComplet(obj["status_complet"].toObject());
-        work.status_actual_ = DeserializeStatusAntual(obj["status_actual"].toObject());
+        work->status_complet_ = DeserializeStatusComplet(obj["status_complet"].toObject());
+        work->status_actual_ = DeserializeStatusAntual(obj["status_actual"].toObject());
 
         return work;
     }
@@ -228,7 +228,7 @@ namespace serialization {
         if (stage.pool_work_.has_value()) {
             QJsonArray pool_array;
             for (const auto& work : stage.pool_work_.value()) {
-                pool_array.append(SerializeSeparateWork(work));
+                pool_array.append(SerializeSeparateWork(*work));
             }
             obj["pool_work"] = pool_array;
         }
@@ -300,7 +300,7 @@ namespace serialization {
         if (obj.contains("pool_work") && !obj["pool_work"].isNull()) {
             QJsonArray pool_array = obj["pool_work"].toArray();
             if (!stage->pool_work_.has_value()) {
-                stage->pool_work_ = std::vector<model::SeparateWork>{};
+                stage->pool_work_ = std::vector<std::shared_ptr<model::SeparateWork>>{};
             }
             for (const auto& item : pool_array) {
                 stage->pool_work_.value().push_back(DeserializeSeparateWork(item.toObject()));
@@ -387,7 +387,7 @@ namespace serialization {
         if (contract->pool_work.has_value()) {
             QJsonArray pool_array;
             for (const auto& work : contract->pool_work.value()) {
-                pool_array.append(SerializeSeparateWork(work));
+                pool_array.append(SerializeSeparateWork(*work));
             }
             obj["pool_work"] = pool_array;
         }
@@ -476,7 +476,7 @@ namespace serialization {
         if (obj.contains("pool_work") && !obj["pool_work"].isNull()) {
             QJsonArray pool_array = obj["pool_work"].toArray();
             if (!contract->pool_work.has_value()) {
-                contract->pool_work = std::vector<model::SeparateWork>{};
+                contract->pool_work = std::vector<std::shared_ptr<model::SeparateWork>>{};
             }
             for (const auto& item : pool_array) {
                 contract->pool_work.value().push_back(DeserializeSeparateWork(item.toObject()));
