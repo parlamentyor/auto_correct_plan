@@ -45,14 +45,7 @@
       <item>
        <widget class="QLineEdit" name="le_number">
         <property name="enabled">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="cb_correct_number">
-        <property name="text">
-         <string>Ввести номер этапа в ручную</string>
+         <bool>true</bool>
         </property>
        </widget>
       </item>

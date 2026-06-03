@@ -196,7 +196,7 @@ namespace serialization {
 
     QJsonObject SerializeStage(const model::Stage &stage) {
         QJsonObject obj;
-        obj["number"] = stage.number_;
+        obj["number"] = QString::fromStdString(stage.number_);
 /*
         if (stage.name_organization_.has_value()) {
             obj["name_organization"] = QString::fromStdString(stage.name_organization_.value());
@@ -269,7 +269,7 @@ namespace serialization {
     std::shared_ptr<model::Stage> DeserializeStage(const QJsonObject &obj) {
         std::shared_ptr<model::Stage> stage = std::make_shared<model::Stage>();
 
-        stage->number_ = obj["number"].toInt();
+        stage->number_ = obj["number"].toString().toStdString();
 /*
         if (obj.contains("name_organization") && !obj["name_organization"].isNull()) {
             stage.name_organization_ = obj["name_organization"].toString().toStdString();

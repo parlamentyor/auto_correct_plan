@@ -22,15 +22,18 @@ public:
     ~MainWindow();
 
 signals:
-    void AddStageInContract(std::optional<std::vector<std::shared_ptr<model::Stage>>>& pool_stage);
-    void AddWorkInContract(std::shared_ptr<app::App> app,
-                           std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work);
+    void AddStageInContract();
+    void AddWorkInContract(std::shared_ptr<app::App> app);
     void AddExpensesInContract(std::shared_ptr<app::App> app,
                                std::optional<std::vector<model::Expenses>>& expenses);
     void EditPaymentsInContract(std::optional<std::vector<model::Payment>>& payments);
+    void EditWork(std::shared_ptr<model::SeparateWork> edit_work);
+    void EditStage(std::shared_ptr<model::Stage> edit_stage);
 
 public slots:
     void toUpdateTable();
+    void toAddNewWork(std::shared_ptr<model::SeparateWork> new_work);
+    void toAddNewStage(std::shared_ptr<model::Stage> new_stage);
 
 private slots:
     void on_pb_odt_clicked();
@@ -54,6 +57,16 @@ private slots:
 
     void on_chb_nds_stateChanged(int arg1);
 
+    void on_ActionDeleteWork(std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work, int index);
+    void on_ActionCompletWork(const std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work, int index);
+    void on_ActionActualWork(const std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work, int index);
+
+    void on_ActionDeleteStage(std::optional<std::vector<std::shared_ptr<model::Stage>>>& pool_stage, int index);
+    void on_ActionCompletStage(const std::optional<std::vector<std::shared_ptr<model::Stage>>>& pool_stage, int index);
+    void on_ActionActualStage(const std::optional<std::vector<std::shared_ptr<model::Stage>>>& pool_stage, int index);
+
+    void ShowContextMenu(const QPoint &pos);
+
 private:
     Ui::MainWindow *ui;
     std::shared_ptr<app::App> app_;
@@ -75,26 +88,32 @@ private:
     void AddOrganizationInBase();
 
     void SetCompleter(QLineEdit *le, const std::set<std::string>& base);
-
+    void SetRowBackgroundColor(int row, const QColor& color);
+    void ShowContextMenuWork(std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work,
+                             const QPoint &pos,
+                             int work_index);
+    void ShowContextMenuStage(std::optional<std::vector<std::shared_ptr<model::Stage>>>& pool_stage,
+                              const QPoint &pos,
+                              int stage_index);
 
 
     // Получить оригинальные данные по виртуальному индексу
     struct ItemInfo {
         enum class Type { HeaderRow, StageRow, WorkRow };
-        Type type;
-        int stageIndex;
-        int workIndex;
-        int virtualRow;
+        Type type_;
+        int stage_index_;
+        int work_index_;
+        int virtual_row_;
     };
 
-    ItemInfo GetItemInfo(int virtualRow) const;
+    ItemInfo GetItemInfo(int virtual_row) const;
 
     // Структура для хранения информации о виртуальных строках
     struct VirtualRow {
-        ItemInfo info;
+        ItemInfo info_;
     };
 
-    mutable std::vector<VirtualRow> virtualRows_;
+    mutable std::vector<VirtualRow> virtual_rows_;
     void BuildVirtualRows() const;
 
 };

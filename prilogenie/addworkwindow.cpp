@@ -8,16 +8,13 @@
 using namespace std::string_literals;
 
 AddWorkWindow::AddWorkWindow(std::shared_ptr<app::App> app,
-                             std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work,
                              QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::AddWorkWindow)
     , app_(app)
-    , pool_work_(pool_work)
     , date_({QDate::currentDate().day(),
              QDate::currentDate().month(),
              QDate::currentDate().year()})
-    , index_(-1)
     , work_(std::make_shared<model::SeparateWork>()){
     ui->setupUi(this);    
     setWindowTitle("Добавление работы");
@@ -39,19 +36,14 @@ AddWorkWindow::AddWorkWindow(std::shared_ptr<app::App> app,
 }
 
 AddWorkWindow::AddWorkWindow(std::shared_ptr<app::App> app,
-                             std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work,
-                             int pos,
+                             std::shared_ptr<model::SeparateWork> edit_work,
                              QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::AddWorkWindow)
     , app_(app)
-    , pool_work_(pool_work)
-    , index_(pos)
-    , work_(pool_work_.value()[index_]) {
+    , work_(edit_work) {
     ui->setupUi(this);
     setWindowTitle("Корректировка работы");
-
-//    model::SeparateWork work = pool_work_.value()[index_];
 
     if (work_->date_deadline_.has_value()) {
         date_ = work_->date_deadline_.value();
@@ -188,15 +180,7 @@ void AddWorkWindow::on_pb_add_work_clicked() {
                        .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
                        .arg(QDate::currentDate().year(), 4, 10, QChar('0'));
     std::string str_info = qstr.toStdString() + ui->le_info->text().toStdString();
-/*
-    model::SeparateWork new_work{
-        .name_ = ui->le_name->text().toStdString(),
-        .names_responsible_employees_ = std::move(employees),
-        .date_deadline_ = date_,
-        .info_ = str_info,
-        .status_complet_ = {false, std::nullopt},
-        .status_actual_ = {false, std::nullopt, std::nullopt}};
-*/
+
     work_->name_ = ui->le_name->text().toStdString();
     work_->names_responsible_employees_ = std::move(employees);
     work_->date_deadline_ = date_;
@@ -204,11 +188,7 @@ void AddWorkWindow::on_pb_add_work_clicked() {
     work_->status_complet_ = {false, std::nullopt};
     work_->status_actual_ = {false, std::nullopt, std::nullopt};
 
-    // Добавляем в pool_work_
-    if (!pool_work_.has_value()) {
-        pool_work_ = std::vector<std::shared_ptr<model::SeparateWork>>();
-    }
-    pool_work_->push_back(work_);
+    emit AddNewWork(work_);
 
     emit UpdateTable();
 
@@ -373,11 +353,11 @@ void AddWorkWindow::on_pb_correct_clicked() {
         return;
     }
 
-    pool_work_.value()[index_]->name_ = ui->le_name->text().toStdString();
-    pool_work_.value()[index_]->names_responsible_employees_ = std::move(employees);
-    pool_work_.value()[index_]->date_deadline_ = date_;
+    work_->name_ = ui->le_name->text().toStdString();
+    work_->names_responsible_employees_ = std::move(employees);
+    work_->date_deadline_ = date_;
     if (!(ui->le_info->text().isEmpty())) {
-        pool_work_.value()[index_]->info_ = pool_work_.value()[index_]->info_.value() + "\n\n"  + ui->le_info->text().toStdString();
+        work_->info_ = work_->info_.value() + "\n\n"  + ui->le_info->text().toStdString();
     }
 
     emit UpdateTable();

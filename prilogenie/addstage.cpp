@@ -9,17 +9,14 @@
 #include <QInputDialog>
 
 AddStage::AddStage(std::shared_ptr<app::App> app,
-                   std::optional<std::vector<std::shared_ptr<model::Stage>>>& pool_stage,
                    QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::AddStage)
-    , pool_stage_(pool_stage)
     , stage_(std::make_shared<model::Stage>())
     , date_({QDate::currentDate().day(),
              QDate::currentDate().month(),
              QDate::currentDate().year()})
-    , app_(app)
-    , index_(-1) {
+    , app_(app) {
     ui->setupUi(this);
     setWindowTitle("Добавление этапа");
     ui->pb_correct->setVisible(false);
@@ -36,13 +33,16 @@ AddStage::AddStage(std::shared_ptr<app::App> app,
 
     SetTableProperties(ui->table_work);
 
+// Убрал потому, что хочу убрать из конструктора pool_stage и поле pool_stage_
+// Вторая причина этап нужно делать и инт и еще непойми что (может быть 1,2,3... а может 1.1, 17.2.4 и ТД
+/*
     if (!pool_stage_.has_value()) {
         ui->le_number->setText("1");
     }
     else {
         ui->le_number->setText(QString::number(pool_stage_.value().size() + 1));
     }
-
+*/
     // Для контекстного меню
     // 1. Включаем политику, разрешающую генерацию сигнала при запросе контекстного меню
     ui->table_work->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -51,27 +51,37 @@ AddStage::AddStage(std::shared_ptr<app::App> app,
     connect(ui->table_work, &QTableWidget::customContextMenuRequested,
             this, &AddStage::ShowContextMenu);
 }
-/*
+
 AddStage::AddStage(std::shared_ptr<app::App> app,
-                   std::optional<std::vector<model::Stage> > &pool_stage,
-                   int index,
+                   std::shared_ptr<model::Stage> edit_stage,
                    QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::AddStage)
-    , pool_stage_(pool_stage)
-    , pool_work_(pool_stage.value()[])
+    , stage_(edit_stage)
     , date_({QDate::currentDate().day(),
              QDate::currentDate().month(),
              QDate::currentDate().year()})
-    , app_(app)
-    , expenses_(std::nullopt)
-    , payments_(std::nullopt) {
+    , app_(app) {
     ui->setupUi(this);
-    setWindowTitle("Добавление этапа");
-    ui->pb_correct->setVisible(false);
+    setWindowTitle("Корректировка этапа");
+    ui->pb_correct->setVisible(true);
+    ui->pb_add_stage->setVisible(false);
     SetCompleter(ui->le_responsible_employee, app_->GetBaseEmployee());
 
-    ui->de_deadline_data->setDate(QDate::currentDate());
+    if (stage_->date_deadline_.has_value()) {
+        date_ = stage_->date_deadline_.value();
+        QDate date = QDate(date_.value().year_, date_.value().month_, date_.value().day_);
+        ui->de_deadline_data->setDate(date);
+
+    }
+    else {
+        date_= std::nullopt;
+        ui->de_deadline_data->setDate(QDate());
+        ui->pb_edit_deadline_data->setEnabled(false);
+        ui->de_deadline_data->setEnabled(false);
+        ui->cb_with_deadline_data->setCheckState(Qt::CheckState::Checked);
+    }
+
     ui->de_deadline_data->setDisplayFormat("dd.MM.yyyy");
     connect(ui->de_deadline_data, &QDateEdit::dateChanged,
             this, &AddStage::on_de_deadline_data_dateChanged);
@@ -82,18 +92,29 @@ AddStage::AddStage(std::shared_ptr<app::App> app,
 
     SetTableProperties(ui->table_work);
 
-
-    pool_work_ =
-
-
-
-
-    if (!pool_stage_.has_value()) {
-        ui->le_number->setText("1");
+    if (stage_->name_full_.has_value()) {
+        ui->le_name_full->setText(QString::fromStdString(stage_->name_full_.value()));
     }
-    else {
-        ui->le_number->setText(QString::number(pool_stage_.value().size() + 1));
+    ui->le_number->setText(QString::fromStdString(stage_->number_));
+
+    if (stage_->name_responsible_employee_.has_value()) {
+        ui->le_responsible_employee->setText(QString::fromStdString(stage_->name_responsible_employee_.value()));
     }
+// Не будем давать возможность тереть информацию, только добавлять
+/*
+    if (stage_->info_.has_value()) {
+        ui->le_info->setText(QString::fromStdString(stage_->info_.value()));
+    }
+*/
+
+    ui->sb_price_ruble->setValue(stage_->price_.ruble_);
+    ui->sb_price_kop->setValue(stage_->price_.kop_);
+    ui->sb_price_other_department_ruble->setValue(stage_->price_other_department_.ruble_);
+    ui->sb_price_other_department_kop->setValue(stage_->price_other_department_.kop_);
+
+    if (stage_->status_payment_.has_value()) {
+        ui->le_status_payment->setText(QString::fromStdString(stage_->status_payment_.value()));
+    } 
 
     // Для контекстного меню
     // 1. Включаем политику, разрешающую генерацию сигнала при запросе контекстного меню
@@ -102,8 +123,10 @@ AddStage::AddStage(std::shared_ptr<app::App> app,
     // 2. Подключаем сигнал к нашему слоту
     connect(ui->table_work, &QTableWidget::customContextMenuRequested,
             this, &AddStage::ShowContextMenu);
+
+    UpdateTableWorkInStage();
 }
-*/
+
 AddStage::~AddStage()
 {
     delete ui;
@@ -111,6 +134,14 @@ AddStage::~AddStage()
 
 void AddStage::toUpdateTableWorkInStage() {
     UpdateTableWorkInStage();
+}
+
+void AddStage::toAddNewWork(std::shared_ptr<model::SeparateWork> new_work) {
+    // Добавляем в pool_work_
+    if (!stage_->pool_work_.has_value()) {
+        stage_->pool_work_ = std::vector<std::shared_ptr<model::SeparateWork>>();
+    }
+    stage_->pool_work_->push_back(new_work);
 }
 
 void AddStage::on_pb_add_work_att_as_clicked() {
@@ -148,35 +179,87 @@ void AddStage::on_pb_add_work_att_as_clicked() {
 
 void AddStage::on_pb_add_stage_clicked() {
 
-    if (!pool_stage_.has_value()) {
-        pool_stage_ = std::vector<std::shared_ptr<model::Stage>>{};
+    if (ui->cb_with_deadline_data->isChecked() == true && ui->le_info->text().isEmpty()) {
+        QMessageBox::warning(this, "Ошибка", "Добавьте в поле Дополнительная информация причину отсутствия даты исполнения по этапу");
+        return;
     }
 
-    stage_->number_ = ui->le_number->text().toInt();
+    if (ui->le_responsible_employee->text().isEmpty()) {
+        QMessageBox::warning(this, "Ошибка", "Не назначен ответственный работник!");
+        return;
+    }
+
+    QString qstr = QString("Создана %1.%2.%3\n")
+                       .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
+                       .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
+                       .arg(QDate::currentDate().year(), 4, 10, QChar('0'));
+    std::string str_info;
+    if (ui->le_info->text().isEmpty()) {
+        str_info = qstr.toStdString() + "\n";
+    }
+    else {
+        str_info = qstr.toStdString() + ui->le_info->text().toStdString() + "\n\n";
+    }
+
+    stage_->number_ = ui->le_number->text().toStdString();
     stage_->name_full_ = ui->le_name_full->text().toStdString();
     stage_->date_deadline_ = date_;
     stage_->name_responsible_employee_ = ui->le_responsible_employee->text().toStdString();
     stage_->price_ = {ui->sb_price_ruble->value(), ui->sb_price_kop->value()};
     stage_->price_other_department_ = {ui->sb_price_other_department_ruble->value(), ui->sb_price_other_department_kop->value()};
-    stage_->info_ = ui->le_info->text().toStdString();
+    stage_->info_ = str_info;
     stage_->status_complet_ = {false, std::nullopt};
     stage_->status_actual_ = {false, std::nullopt, std::nullopt};
     stage_->is_paid_ = false;
     stage_->status_payment_ = ui->le_status_payment->text().toStdString();
 
-    pool_stage_.value().push_back(stage_);
+    emit AddNewStage(stage_);
 
     emit UpdateTable();
 
     QMessageBox::information(this, "Добавление этапа", "Этап добавлен!");
 }
 
-void AddStage::on_cb_correct_number_stateChanged(int arg1) {
-    ui->le_number->setEnabled(arg1);
+
+
+void AddStage::on_pb_correct_clicked() {
+    if (ui->cb_with_deadline_data->isChecked() == true && ui->le_info->text().isEmpty()) {
+        QMessageBox::warning(this, "Ошибка", "Добавьте в поле Дополнительная информация причину отсутствия даты исполнения по этапу");
+        return;
+    }
+
+    if (ui->le_responsible_employee->text().isEmpty()) {
+        QMessageBox::warning(this, "Ошибка", "Не назначен ответственный работник!");
+        return;
+    }
+
+    QString qstr = QString("Внесены изменения %1.%2.%3\n")
+                       .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
+                       .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
+                       .arg(QDate::currentDate().year(), 4, 10, QChar('0'));
+    std::string str_info = qstr.toStdString() + ui->le_info->text().toStdString();
+
+    stage_->number_ = ui->le_number->text().toStdString();
+    stage_->name_full_ = ui->le_name_full->text().toStdString();
+    stage_->date_deadline_ = date_;
+    stage_->name_responsible_employee_ = ui->le_responsible_employee->text().toStdString();
+    stage_->price_ = {ui->sb_price_ruble->value(), ui->sb_price_kop->value()};
+    stage_->price_other_department_ = {ui->sb_price_other_department_ruble->value(), ui->sb_price_other_department_kop->value()};
+    if (!stage_->info_.has_value()) {
+        stage_->info_ = str_info;
+    }
+    else {
+        stage_->info_ = stage_->info_.value() + "\n\n" + str_info;
+    }
+    stage_->status_payment_ = ui->le_status_payment->text().toStdString();
+
+    emit UpdateTable();
+
+    QMessageBox::information(this, "Изменение этапа", "Этап изменен!");
 }
 
 void AddStage::on_pb_add_work_clicked() {
-    emit AddWorkInStage(stage_->pool_work_);
+    emit AddWorkInStage();
 }
 
 void AddStage::on_table_work_cellChanged(int row, int column)
@@ -434,7 +517,7 @@ void AddStage::ShowContextMenu(const QPoint &pos) {
     QAction* selectedAction = menu.exec(ui->table_work->mapToGlobal(pos));
 
     if (selectedAction == action_edit) {
-        emit EditWork(stage_->pool_work_, index);
+        emit EditWork(stage_->pool_work_.value()[index]);
     }
     else if (selectedAction == action_delete) {
         on_ActionDelete(index);

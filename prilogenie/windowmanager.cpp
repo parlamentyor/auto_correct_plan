@@ -41,6 +41,8 @@ void WindowManager::onAddContract() {
         connect(main_window_, &MainWindow::AddWorkInContract, this, &WindowManager::onAddWorkInContract);
         connect(main_window_, &MainWindow::AddExpensesInContract, this, &WindowManager::onAddExpensesInContract);
         connect(main_window_, &MainWindow::EditPaymentsInContract, this, &WindowManager::onEditPayments);
+        connect(main_window_, &MainWindow::EditWork, this, &WindowManager::onEditWork);
+        connect(main_window_, &MainWindow::EditStage, this, &WindowManager::onEditStage);
         // Дополнительно: отслеживаем уничтожение окна, чтобы обнулить указатель
         connect(main_window_, &QObject::destroyed, this, [this]() {
             main_window_ = nullptr;
@@ -49,11 +51,11 @@ void WindowManager::onAddContract() {
     main_window_->show();
 }
 
-void WindowManager::onAddWorkInContract(std::shared_ptr<app::App> app,
-                                        std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work) {
+void WindowManager::onAddWorkInContract(std::shared_ptr<app::App> app) {
     if (!add_work_window_) {
-        add_work_window_ = new AddWorkWindow(app, pool_work);
+        add_work_window_ = new AddWorkWindow(app);
         add_work_window_->setAttribute(Qt::WA_DeleteOnClose);
+        connect(add_work_window_, &AddWorkWindow::AddNewWork, main_window_, &MainWindow::toAddNewWork);     //!!!!!!!!могут быть проблемы
         connect(add_work_window_, &QObject::destroyed, this, [this]() {
             add_work_window_ = nullptr;
         });
@@ -65,10 +67,12 @@ void WindowManager::onAddWorkInContract(std::shared_ptr<app::App> app,
     add_work_window_->show();
 }
 
-void WindowManager::onAddWorkInStage(std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work) {
+void WindowManager::onAddWorkInStage() {
     if (!add_work_window_) {
-        add_work_window_ = new AddWorkWindow(app_, pool_work);
+        add_work_window_ = new AddWorkWindow(app_);
         add_work_window_->setAttribute(Qt::WA_DeleteOnClose);
+
+        connect(add_work_window_, &AddWorkWindow::AddNewWork, add_stage_, &AddStage::toAddNewWork);         //!!!!!!!!могут быть проблемы
         connect(add_work_window_, &QObject::destroyed, this, [this]() {
             add_work_window_ = nullptr;
         });
@@ -102,14 +106,16 @@ void WindowManager::onAppAboutToQuit() {
     }
 }
 
-void WindowManager::onAddStageInContract(std::optional<std::vector<std::shared_ptr<model::Stage>>> &pool_stage) {
+void WindowManager::onAddStageInContract() {
     if (!add_stage_) {
-        add_stage_ = new AddStage(app_, pool_stage);
+        add_stage_ = new AddStage(app_);
         add_stage_->setAttribute(Qt::WA_DeleteOnClose);
         connect(add_stage_, &AddStage::AddWorkInStage, this, &WindowManager::onAddWorkInStage);
         connect(add_stage_, &AddStage::AddExpensesInStage, this, &WindowManager::onAddExpensesInStage);
         connect(add_stage_, &AddStage::EditPaymentsInStage, this, &WindowManager::onEditPayments);
         connect(add_stage_, &AddStage::EditWork, this, &WindowManager::onEditWork);
+        connect(add_stage_, &AddStage::AddNewStage, main_window_, &MainWindow::toAddNewStage);
+
         connect(add_stage_, &QObject::destroyed, this, [this]() {
             add_stage_ = nullptr;
         });
@@ -182,9 +188,9 @@ void WindowManager::onEditPayments(std::optional<std::vector<model::Payment>> &p
     payments_window_->show();
 }
 
-void WindowManager::onEditWork(std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work, int pos) {
+void WindowManager::onEditWork(std::shared_ptr<model::SeparateWork> edit_work) {
     if (!add_work_window_) {
-        add_work_window_ = new AddWorkWindow(app_, pool_work, pos);
+        add_work_window_ = new AddWorkWindow(app_, edit_work);
         add_work_window_->setAttribute(Qt::WA_DeleteOnClose);
         connect(add_work_window_, &QObject::destroyed, this, [this]() {
             add_work_window_ = nullptr;
@@ -193,7 +199,29 @@ void WindowManager::onEditWork(std::optional<std::vector<std::shared_ptr<model::
         // Соединяем сигнал со слотом менеджера для обновления таблицы в окне добавления этапа
         connect(add_work_window_, &AddWorkWindow::UpdateTable,
                 this, &WindowManager::onUpdateTableWorkInStage);
+        connect(add_work_window_, &AddWorkWindow::UpdateTable,
+                this, &WindowManager::onUpdateTable);
     }
     add_work_window_->show();
+}
+
+void WindowManager::onEditStage(std::shared_ptr<model::Stage> edit_stage) {
+    if (!add_stage_) {
+        add_stage_ = new AddStage(app_, edit_stage);
+        connect(add_stage_, &AddStage::AddWorkInStage, this, &WindowManager::onAddWorkInStage);
+        connect(add_stage_, &AddStage::AddExpensesInStage, this, &WindowManager::onAddExpensesInStage);
+        connect(add_stage_, &AddStage::EditPaymentsInStage, this, &WindowManager::onEditPayments);
+        connect(add_stage_, &AddStage::EditWork, this, &WindowManager::onEditWork);
+        connect(add_stage_, &AddStage::AddNewStage, main_window_, &MainWindow::toAddNewStage);
+        add_stage_->setAttribute(Qt::WA_DeleteOnClose);
+        connect(add_stage_, &QObject::destroyed, this, [this]() {
+            add_stage_ = nullptr;
+        });
+
+        // Соединяем сигнал со слотом менеджера для обновления таблицы в окне добавления этапа
+        connect(add_stage_, &AddStage::UpdateTable,
+                this, &WindowManager::onUpdateTable);
+    }
+    add_stage_->show();
 }
 

@@ -20,30 +20,28 @@ class AddStage : public QMainWindow
 
 public:
     explicit AddStage(std::shared_ptr<app::App> app,
-                      std::optional<std::vector<std::shared_ptr<model::Stage>>> &pool_stage,
                       QWidget *parent = nullptr);
     explicit AddStage(std::shared_ptr<app::App> app,
-                      std::optional<std::vector<std::shared_ptr<model::Stage>>> &pool_stage,
-                      int index,
+                      std::shared_ptr<model::Stage> edit_stage_,
                       QWidget *parent = nullptr);
     ~AddStage();
 
 signals:
     void UpdateTable();
-    void AddWorkInStage(std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work);
+    void AddWorkInStage();
     void AddExpensesInStage(std::optional<std::vector<model::Expenses>>& expenses);
     void EditPaymentsInStage(std::optional<std::vector<model::Payment>>& payments);
-    void EditWork(std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work,
-                  int pos);
+    void EditWork(std::shared_ptr<model::SeparateWork> edit_work);
+    void AddNewStage(std::shared_ptr<model::Stage> new_stage);
 
 public slots:
     void toUpdateTableWorkInStage();
+    void toAddNewWork(std::shared_ptr<model::SeparateWork> new_work);
 
 private slots:
     void on_pb_add_work_att_as_clicked();
     void on_pb_add_stage_clicked();
     void on_cb_with_deadline_data_stateChanged(int arg1);
-    void on_cb_correct_number_stateChanged(int arg1);
     void on_pb_add_work_clicked();
     void on_table_work_cellChanged(int row, int column);
 
@@ -57,14 +55,13 @@ private slots:
 
     void ShowContextMenu(const QPoint& pos);
 
+    void on_pb_correct_clicked();
+
 private:
     Ui::AddStage *ui;
-    std::optional<std::vector<std::shared_ptr<model::Stage>>>& pool_stage_;
     std::shared_ptr<model::Stage> stage_;
     std::optional<model::Date> date_;
     std::shared_ptr<app::App> app_;
-
-    int index_;
 
     void SetTableProperties(QTableWidget* table);
     void UpdateTableWorkInStage();

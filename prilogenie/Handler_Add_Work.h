@@ -101,7 +101,7 @@ namespace details {
         // Заполняем первый столбец (name_)
 //        table->setItem(rowCount, 0,
 //                       new QTableWidgetItem(QString::fromStdString(stage.name_full_.value_or(""))));
-        QTableWidgetItem* nameItem = new QTableWidgetItem(QString("Этап %1\n%2").arg(stage.number_).arg(QString::fromStdString(stage.name_full_.value_or(""))));
+        QTableWidgetItem* nameItem = new QTableWidgetItem(QString("Этап %1\n%2").arg(QString::fromStdString(stage.number_)).arg(QString::fromStdString(stage.name_full_.value_or(""))));
         nameItem->setFlags(nameItem->flags() | Qt::ItemIsEditable);
         table->setItem(rowCount, 0, nameItem);
 

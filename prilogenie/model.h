@@ -122,7 +122,7 @@ namespace model {
     };
 
     struct Stage {
-        int number_;
+        std::string number_;
 //        std::optional<std::string> name_organization_;
 //        std::optional<std::string> name_short_;
         std::optional<std::string> name_full_; // убрать optional полное наименование обязано быть

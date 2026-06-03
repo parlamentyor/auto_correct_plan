@@ -288,7 +288,7 @@ QVariant ContractModel::getStageRowData(const ItemInfo& info, int column, int ro
         switch (column) {
         case 0: return QString("%1.%2").arg(info.contractIndex + 1).arg(info.stageIndex + 1);
         case 1: return stage->name_full_.has_value() ?
-                       QString("Этап №%1 %2").arg(stage->number_).arg(QString::fromStdString(stage->name_full_.value())) : "";
+                       QString("Этап №%1 %2").arg(QString::fromStdString(stage->number_)).arg(QString::fromStdString(stage->name_full_.value())) : "";
         case 3: return stage->date_deadline_.has_value() ?
                        formatDate(stage->date_deadline_.value()) : "";
         case 4: return stage->name_responsible_employee_.has_value() ?

@@ -10,6 +10,7 @@
 #include <QMessageBox>
 #include <QCalendarWidget>
 #include <QCompleter>
+#include <QInputDialog>
 
 MainWindow::MainWindow(std::shared_ptr<app::App> app, QWidget *parent)
     : QMainWindow(parent)
@@ -39,27 +40,49 @@ MainWindow::MainWindow(std::shared_ptr<app::App> app, QWidget *parent)
             this, &MainWindow::on_table_work_cellChanged);
 
     SetTableProperties(ui->table_work);
+
+    // Для контекстного меню
+    // 1. Включаем политику, разрешающую генерацию сигнала при запросе контекстного меню
+    ui->table_work->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    // 2. Подключаем сигнал к нашему слоту
+    connect(ui->table_work, &QTableWidget::customContextMenuRequested,
+            this, &MainWindow::ShowContextMenu);
+
+    BuildVirtualRows();
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::toUpdateTable()
-{
+void MainWindow::toUpdateTable() {
+    UpdateTable();
+}
+
+void MainWindow::toAddNewWork(std::shared_ptr<model::SeparateWork> new_work) {
+    if (!contract_->pool_work.has_value()) {
+        contract_->pool_work = std::vector<std::shared_ptr<model::SeparateWork>>();
+    }
+    contract_->pool_work->push_back(new_work);
+}
+
+void MainWindow::toAddNewStage(std::shared_ptr<model::Stage> new_stage) {
+    if (!contract_->pool_stage_.has_value()) {
+        contract_->pool_stage_ = std::vector<std::shared_ptr<model::Stage>>();
+    }
+    contract_->pool_stage_->push_back(new_stage);
+
     UpdateTable();
 }
 
 
-void MainWindow::on_pb_odt_clicked()
-{
+void MainWindow::on_pb_odt_clicked() {
     CreateOdtWithTable();
 }
 
 
-void MainWindow::on_pb_pdf_clicked()
-{
+void MainWindow::on_pb_pdf_clicked() {
     CreatePdfReport();
 }
 
@@ -179,7 +202,8 @@ void MainWindow::on_pb_add_stage_clicked()
 {
     ui->chb_stage->setEnabled(false);
 
-    emit AddStageInContract(contract_->pool_stage_);
+    emit AddStageInContract();
+
 }
 
 void MainWindow::SetTableProperties(QTableWidget* table) {
@@ -206,9 +230,23 @@ void MainWindow::UpdateTable() {
     if (contract_->pool_stage_.has_value()) {
         for (const auto& stage : contract_->pool_stage_.value()) {
             details::AddStageToTable(ui->table_work, *stage);
+            int row_stage = ui->table_work->rowCount() - 1;
+            if (stage->status_complet_.is_complet_) {
+                SetRowBackgroundColor(row_stage, QColor(144, 238, 144));  //Светло-зеленый
+            }
+            if (stage->status_actual_.is_no_actual_) {
+                SetRowBackgroundColor(row_stage, Qt::lightGray);  //Светло-серый
+            }
             if (stage->pool_work_.has_value()) {
                 for (const auto& work : stage->pool_work_.value()) {
                     details::AddSeparateWorkToTable(ui->table_work, *work);
+                    int row = ui->table_work->rowCount() - 1;
+                    if (work->status_complet_.is_complet_) {
+                        SetRowBackgroundColor(row, QColor(144, 238, 144));  //Светло-зеленый
+                    }
+                    if (work->status_actual_.is_no_actual_) {
+                        SetRowBackgroundColor(row, Qt::lightGray);  //Светло-серый
+                    }
                 }
             }
         }
@@ -218,6 +256,13 @@ void MainWindow::UpdateTable() {
         details::AddHeaderToTable(ui->table_work, "Работы вне этапа");
         for (const auto& work : contract_->pool_work.value()) {
             details::AddSeparateWorkToTable(ui->table_work, *work);
+            int row = ui->table_work->rowCount() - 1;
+            if (work->status_complet_.is_complet_) {
+                SetRowBackgroundColor(row, QColor(144, 238, 144));  //Светло-зеленый
+            }
+            if (work->status_actual_.is_no_actual_) {
+                SetRowBackgroundColor(row, Qt::lightGray);  //Светло-серый
+            }
         }
     }
 
@@ -230,7 +275,7 @@ void MainWindow::UpdateTable() {
 }
 
 void MainWindow::on_pb_add_work_clicked() {
-    emit AddWorkInContract(app_, contract_->pool_work);
+    emit AddWorkInContract(app_);
 }
 
 void MainWindow::on_table_work_cellChanged(int row, int column) {
@@ -553,33 +598,34 @@ void MainWindow::on_chb_nds_stateChanged(int arg1) {
 
 
 
-MainWindow::ItemInfo MainWindow::GetItemInfo(int virtualRow) const {
-    if (virtualRow >= 0 && virtualRow < static_cast<int>(virtualRows_.size())) {
-        return virtualRows_[virtualRow].info;
+MainWindow::ItemInfo MainWindow::GetItemInfo(int virtual_row) const {
+    if (virtual_row >= 0 && virtual_row < static_cast<int>(virtual_rows_.size())) {
+        return virtual_rows_[virtual_row].info_;
     }
-    //    return {ItemInfo::Type::HeaderRow, -1, -1, -1}; //Возможно и не нужно это
+    return {ItemInfo::Type::HeaderRow, -1, -1, -1}; //Возможно и не нужно это
 }
 
 void MainWindow::BuildVirtualRows() const {
-    virtualRows_.clear();
-    int globalRow = 0;
+    virtual_rows_.clear();
+    int global_row = 0;
 //    int subCounter = 1; // для нумерации работ без этапов
 
     // Отображаем этапы
     if (contract_->pool_stage_.has_value()) {
         const auto& stages = contract_->pool_stage_.value();
-        for (size_t stageIdx = 0; stageIdx < stages.size(); ++stageIdx) {
+        for (size_t stage_idx = 0; stage_idx < stages.size(); ++stage_idx) {
             // Строка этапа
-            virtualRows_.push_back({{ItemInfo::Type::StageRow,
-                                     static_cast<int>(stageIdx), -1, globalRow++}});
+            virtual_rows_.push_back({{ItemInfo::Type::StageRow,
+                                     static_cast<int>(stage_idx), -1, global_row++}});
 
             // Отображаем работы этапа
-            if (stages[stageIdx]->pool_work_.has_value()) {
-                const auto& works = stages[stageIdx]->pool_work_.value();
-                for (size_t workIdx = 0; workIdx < works.size(); ++workIdx) {
-                    virtualRows_.push_back({{ItemInfo::Type::WorkRow,
-                                             static_cast<int>(stageIdx),
-                                             static_cast<int>(workIdx), globalRow++}});
+            if (stages[stage_idx]->pool_work_.has_value()) {
+                const auto& works = stages[stage_idx]->pool_work_.value();
+                for (size_t work_idx = 0; work_idx < works.size(); ++work_idx) {
+                    virtual_rows_.push_back({{ItemInfo::Type::WorkRow,
+                                              static_cast<int>(stage_idx),
+                                              static_cast<int>(work_idx),
+                                              global_row++}});
                 }
             }
 //            subCounter = stages.size() + 1;
@@ -588,13 +634,272 @@ void MainWindow::BuildVirtualRows() const {
 
     // Отображаем работы контракта (без этапов)
     if (contract_->pool_work.has_value()) {
-        virtualRows_.push_back({{ItemInfo::Type::WorkRow, -1, -1, globalRow++}});
+        virtual_rows_.push_back({{ItemInfo::Type::HeaderRow, -1, -1, global_row++}});
         const auto& works = contract_->pool_work.value();
-        for (size_t workIdx = 0; workIdx < works.size(); ++workIdx) {
-            virtualRows_.push_back({{ItemInfo::Type::WorkRow,
-                                     -1,
-                                     static_cast<int>(workIdx), globalRow++}});
+        for (size_t work_idx = 0; work_idx < works.size(); ++work_idx) {
+            virtual_rows_.push_back({{ItemInfo::Type::WorkRow,
+                                      -1,
+                                      static_cast<int>(work_idx),
+                                      global_row++}});
         }
     }
 }
 
+void MainWindow::ShowContextMenu(const QPoint &pos) {
+    // pos - это координаты клика относительно виджета tableWidget.
+    // Чтобы узнать, по какой именно ячейке кликнули, используем itemAt().
+    QTableWidgetItem* item = ui->table_work->itemAt(pos);
+
+    if (!item) {
+        // Кликнули не по ячейке, а по пустой области таблицы
+        return;
+    }
+
+    // Сохраняем строку, чтобы потом производить действия над ней
+    int index = item->row();
+
+    auto item_info = GetItemInfo(index);
+
+    if (item_info.type_ == ItemInfo::Type::WorkRow && item_info.stage_index_ == -1) {
+        ShowContextMenuWork(contract_->pool_work, pos, item_info.work_index_);
+    }
+    else if (item_info.type_ == ItemInfo::Type::WorkRow && item_info.stage_index_ != -1) {
+        ShowContextMenuWork(contract_->pool_stage_.value()[item_info.stage_index_]->pool_work_, pos, item_info.work_index_);
+    }
+    else if (item_info.type_ == ItemInfo::Type::StageRow) {
+        ShowContextMenuStage(contract_->pool_stage_, pos, item_info.stage_index_);
+    }
+
+    UpdateTable();
+}
+
+void MainWindow::ShowContextMenuWork(std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work, const QPoint &pos, int work_index) {
+    QMenu menu;
+    QAction* action_edit_work = menu.addAction("Редактировать работу");
+    QAction* action_delete_work = menu.addAction("Удалить работу");
+    QAction* action_complet_work = menu.addAction("Изменить статус выполнения");
+    QAction* action_actual_work = menu.addAction("Изменить статус актуальности");
+
+    if (pool_work.value()[work_index]->status_complet_.is_complet_) {
+        action_edit_work->setEnabled(false);
+        action_delete_work->setEnabled(false);
+        action_actual_work->setEnabled(false);
+    }
+
+    if (pool_work.value()[work_index]->status_actual_.is_no_actual_) {
+        action_edit_work->setEnabled(false);
+        action_delete_work->setEnabled(false);
+        action_complet_work->setEnabled(false);
+    }
+
+    // Показываем меню в точке клика. mapToGlobal преобразует локальные координаты в глобальные.
+    QAction* selected_action = menu.exec(ui->table_work->mapToGlobal(pos));
+
+    if (selected_action == action_edit_work) {
+        emit EditWork(pool_work.value()[work_index]);
+    }
+    else if (selected_action == action_delete_work) {
+        on_ActionDeleteWork(pool_work, work_index);
+    }
+    else if (selected_action == action_complet_work) {
+        on_ActionCompletWork(pool_work, work_index);
+    }
+    else if (selected_action == action_actual_work) {
+        on_ActionActualWork(pool_work, work_index);
+    }
+}
+
+void MainWindow::ShowContextMenuStage(std::optional<std::vector<std::shared_ptr<model::Stage> > > &pool_stage,
+                                      const QPoint &pos,
+                                      int stage_index) {
+    QMenu menu;
+    QAction* action_edit_stage = menu.addAction("Редактировать этап");
+    QAction* action_delete_stage = menu.addAction("Удалить этап");
+    QAction* action_complet_stage = menu.addAction("Изменить статус выполнения");
+    QAction* action_actual_stage = menu.addAction("Изменить статус актуальности");
+
+    if (pool_stage.value()[stage_index]->status_complet_.is_complet_) {
+        action_edit_stage->setEnabled(false);
+        action_delete_stage->setEnabled(false);
+        action_actual_stage->setEnabled(false);
+    }
+
+    if (pool_stage.value()[stage_index]->status_actual_.is_no_actual_) {
+        action_edit_stage->setEnabled(false);
+        action_delete_stage->setEnabled(false);
+        action_complet_stage->setEnabled(false);
+    }
+
+    // Показываем меню в точке клика. mapToGlobal преобразует локальные координаты в глобальные.
+    QAction* selected_action = menu.exec(ui->table_work->mapToGlobal(pos));
+
+    if (selected_action == action_edit_stage) {
+        emit EditStage(pool_stage.value()[stage_index]);
+    }
+    else if (selected_action == action_delete_stage) {
+        on_ActionDeleteStage(pool_stage, stage_index);
+    }
+    else if (selected_action == action_complet_stage) {
+        on_ActionCompletStage(pool_stage, stage_index);
+    }
+    else if (selected_action == action_actual_stage) {
+        on_ActionActualStage(pool_stage, stage_index);
+    }
+}
+
+void MainWindow::on_ActionDeleteWork(std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work, int index) {
+    pool_work.value().erase(pool_work.value().begin() + index);
+    if (pool_work.value().empty()) {
+        pool_work = std::nullopt;
+    }
+}
+
+void MainWindow::on_ActionCompletWork(const std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work, int index) {
+    if (!(pool_work.value()[index]->status_complet_.is_complet_)) {
+        model::Date date = {QDate::currentDate().day(),
+                            QDate::currentDate().month(),
+                            QDate::currentDate().year()};
+        pool_work.value()[index]->status_complet_ = {true, date};
+        QString qstr = QString("\n\nВыполнена %1.%2.%3")
+                           .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
+                           .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
+                           .arg(QDate::currentDate().year(), 4, 10, QChar('0'));
+        std::string str_info = qstr.toStdString();
+        pool_work.value()[index]->info_ = pool_work.value()[index]->info_.value() + str_info;
+    }
+    else {
+        pool_work.value()[index]->status_complet_ = {false, std::nullopt};
+        QString qstr = QString("\n\nВернули в работу %1.%2.%3")
+                           .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
+                           .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
+                           .arg(QDate::currentDate().year(), 4, 10, QChar('0'));
+        std::string str_info = qstr.toStdString();
+        pool_work.value()[index]->info_ = pool_work.value()[index]->info_.value() + str_info;
+    }
+}
+
+void MainWindow::on_ActionActualWork(const std::optional<std::vector<std::shared_ptr<model::SeparateWork>>>& pool_work, int index) {
+    if (!(pool_work.value()[index]->status_actual_.is_no_actual_)) {
+        bool ok;
+        QString text = QInputDialog::getText(
+            nullptr,
+            "Изменение статуса актуальности",
+            "Введите причину изменения статуса актуальности:",
+            QLineEdit::Normal,
+            "",
+            &ok
+            );
+
+        if (ok && !text.isEmpty()) {
+            model::Date date = {QDate::currentDate().day(),
+                                QDate::currentDate().month(),
+                                QDate::currentDate().year()};
+            pool_work.value()[index]->status_actual_ = {true, date, text.toStdString()};
+            QString qstr = QString("\n\nНеактуальна %1.%2.%3\n%4")
+                               .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
+                               .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
+                               .arg(QDate::currentDate().year(), 4, 10, QChar('0'))
+                               .arg(QString::fromStdString(text.toStdString()));
+            std::string str_info = qstr.toStdString();
+            pool_work.value()[index]->info_ = pool_work.value()[index]->info_.value() + str_info;
+        }
+    }
+    else {
+        pool_work.value()[index]->status_actual_ = {false, std::nullopt, std::nullopt};
+        QString qstr = QString("\n\nВернули в работу %1.%2.%3")
+                           .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
+                           .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
+                           .arg(QDate::currentDate().year(), 4, 10, QChar('0'));
+        std::string str_info = qstr.toStdString();
+        pool_work.value()[index]->info_ = pool_work.value()[index]->info_.value() + str_info;
+    }
+}
+
+void MainWindow::on_ActionDeleteStage(std::optional<std::vector<std::shared_ptr<model::Stage>>>& pool_stage, int index) {
+    pool_stage.value().erase(pool_stage.value().begin() + index);
+    if (pool_stage.value().empty()) {
+        pool_stage = std::nullopt;
+    }
+}
+
+void MainWindow::on_ActionCompletStage(const std::optional<std::vector<std::shared_ptr<model::Stage>>>& pool_stage, int index) {
+    if (!(pool_stage.value()[index]->status_complet_.is_complet_)) {
+        model::Date date = {QDate::currentDate().day(),
+                            QDate::currentDate().month(),
+                            QDate::currentDate().year()};
+        pool_stage.value()[index]->status_complet_ = {true, date};
+        QString qstr = QString("\n\nВыполнен %1.%2.%3")
+                           .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
+                           .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
+                           .arg(QDate::currentDate().year(), 4, 10, QChar('0'));
+        std::string str_info = qstr.toStdString();
+        pool_stage.value()[index]->info_ = pool_stage.value()[index]->info_.value() + str_info;
+    }
+    else {
+        pool_stage.value()[index]->status_complet_ = {false, std::nullopt};
+        QString qstr = QString("\n\nВернули в работу %1.%2.%3")
+                           .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
+                           .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
+                           .arg(QDate::currentDate().year(), 4, 10, QChar('0'));
+        std::string str_info = qstr.toStdString();
+        pool_stage.value()[index]->info_ = pool_stage.value()[index]->info_.value() + str_info;
+    }
+}
+
+void MainWindow::on_ActionActualStage(const std::optional<std::vector<std::shared_ptr<model::Stage>>>& pool_stage, int index) {
+    if (!(pool_stage.value()[index]->status_actual_.is_no_actual_)) {
+        bool ok;
+        QString text = QInputDialog::getText(
+            nullptr,
+            "Изменение статуса актуальности",
+            "Введите причину изменения статуса актуальности:",
+            QLineEdit::Normal,
+            "",
+            &ok
+            );
+
+        if (ok && !text.isEmpty()) {
+            model::Date date = {QDate::currentDate().day(),
+                                QDate::currentDate().month(),
+                                QDate::currentDate().year()};
+            pool_stage.value()[index]->status_actual_ = {true, date, text.toStdString()};
+            QString qstr = QString("\n\nНеактуальный %1.%2.%3\n%4")
+                               .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
+                               .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
+                               .arg(QDate::currentDate().year(), 4, 10, QChar('0'))
+                               .arg(QString::fromStdString(text.toStdString()));
+            std::string str_info = qstr.toStdString();
+            pool_stage.value()[index]->info_ = pool_stage.value()[index]->info_.value() + str_info;
+        }
+    }
+    else {
+        pool_stage.value()[index]->status_actual_ = {false, std::nullopt, std::nullopt};
+        QString qstr = QString("\n\nВернули в работу %1.%2.%3")
+                           .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
+                           .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
+                           .arg(QDate::currentDate().year(), 4, 10, QChar('0'));
+        std::string str_info = qstr.toStdString();
+        pool_stage.value()[index]->info_ = pool_stage.value()[index]->info_.value() + str_info;
+    }
+}
+
+void MainWindow::SetRowBackgroundColor(int row, const QColor& color) {
+    // Получаем количество столбцов в таблице
+    int columnCount = ui->table_work->columnCount();
+
+    // Перебираем все столбцы в указанной строке
+    for (int col = 0; col < columnCount; ++col) {
+        QTableWidgetItem* item = ui->table_work->item(row, col);
+
+        // Если ячейка существует
+        if (item) {
+            // Устанавливаем цвет фона
+            item->setBackground(color);
+        } else {
+            // Если ячейка пустая, создаем новый item
+            item = new QTableWidgetItem();
+            item->setBackground(color);
+            ui->table_work->setItem(row, col, item);
+        }
+    }
+}
