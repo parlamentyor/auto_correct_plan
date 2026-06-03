@@ -118,7 +118,7 @@ void ContractView::mousePressEvent(QMouseEvent* event) {
 void SpanDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
            const QModelIndex& index) const {
 //    auto* tableView = qobject_cast<QTableView*>(option.widget); // тут ошибка заменил далее объявлением и if...
-    // Правильное получение tableView
+// Правильное получение tableView
     QTableView* tableView = nullptr;
     if (option.widget) {
         // const_cast безопасен, так как widget на самом деле не константный

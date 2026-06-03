@@ -359,18 +359,32 @@ void AddStage::UpdateTableWorkInStage() {
         for (const auto& work : stage_->pool_work_.value()) {
             details::AddSeparateWorkToTable(ui->table_work, *work);
             int row = ui->table_work->rowCount() - 1;
-            if (work->status_complet_.is_complet_) {
-                SetRowBackgroundColor(row, QColor(144, 238, 144));  //Светло-зеленый
-            }
-            if (work->status_actual_.is_no_actual_) {
-                SetRowBackgroundColor(row, Qt::lightGray);  //Светло-серый
-            }
+            SetRowBackgroundColor(row, GetColor(work));  //Светло-зеленый
         }
     }
 
     SetTableProperties(ui->table_work);
     // Включаем сигналы обратно, чтобы изменения в таблице сразу заносились в работы/этапы
     ui->table_work->blockSignals(false);
+}
+
+QColor AddStage::GetColor(const std::shared_ptr<model::SeparateWork>& work) {
+    if (!(work->status_actual_.is_no_actual_)) {
+        if (work->status_complet_.is_complet_) {
+            return  QColor(144, 238, 144);          //Светло-зеленый
+        }
+        else {
+            QDate date = QDate(work->date_deadline_.value().year_, work->date_deadline_.value().month_, work->date_deadline_.value().day_);
+            if (QDate::currentDate() > date) {
+                return  QColor(255, 0, 0);          //Красный
+            }
+            else {
+                return  QColor(Qt::transparent);    //Прозрачный или QColor(0, 0, 0, 0)
+            }
+        }
+    }
+    return Qt::lightGray;                            //Светло-серый
+
 }
 
 void AddStage::SetCompleter(QLineEdit *le, const std::set<std::string> &base) {

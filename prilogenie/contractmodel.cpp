@@ -31,7 +31,7 @@ void ContractModel::buildVirtualRows() const {
         virtualRows_.push_back({{ItemInfo::Type::ContractRow,
                                  static_cast<int>(contractIdx), -1, -1, globalRow++}});
 
-        int subCounter = 1; // для нумерации работ без этапов
+//        int subCounter = 1; // для нумерации работ без этапов // IDE РУГАЕТСЯ, ГОТОРИТ НЕ НУЖНА ЭТА ПЕРЕМЕННАЯ
 
         // Отображаем этапы
         if (contract->pool_stage_.has_value()) {
@@ -52,7 +52,7 @@ void ContractModel::buildVirtualRows() const {
                                                  static_cast<int>(workIdx), globalRow++}});
                     }
                 }
-                subCounter = stages.size() + 1;
+//                subCounter = stages.size() + 1;   // IDE РУГАЕТСЯ, ГОТОРИТ НЕ НУЖНА ЭТА ПЕРЕМЕННАЯ c 'nbv ltqcndbtv
             }
         }
 
