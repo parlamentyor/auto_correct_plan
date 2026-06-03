@@ -229,24 +229,15 @@ void MainWindow::UpdateTable() {
 
     if (contract_->pool_stage_.has_value()) {
         for (const auto& stage : contract_->pool_stage_.value()) {
+            stage->UpdateIsPaid();                                 // явно не здесь это должно быть, когда-нибудь разобраться и исправить
             details::AddStageToTable(ui->table_work, *stage);
             int row_stage = ui->table_work->rowCount() - 1;
-            if (stage->status_complet_.is_complet_) {
-                SetRowBackgroundColor(row_stage, QColor(144, 238, 144));  //Светло-зеленый
-            }
-            if (stage->status_actual_.is_no_actual_) {
-                SetRowBackgroundColor(row_stage, Qt::lightGray);  //Светло-серый
-            }
+            SetRowBackgroundColor(row_stage, GetColorStage(stage));
             if (stage->pool_work_.has_value()) {
                 for (const auto& work : stage->pool_work_.value()) {
                     details::AddSeparateWorkToTable(ui->table_work, *work);
                     int row = ui->table_work->rowCount() - 1;
-                    if (work->status_complet_.is_complet_) {
-                        SetRowBackgroundColor(row, QColor(144, 238, 144));  //Светло-зеленый
-                    }
-                    if (work->status_actual_.is_no_actual_) {
-                        SetRowBackgroundColor(row, Qt::lightGray);  //Светло-серый
-                    }
+                        SetRowBackgroundColor(row, GetColorWork(work));
                 }
             }
         }
@@ -257,12 +248,7 @@ void MainWindow::UpdateTable() {
         for (const auto& work : contract_->pool_work.value()) {
             details::AddSeparateWorkToTable(ui->table_work, *work);
             int row = ui->table_work->rowCount() - 1;
-            if (work->status_complet_.is_complet_) {
-                SetRowBackgroundColor(row, QColor(144, 238, 144));  //Светло-зеленый
-            }
-            if (work->status_actual_.is_no_actual_) {
-                SetRowBackgroundColor(row, Qt::lightGray);  //Светло-серый
-            }
+            SetRowBackgroundColor(row, GetColorWork(work));
         }
     }
 
@@ -547,6 +533,47 @@ void MainWindow::AddOrganizationInBase() {
     }
 }
 
+QColor MainWindow::GetColorStage(const std::shared_ptr<model::Stage>& stage) {
+    if (!(stage->status_actual_.is_no_actual_)) {
+        if (stage->status_complet_.is_complet_) {
+            if (stage->is_paid_) {
+                return  QColor(144, 238, 144);      //Светло-зеленый
+            }
+            else {
+                return  QColor(255, 255, 0);        //Желтый
+            }
+        }
+        else {
+            QDate date = QDate(stage->date_deadline_.value().year_, stage->date_deadline_.value().month_, stage->date_deadline_.value().day_);
+            if (QDate::currentDate() > date) {
+                return  QColor(255, 0, 0);          //Красный
+            }
+            else {
+                return  QColor(Qt::transparent);    //Прозрачный или QColor(0, 0, 0, 0)
+            }
+        }
+    }
+    return Qt::lightGray;                            //Светло-серый
+}
+
+QColor MainWindow::GetColorWork(const std::shared_ptr<model::SeparateWork>& work) {
+    if (!(work->status_actual_.is_no_actual_)) {
+        if (work->status_complet_.is_complet_) {
+            return  QColor(144, 238, 144);      //Светло-зеленый
+        }
+        else {
+            QDate date = QDate(work->date_deadline_.value().year_, work->date_deadline_.value().month_, work->date_deadline_.value().day_);
+            if (QDate::currentDate() > date) {
+                return  QColor(255, 0, 0);          //Красный
+            }
+            else {
+                return  QColor(Qt::transparent);    //Прозрачный или QColor(0, 0, 0, 0)
+            }
+        }
+    }
+    return Qt::lightGray;                            //Светло-серый
+}
+
 void MainWindow::SetCompleter(QLineEdit *le, const std::set<std::string> &base) {
     // 1. Наша база слов для автодополнения le_name
     QStringList base_qsl;
@@ -594,9 +621,6 @@ void MainWindow::on_chb_nds_stateChanged(int arg1) {
         ui->sb_stavka_nds->setValue(0);
     }
 }
-
-
-
 
 MainWindow::ItemInfo MainWindow::GetItemInfo(int virtual_row) const {
     if (virtual_row >= 0 && virtual_row < static_cast<int>(virtual_rows_.size())) {
@@ -717,6 +741,7 @@ void MainWindow::ShowContextMenuStage(std::optional<std::vector<std::shared_ptr<
     QAction* action_delete_stage = menu.addAction("Удалить этап");
     QAction* action_complet_stage = menu.addAction("Изменить статус выполнения");
     QAction* action_actual_stage = menu.addAction("Изменить статус актуальности");
+    QAction* action_edit_payment_stage = menu.addAction("Внести оплату");
 
     if (pool_stage.value()[stage_index]->status_complet_.is_complet_) {
         action_edit_stage->setEnabled(false);
@@ -744,6 +769,9 @@ void MainWindow::ShowContextMenuStage(std::optional<std::vector<std::shared_ptr<
     }
     else if (selected_action == action_actual_stage) {
         on_ActionActualStage(pool_stage, stage_index);
+    }
+    else if (selected_action == action_edit_payment_stage) {
+        emit EditPaymentsInContract(pool_stage.value()[stage_index]->payments_);
     }
 }
 

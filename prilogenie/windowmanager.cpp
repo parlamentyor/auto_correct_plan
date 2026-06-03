@@ -182,8 +182,10 @@ void WindowManager::onEditPayments(std::optional<std::vector<model::Payment>> &p
 
         // Соединяем сигнал со слотом менеджера для обновления таблицы в окне добавления договора
         // В будущем нужно отображать затраты в главном окне
-        //        connect(payments_window_, &PaymentWindow::UpdateTable,
-        //                this, &WindowManager::onUpdateTable);
+        if (main_window_) {
+            connect(payments_window_, &PaymentWindow::UpdateTableGlobal,
+                    this, &WindowManager::onUpdateTable);
+        }
     }
     payments_window_->show();
 }

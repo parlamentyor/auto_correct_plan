@@ -18,6 +18,9 @@ public:
                            QWidget *parent = nullptr);
     ~PaymentWindow();
 
+signals:
+    void UpdateTableGlobal();
+
 private slots:
     void on_de_add_data_dateChanged(const QDate &date);
     void on_pb_edit_add_data_clicked();

@@ -18,6 +18,12 @@ namespace model {
 
     struct Price {
         Price& operator+=(const Price& other_price);
+        bool operator==(const Price& other) const;
+        bool operator!=(const Price& other) const;
+        bool operator<(const Price& other) const;
+        bool operator>(const Price& other) const;
+        bool operator<=(const Price& other) const;
+        bool operator>=(const Price& other) const;
         int ruble_;
         int kop_;
 // НА БУДУЩЕЕ ЗАПИЛИТЬ КОСТРУКТОР И НОРМАЛИЗАЦИЮ С УЧЁТОМ ТОГО, ЧТО КОПЕЕК БОЛЬШЕ 100 НЕ БЫВАЕТ
@@ -122,6 +128,8 @@ namespace model {
     };
 
     struct Stage {
+        void UpdateIsPaid();
+
         std::string number_;
 //        std::optional<std::string> name_organization_;
 //        std::optional<std::string> name_short_;

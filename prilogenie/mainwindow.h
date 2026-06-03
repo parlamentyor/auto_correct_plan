@@ -96,6 +96,8 @@ private:
                               const QPoint &pos,
                               int stage_index);
 
+    QColor GetColorStage(const std::shared_ptr<model::Stage>& stage);
+    QColor GetColorWork(const std::shared_ptr<model::SeparateWork>& work);
 
     // Получить оригинальные данные по виртуальному индексу
     struct ItemInfo {

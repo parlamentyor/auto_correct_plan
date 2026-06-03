@@ -66,6 +66,7 @@ private:
     void SetTableProperties(QTableWidget* table);
     void UpdateTableWorkInStage();
     QColor GetColor(const std::shared_ptr<model::SeparateWork>& work);
+    bool IsPaid(const model::Price& price);
     void SetCompleter(QLineEdit *le, const std::set<std::string>& base);
     void SetRowBackgroundColor(int row, const QColor& color);
 };

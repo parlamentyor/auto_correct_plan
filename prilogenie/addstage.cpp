@@ -201,16 +201,18 @@ void AddStage::on_pb_add_stage_clicked() {
         str_info = qstr.toStdString() + ui->le_info->text().toStdString() + "\n\n";
     }
 
+    model::Price price = {ui->sb_price_ruble->value(), ui->sb_price_kop->value()};
+
     stage_->number_ = ui->le_number->text().toStdString();
     stage_->name_full_ = ui->le_name_full->text().toStdString();
     stage_->date_deadline_ = date_;
     stage_->name_responsible_employee_ = ui->le_responsible_employee->text().toStdString();
-    stage_->price_ = {ui->sb_price_ruble->value(), ui->sb_price_kop->value()};
+    stage_->price_ = price;
     stage_->price_other_department_ = {ui->sb_price_other_department_ruble->value(), ui->sb_price_other_department_kop->value()};
     stage_->info_ = str_info;
     stage_->status_complet_ = {false, std::nullopt};
     stage_->status_actual_ = {false, std::nullopt, std::nullopt};
-    stage_->is_paid_ = false;
+    stage_->is_paid_ = IsPaid(price);
     stage_->status_payment_ = ui->le_status_payment->text().toStdString();
 
     emit AddNewStage(stage_);
@@ -239,11 +241,13 @@ void AddStage::on_pb_correct_clicked() {
                        .arg(QDate::currentDate().year(), 4, 10, QChar('0'));
     std::string str_info = qstr.toStdString() + ui->le_info->text().toStdString();
 
+    model::Price price = {ui->sb_price_ruble->value(), ui->sb_price_kop->value()};
     stage_->number_ = ui->le_number->text().toStdString();
     stage_->name_full_ = ui->le_name_full->text().toStdString();
     stage_->date_deadline_ = date_;
     stage_->name_responsible_employee_ = ui->le_responsible_employee->text().toStdString();
-    stage_->price_ = {ui->sb_price_ruble->value(), ui->sb_price_kop->value()};
+    stage_->price_ = price;
+    stage_->is_paid_ = IsPaid(price);
     stage_->price_other_department_ = {ui->sb_price_other_department_ruble->value(), ui->sb_price_other_department_kop->value()};
     if (!stage_->info_.has_value()) {
         stage_->info_ = str_info;
@@ -385,6 +389,22 @@ QColor AddStage::GetColor(const std::shared_ptr<model::SeparateWork>& work) {
     }
     return Qt::lightGray;                            //Светло-серый
 
+}
+
+bool AddStage::IsPaid(const model::Price &price) {
+    if (price.ruble_ == 0 & price.kop_ == 0) {
+        return true;
+    }
+    if (stage_->payments_.has_value()) {
+        model::Price total_payments;
+        for (const model::Payment& payment : stage_->payments_.value()) {
+            total_payments += payment.price_;
+        }
+        if (total_payments >= price) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void AddStage::SetCompleter(QLineEdit *le, const std::set<std::string> &base) {

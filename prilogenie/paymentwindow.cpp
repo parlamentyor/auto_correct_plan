@@ -167,6 +167,7 @@ void PaymentWindow::on_pb_add_payment_clicked() {
     payments_.value().push_back({{ui->sb_price_add_ruble->value(), ui->sb_price_add_kop->value()},
                                  date_});
     UpdateTable();
+    emit UpdateTableGlobal();
 }
 
 
@@ -187,5 +188,6 @@ void PaymentWindow::on_pb_delete_payment_clicked() {
             UpdateTable();
         }
     }
+    emit UpdateTableGlobal();
 }
 
