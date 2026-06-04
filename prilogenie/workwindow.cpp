@@ -204,6 +204,14 @@ int WorkWindow::getCurrentContractIndex() const {
     return itemInfo.contractIndex;
 }
 
+std::shared_ptr<model::Contract> WorkWindow::getCurrentContract() const {
+    int index = getCurrentContractIndex();
+    if (index >= 0 && index < static_cast<int>(app_->GetContracts().size())) {
+            return app_->GetContracts()[index];
+    }
+    return nullptr;
+}
+
 void WorkWindow::onTableViewCustomContextMenuRequested(const QPoint& pos) {
     QModelIndex index = tableView_->indexAt(pos);
     if (!index.isValid()) return;
@@ -217,6 +225,10 @@ void WorkWindow::onTableViewCustomContextMenuRequested(const QPoint& pos) {
     currentContextMenuRow_ = itemInfo.contractIndex;
 
     QMenu contextMenu;
+
+    // Действие "Изменить договор"
+    QAction* editAction = contextMenu.addAction("Изменить договор");
+    editAction->setIcon(QIcon::fromTheme("document-edit"));
 
     // Действие "Удалить договор"
     QAction* deleteAction = contextMenu.addAction("Удалить договор");
@@ -238,11 +250,27 @@ void WorkWindow::onTableViewCustomContextMenuRequested(const QPoint& pos) {
     // Показываем меню и обрабатываем выбор
     QAction* selectedAction = contextMenu.exec(tableView_->viewport()->mapToGlobal(pos));
 
-    if (selectedAction == deleteAction) {
+    if (selectedAction == editAction) {
+            onEditContractAction();
+    } else if (selectedAction == deleteAction) {
             onDeleteContractAction();
     } else if (selectedAction == completeAction) {
             onMarkAsCompletedAction();
     }
+}
+
+void WorkWindow::onEditContractAction() {
+    auto contract = getCurrentContract();
+    if (!contract) {
+            QMessageBox::warning(this, "Ошибка", "Договор не найден");
+            return;
+    }
+
+    // Испускаем сигнал для редактирования договора
+    emit EditContract(contract);
+
+    // Закрываем текущее окно, так как откроется новое
+//    this->close();
 }
 
 void WorkWindow::onDeleteContractAction() {

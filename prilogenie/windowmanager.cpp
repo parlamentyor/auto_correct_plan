@@ -29,6 +29,7 @@ void WindowManager::Start() {
 void WindowManager::onLoginSuccess() {
     work_window_ = new WorkWindow(app_);
     connect(work_window_, &WorkWindow::AddContract, this, &WindowManager::onAddContract);
+    connect(work_window_, &WorkWindow::EditContract, this, &WindowManager::onEditContract);
     work_window_->show();
     authoriz_->close();
 }
@@ -36,6 +37,24 @@ void WindowManager::onLoginSuccess() {
 void WindowManager::onAddContract() {
     if (!main_window_) {
         main_window_ = new MainWindow(app_);
+        main_window_->setAttribute(Qt::WA_DeleteOnClose);
+        connect(main_window_, &MainWindow::AddStageInContract, this, &WindowManager::onAddStageInContract);
+        connect(main_window_, &MainWindow::AddWorkInContract, this, &WindowManager::onAddWorkInContract);
+        connect(main_window_, &MainWindow::AddExpensesInContract, this, &WindowManager::onAddExpensesInContract);
+        connect(main_window_, &MainWindow::EditPaymentsInContract, this, &WindowManager::onEditPayments);
+        connect(main_window_, &MainWindow::EditWork, this, &WindowManager::onEditWork);
+        connect(main_window_, &MainWindow::EditStage, this, &WindowManager::onEditStage);
+        // Дополнительно: отслеживаем уничтожение окна, чтобы обнулить указатель
+        connect(main_window_, &QObject::destroyed, this, [this]() {
+            main_window_ = nullptr;
+        });
+    }
+    main_window_->show();
+}
+
+void WindowManager::onEditContract(std::shared_ptr<model::Contract> contract) {
+    if (!main_window_) {
+        main_window_ = new MainWindow(app_, contract);
         main_window_->setAttribute(Qt::WA_DeleteOnClose);
         connect(main_window_, &MainWindow::AddStageInContract, this, &WindowManager::onAddStageInContract);
         connect(main_window_, &MainWindow::AddWorkInContract, this, &WindowManager::onAddWorkInContract);

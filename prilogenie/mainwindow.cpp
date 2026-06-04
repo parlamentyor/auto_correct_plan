@@ -26,6 +26,8 @@ MainWindow::MainWindow(std::shared_ptr<app::App> app, QWidget *parent)
     ui->setupUi(this);
     setWindowTitle("Добавление договора");
 
+    ui->pb_correct->setVisible(false);
+
     SetCompleter(ui->le_responsible_employee, app_->GetBaseEmployee());
     SetCompleter(ui->le_name_organization, app_->GetBaseOrganizations());
 
@@ -50,6 +52,147 @@ MainWindow::MainWindow(std::shared_ptr<app::App> app, QWidget *parent)
             this, &MainWindow::ShowContextMenu);
 
     BuildVirtualRows();
+}
+
+MainWindow::MainWindow(std::shared_ptr<app::App> app,
+                       std::shared_ptr<model::Contract> contract,
+                       QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+    , app_(app)
+    , contract_(contract)
+    , contract_date_({QDate::currentDate().day(),
+                      QDate::currentDate().month(),
+                      QDate::currentDate().year()})
+    , deadline_date_({QDate::currentDate().day(),
+                      QDate::currentDate().month(),
+                      QDate::currentDate().year()}) {
+    ui->setupUi(this);
+    setWindowTitle("Редактирование договора");
+
+    ui->pb_add_contract->setVisible(false);
+
+    SetCompleter(ui->le_responsible_employee, app_->GetBaseEmployee());
+    SetCompleter(ui->le_name_organization, app_->GetBaseOrganizations());
+
+    if (contract_->date_deadline_.has_value()) {
+        deadline_date_ = contract_->date_deadline_.value();
+        QDate deadline_date = QDate(deadline_date_.value().year_, deadline_date_.value().month_, deadline_date_.value().day_);
+        ui->de_deadline_data->setDate(deadline_date);
+    }
+    else {
+        deadline_date_= std::nullopt;
+        ui->de_deadline_data->setDate(QDate());
+        ui->pb_edit_deadline_data->setEnabled(false);
+        ui->de_deadline_data->setEnabled(false);
+        ui->cb_with_deadline_data->setCheckState(Qt::CheckState::Checked);
+    }
+
+    if (contract_->date_.has_value()) {
+        contract_date_ = contract_->date_.value();
+        QDate contract_date = QDate(contract_date_.value().year_, contract_date_.value().month_, contract_date_.value().day_);
+        ui->de_contract_data->setDate(contract_date);
+    }
+    else {
+        contract_date_= std::nullopt;
+        ui->de_contract_data->setDate(QDate());
+        ui->pb_edit_contract_data->setEnabled(false);
+        ui->de_contract_data->setEnabled(false);
+        ui->cb_with_date->setCheckState(Qt::CheckState::Checked);
+    }
+
+    ui->de_contract_data->setDisplayFormat("dd.MM.yyyy");
+    ui->de_deadline_data->setDisplayFormat("dd.MM.yyyy");
+
+    if (contract_->name_organization_.has_value()) {
+        ui->le_name_organization->setText(QString::fromStdString(contract_->name_organization_.value()));
+    }
+
+    if (contract_->name_full_.has_value()) {
+        ui->le_name_full->setText(QString::fromStdString(contract_->name_full_.value()));
+    }
+
+    if (contract_->name_short_.has_value()) {
+        ui->le_name_short->setText(QString::fromStdString(contract_->name_short_.value()));
+    }
+
+    if (contract_->number_.has_value()) {
+        ui->le_number->setText(QString::fromStdString(contract_->number_.value()));
+    }
+
+    if (contract_->name_responsible_employee_.has_value()) {
+        ui->le_responsible_employee->setText(QString::fromStdString(contract_->name_responsible_employee_.value()));
+    }
+
+    model::TypeContract type = contract_->type_;
+    if (type == model::TypeContract::GOZ) {
+        ui->cob_type_contract->setCurrentIndex(0);
+    }
+    else if (type == model::TypeContract::ATT) {
+        ui->cob_type_contract->setCurrentIndex(1);
+    }
+    else if (type == model::TypeContract::BEK) {
+        ui->cob_type_contract->setCurrentIndex(2);
+    }
+    else if (type == model::TypeContract::SI) {
+        ui->cob_type_contract->setCurrentIndex(3);
+    }
+    else {
+        ui->cob_type_contract->setCurrentIndex(-1);
+    }
+
+    if (contract_->info_.has_value()) {
+        ui->le_info->setText(QString::fromStdString(contract_->info_.value()));
+    }
+
+    if (contract_->with_nds_) {
+        ui->chb_nds->setCheckState(Qt::Checked);
+        ui->sb_stavka_nds->setValue(contract_->stavka_nds_);
+    }
+    else {
+        ui->chb_nds->setCheckState(Qt::Unchecked);
+        ui->sb_stavka_nds->setValue(0);
+        ui->sb_stavka_nds->setEnabled(false);
+    }
+
+    if (contract_->with_stage_) {
+        ui->sb_price_ruble->setEnabled(false);
+        ui->sb_price_kop->setEnabled(false);
+        ui->sb_price_other_department_ruble->setEnabled(false);
+        ui->sb_price_other_department_kop->setEnabled(false);
+        ui->chb_stage->setCheckState(Qt::Checked);
+        ui->pb_add_stage->setEnabled(true);
+    }
+    else {
+        ui->sb_price_ruble->setEnabled(true);
+        ui->sb_price_kop->setEnabled(true);
+        ui->sb_price_other_department_ruble->setEnabled(true);
+        ui->sb_price_other_department_kop->setEnabled(true);
+        ui->chb_stage->setCheckState(Qt::Unchecked);
+        ui->pb_add_stage->setEnabled(false);
+    }
+
+    ui->sb_price_ruble->setValue(contract_->price_.ruble_);
+    ui->sb_price_kop->setValue(contract_->price_.kop_);
+    ui->sb_price_other_department_ruble->setValue(contract_->price_other_department_.ruble_);
+    ui->sb_price_other_department_kop->setValue(contract_->price_other_department_.kop_);
+
+    // Подключаем сигнал изменения ячейки таблицы
+    connect(ui->table_work, &QTableWidget::cellChanged,
+            this, &MainWindow::on_table_work_cellChanged);
+
+    SetTableProperties(ui->table_work);
+
+    // Для контекстного меню
+    // 1. Включаем политику, разрешающую генерацию сигнала при запросе контекстного меню
+    ui->table_work->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    // 2. Подключаем сигнал к нашему слоту
+    connect(ui->table_work, &QTableWidget::customContextMenuRequested,
+            this, &MainWindow::ShowContextMenu);
+
+    BuildVirtualRows();
+    UpdateTable();
 }
 
 MainWindow::~MainWindow() {
@@ -176,6 +319,49 @@ void MainWindow::on_pb_add_contract_clicked() {
     app_->AddContract(contract_);
 
     QMessageBox::information(this, "Добавление договора", "Договор добавлен!");
+}
+
+
+void MainWindow::on_pb_correct_clicked() {
+    model::TypeContract type = model::TypeContract::ATT;
+    QString type_qstr = ui->cob_type_contract->currentText();
+    if (type_qstr == "ГОЗ") {
+        type = model::TypeContract::GOZ;
+    }
+    else if (type_qstr == "СИ") {
+        type = model::TypeContract::SI;
+    }
+    else if (type_qstr == "Атт") {
+        type = model::TypeContract::ATT;
+    }
+    else {
+        type = model::TypeContract::BEK;
+    }
+
+    model::Price price = MakePriceContract();
+    model::Price price_other_department = MakePriceOtherDepartmentContract();
+
+    contract_->number_ = ui->le_number->text().toStdString();
+    contract_->date_ = contract_date_;
+    contract_->name_organization_ = ui->le_name_organization->text().toStdString();
+    contract_->name_short_ = ui->le_name_short->text().toStdString();
+    contract_->name_full_ = ui->le_name_full->text().toStdString();
+    contract_->date_deadline_ = deadline_date_;
+    contract_->name_responsible_employee_ = ui->le_responsible_employee->text().toStdString();
+    contract_->price_ = price;
+    contract_->price_other_department_ = price_other_department;
+    contract_->with_nds_ = ui->chb_nds->isChecked();
+    contract_->stavka_nds_ = ui->sb_stavka_nds->value();
+    contract_->type_ = type;
+    contract_->with_stage_ = ui->chb_stage->isChecked();
+    contract_->info_ = ui->le_info->text().toStdString();
+    contract_->status_payment_ = ui->le_status_payment->text().toStdString();
+
+    AddWorkInBase();
+    AddExpenseInBase();
+    AddOrganizationInBase();
+
+    QMessageBox::information(this, "Изменение договора", "Договор изменен!");
 }
 
 
@@ -931,3 +1117,4 @@ void MainWindow::SetRowBackgroundColor(int row, const QColor& color) {
         }
     }
 }
+

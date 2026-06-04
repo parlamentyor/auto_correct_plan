@@ -19,6 +19,9 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(std::shared_ptr<app::App> app,
                QWidget *parent = nullptr);
+    MainWindow(std::shared_ptr<app::App> app,
+               std::shared_ptr<model::Contract> contract,
+               QWidget *parent = nullptr);
     ~MainWindow();
 
 signals:
@@ -66,6 +69,8 @@ private slots:
     void on_ActionActualStage(const std::optional<std::vector<std::shared_ptr<model::Stage>>>& pool_stage, int index);
 
     void ShowContextMenu(const QPoint &pos);
+
+    void on_pb_correct_clicked();
 
 private:
     Ui::MainWindow *ui;

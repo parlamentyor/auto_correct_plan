@@ -24,6 +24,7 @@ public:
 private slots:
     void onLoginSuccess();
     void onAddContract();
+    void onEditContract(std::shared_ptr<model::Contract> contract);
     void onAddWorkInContract(std::shared_ptr<app::App> app);
     void onAddWorkInStage();
     void onUpdateTableWorkInStage();

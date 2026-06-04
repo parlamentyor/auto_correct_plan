@@ -578,6 +578,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="pb_correct">
+        <property name="text">
+         <string>Изменить договор</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="pb_pdf">
         <property name="enabled">
          <bool>true</bool>

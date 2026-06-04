@@ -23,6 +23,7 @@ public:
 
 signals:
     void AddContract();
+    void EditContract(std::shared_ptr<model::Contract> contract);
 
 private slots:
     void on_pb_open_plan_month_clicked();
@@ -33,6 +34,7 @@ private slots:
 
     // для контекстного меню
     void onTableViewCustomContextMenuRequested(const QPoint& pos);
+    void onEditContractAction();
     void onDeleteContractAction();
     void onMarkAsCompletedAction();
 
@@ -57,6 +59,7 @@ private:
     void DeleteWidgetInLayout();
 
     int getCurrentContractIndex() const;
+    std::shared_ptr<model::Contract> getCurrentContract() const;
 
     void UpdateTableEmployees();
     void ApplyIterator();

@@ -144,7 +144,7 @@ QVariant ContractModel::data(const QModelIndex& index, int role) const {
     // Для выполненных контрактов добавляем зеленый фон
     if (role == Qt::BackgroundRole && isContractCompleted(itemInfo.contractIndex)) {
         if (itemInfo.type != ItemInfo::Type::ContractHeader) {
-            return QBrush(QColor(200, 255, 200)); // Светло-зеленый для всех строк контракта
+            return QBrush(QColor(144, 238, 144)); // Светло-зеленый для всех строк контракта
         }
     }
 
@@ -184,7 +184,7 @@ QVariant ContractModel::getContractHeaderData(const ItemInfo& info, int column, 
     if (column != 0) {
         if (role == Qt::BackgroundRole && !isContractCompleted(info.contractIndex)) {
             // Возвращаем цвет фона для всех столбцов объединенной строки
-            return QBrush(QColor(144, 238, 144));
+            return QBrush(QColor(200, 255, 200));
         }
         return QVariant();
     }
@@ -206,9 +206,9 @@ QVariant ContractModel::getContractHeaderData(const ItemInfo& info, int column, 
     }
     case Qt::BackgroundRole: {
         if (!isContractCompleted(info.contractIndex)) {
-            return QBrush(QColor(144, 238, 144)); //Светло-зелёный
+            return QBrush(QColor(200, 255, 200)); //Светло-зелёный
         }
-        return QBrush(QColor(200, 255, 200));
+        return QBrush(QColor(144, 238, 144));
     }
     case Qt::TextAlignmentRole: {
         return Qt::AlignCenter;
