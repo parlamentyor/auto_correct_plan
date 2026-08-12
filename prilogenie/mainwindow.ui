@@ -488,7 +488,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="le_status_payment">
+       <widget class="QLineEdit" name="le_info_payment">
         <property name="enabled">
          <bool>true</bool>
         </property>

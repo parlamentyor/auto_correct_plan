@@ -5,8 +5,7 @@
 #include <QDebug>
 
 ContractModel::ContractModel(std::vector<std::shared_ptr<model::Contract>>& contracts, QObject* parent)
-    : QAbstractTableModel(parent)
-    , contracts_(contracts) {
+    : AbstractContractModel(contracts, parent) {
     buildVirtualRows();
 }
 
@@ -52,7 +51,7 @@ void ContractModel::buildVirtualRows() const {
                                                  static_cast<int>(workIdx), globalRow++}});
                     }
                 }
-//                subCounter = stages.size() + 1;   // IDE РУГАЕТСЯ, ГОТОРИТ НЕ НУЖНА ЭТА ПЕРЕМЕННАЯ c 'nbv ltqcndbtv
+//                subCounter = stages.size() + 1;   // IDE РУГАЕТСЯ, ГОВОРИТ НЕ НУЖНА ЭТА ПЕРЕМЕННАЯ c 'nbv ltqcndbtv
             }
         }
 
@@ -140,14 +139,14 @@ QVariant ContractModel::data(const QModelIndex& index, int role) const {
         return QVariant();
 
     const auto& itemInfo = virtualRows_[index.row()].info;
-
-    // Для выполненных контрактов добавляем зеленый фон
+/*
+    // Если нужно все строки договора окрасить в цвета ВЫПОЛНЕНО
     if (role == Qt::BackgroundRole && isContractCompleted(itemInfo.contractIndex)) {
         if (itemInfo.type != ItemInfo::Type::ContractHeader) {
-            return QBrush(QColor(144, 238, 144)); // Светло-зеленый для всех строк контракта
+            return QBrush(QColor(144, 238, 144)); // Зеленый для всех строк контракта
         }
     }
-
+*/
     switch (itemInfo.type) {
     case ItemInfo::Type::ContractHeader:
         return getContractHeaderData(itemInfo, index.column(), role);
@@ -177,6 +176,7 @@ Qt::ItemFlags ContractModel::flags(const QModelIndex& index) const {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
+
 QVariant ContractModel::getContractHeaderData(const ItemInfo& info, int column, int role) const {
     const auto& contract = contracts_[info.contractIndex];
 
@@ -191,12 +191,28 @@ QVariant ContractModel::getContractHeaderData(const ItemInfo& info, int column, 
 
     switch (role) {
     case Qt::DisplayRole: {
+// Было так, предложено изначально
+/*
         QString headerText;
         if (contract->name_organization_.has_value() && contract->name_short_.has_value()) {
             headerText = QString::fromStdString(contract->name_organization_.value() +
                                                 " (" + contract->name_short_.value() + ")");
         }
         return headerText;
+*/
+        QString header_text = "";
+        if (contract->name_organization_.has_value() && contract->name_short_.has_value()) {
+            header_text = QString::fromStdString(contract->name_organization_.value() +
+                                                " (" + contract->name_short_.value() + ")");
+        }
+        else if (contract->name_organization_.has_value() && !(contract->name_short_.has_value())) {
+            header_text = QString::fromStdString(contract->name_organization_.value());
+        }
+        else if (contract->name_short_.has_value() && !(contract->name_organization_.has_value())) {
+            header_text = QString::fromStdString(contract->name_short_.value());
+        }
+
+        return header_text;
     }
     case Qt::FontRole: {
         QFont font;

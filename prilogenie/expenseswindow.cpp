@@ -89,7 +89,7 @@ void ExpensesWindow::on_pb_add_clicked() {
         expenses_ = std::vector<model::Expenses>{};
     }
     expenses_.value().push_back({{ui->sb_price_add_ruble->value(), ui->sb_price_add_kop->value()},
-                                  ui->le_add_name->text().toStdString()});
+                                 ui->le_add_name->text().toStdString(), app_->GetActivUserName()});
     UpdateTable();
 }
 

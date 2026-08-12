@@ -15,6 +15,7 @@ class PaymentWindow : public QMainWindow
 
 public:
     explicit PaymentWindow(std::optional<std::vector<model::Payment>>& payments,
+                           const std::string& activ_user,
                            QWidget *parent = nullptr);
     ~PaymentWindow();
 
@@ -33,6 +34,7 @@ private:
     Ui::PaymentWindow *ui;
 
     std::optional<std::vector<model::Payment>>& payments_;
+    const std::string activ_user_;
     model::Date date_;
 
     void SetTableProperties();

@@ -112,8 +112,8 @@ AddStage::AddStage(std::shared_ptr<app::App> app,
     ui->sb_price_other_department_ruble->setValue(stage_->price_other_department_.ruble_);
     ui->sb_price_other_department_kop->setValue(stage_->price_other_department_.kop_);
 
-    if (stage_->status_payment_.has_value()) {
-        ui->le_status_payment->setText(QString::fromStdString(stage_->status_payment_.value()));
+    if (stage_->info_payment_.has_value()) {
+        ui->le_info_payment->setText(QString::fromStdString(stage_->info_payment_.value()));
     } 
 
     // Для контекстного меню
@@ -152,20 +152,20 @@ void AddStage::on_pb_add_work_att_as_clicked() {
                                                                                                                 {"Пупкин С.С."},
                                                                                                                 date_razrab_PIM,
                                                                                                                 "По готовности объекта",
-                                                                                                                {false, std::nullopt},
-                                                                                                                {false, std::nullopt, std::nullopt}});
+                                                                                                                {false, std::nullopt, app_->GetActivUserName()},
+                                                                                                                {false, std::nullopt, std::nullopt, app_->GetActivUserName()}});
     std::shared_ptr<model::SeparateWork> att_as = std::make_shared<model::SeparateWork>(model::SeparateWork{"Аттестация АС",
                                                                                                             {"Суходрищев В.В."},
                                                                                                             date_att_as,
                                                                                                             "",
-                                                                                                            {false, std::nullopt},
-                                                                                                            {false, std::nullopt, std::nullopt}});
+                                                                                                            {false, std::nullopt, app_->GetActivUserName()},
+                                                                                                            {false, std::nullopt, std::nullopt, app_->GetActivUserName()}});
     std::shared_ptr<model::SeparateWork> razrab_doc = std::make_shared<model::SeparateWork>(model::SeparateWork{"Разработка документации после аттестационных испытаний с учетом погрешности, которая появляется в связи с долгой засухой",
                                                                                                                 {"Суходрищев В.В.", "Пупкин С.С.", "Касторкин А.А."},
                                                                                                                 date_razrab_doc,
                                                                                                                 "может быть выполним когда-нибудь",
-                                                                                                                {false, std::nullopt},
-                                                                                                                {false, std::nullopt, std::nullopt}});
+                                                                                                                {false, std::nullopt, app_->GetActivUserName()},
+                                                                                                                {false, std::nullopt, std::nullopt, app_->GetActivUserName()}});
 
     if (!stage_->pool_work_.has_value()) {
         stage_->pool_work_ = std::vector<std::shared_ptr<model::SeparateWork>>{};
@@ -210,10 +210,10 @@ void AddStage::on_pb_add_stage_clicked() {
     stage_->price_ = price;
     stage_->price_other_department_ = {ui->sb_price_other_department_ruble->value(), ui->sb_price_other_department_kop->value()};
     stage_->info_ = str_info;
-    stage_->status_complet_ = {false, std::nullopt};
-    stage_->status_actual_ = {false, std::nullopt, std::nullopt};
-    stage_->is_paid_ = IsPaid(price);
-    stage_->status_payment_ = ui->le_status_payment->text().toStdString();
+    stage_->status_complet_ = {false, std::nullopt, app_->GetActivUserName()};
+    stage_->status_actual_ = {false, std::nullopt, std::nullopt, app_->GetActivUserName()};
+    stage_->status_payment_ = {IsPaid(price), date_.value()};
+    stage_->info_payment_ = ui->le_info_payment->text().toStdString();
 
     emit AddNewStage(stage_);
 
@@ -247,7 +247,7 @@ void AddStage::on_pb_correct_clicked() {
     stage_->date_deadline_ = date_;
     stage_->name_responsible_employee_ = ui->le_responsible_employee->text().toStdString();
     stage_->price_ = price;
-    stage_->is_paid_ = IsPaid(price);
+    stage_->status_payment_ = {IsPaid(price), date_.value()};
     stage_->price_other_department_ = {ui->sb_price_other_department_ruble->value(), ui->sb_price_other_department_kop->value()};
     if (!stage_->info_.has_value()) {
         stage_->info_ = str_info;
@@ -255,7 +255,7 @@ void AddStage::on_pb_correct_clicked() {
     else {
         stage_->info_ = stage_->info_.value() + "\n\n" + str_info;
     }
-    stage_->status_payment_ = ui->le_status_payment->text().toStdString();
+    stage_->info_payment_ = ui->le_info_payment->text().toStdString();
 
     emit UpdateTable();
 
@@ -577,7 +577,7 @@ void AddStage::on_ActionComplet(int index) {
         model::Date date = {QDate::currentDate().day(),
                             QDate::currentDate().month(),
                             QDate::currentDate().year()};
-        stage_->pool_work_.value()[index]->status_complet_ = {true, date};
+        stage_->pool_work_.value()[index]->status_complet_ = {true, date, app_->GetActivUserName()};
         QString qstr = QString("\n\nВыполнена %1.%2.%3")
                            .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
@@ -586,7 +586,7 @@ void AddStage::on_ActionComplet(int index) {
         stage_->pool_work_.value()[index]->info_ = stage_->pool_work_.value()[index]->info_.value() + str_info;
     }
     else {
-        stage_->pool_work_.value()[index]->status_complet_ = {false, std::nullopt};
+        stage_->pool_work_.value()[index]->status_complet_ = {false, std::nullopt, app_->GetActivUserName()};
         QString qstr = QString("\n\nВернули в работу %1.%2.%3")
                            .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
@@ -612,7 +612,7 @@ void AddStage::on_ActionActual(int index) {
             model::Date date = {QDate::currentDate().day(),
                                 QDate::currentDate().month(),
                                 QDate::currentDate().year()};
-            stage_->pool_work_.value()[index]->status_actual_ = {true, date, text.toStdString()};
+            stage_->pool_work_.value()[index]->status_actual_ = {true, date, text.toStdString(), app_->GetActivUserName()};
             QString qstr = QString("\n\nНеактуальна %1.%2.%3\n%4")
                                .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                                .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
@@ -623,7 +623,7 @@ void AddStage::on_ActionActual(int index) {
         }
     }
     else {
-        stage_->pool_work_.value()[index]->status_actual_ = {false, std::nullopt, std::nullopt};
+        stage_->pool_work_.value()[index]->status_actual_ = {false, std::nullopt, std::nullopt, app_->GetActivUserName()};
         QString qstr = QString("\n\nВернули в работу %1.%2.%3")
                            .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().month(), 2, 10, QChar('0'))

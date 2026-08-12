@@ -18,22 +18,26 @@ SOURCES += \
     contractmodel.cpp \
     contractview.cpp \
     expenseswindow.cpp \
+    filterwidget.cpp \
     handler_odt.cpp \
     main.cpp \
     mainwindow.cpp \
     model.cpp \
     paymentwindow.cpp \
     serialization_qt_json.cpp \
+    stagesonlymodel.cpp \
     windowmanager.cpp \
     workwindow.cpp
 
 HEADERS += \
+    abstractcontractmodel.h \
     add_contract_plan_month_docx.h \
     addstage.h \
     addworkwindow.h \
     contractmodel.h \
     contractview.h \
     expenseswindow.h \
+    filterwidget.h \
     general_functions.h \
     handler_add_work.h \
     app.h \
@@ -47,6 +51,7 @@ HEADERS += \
     my_logger.h \
     paymentwindow.h \
     serialization_qt_json.h \
+    stagesonlymodel.h \
     windowmanager.h \
     workwindow.h
 

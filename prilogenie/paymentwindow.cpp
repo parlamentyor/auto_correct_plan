@@ -6,10 +6,12 @@
 #include <QMessageBox>
 
 PaymentWindow::PaymentWindow(std::optional<std::vector<model::Payment>>& payments,
+                             const std::string& activ_user,
                              QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::PaymentWindow)
     , payments_(payments)
+    , activ_user_(activ_user)
     , date_({QDate::currentDate().day(),
              QDate::currentDate().month(),
              QDate::currentDate().year()}) {
@@ -165,7 +167,7 @@ void PaymentWindow::on_pb_add_payment_clicked() {
         payments_ = std::vector<model::Payment>{};
     }
     payments_.value().push_back({{ui->sb_price_add_ruble->value(), ui->sb_price_add_kop->value()},
-                                 date_});
+                                 date_, activ_user_});
     UpdateTable();
     emit UpdateTableGlobal();
 }

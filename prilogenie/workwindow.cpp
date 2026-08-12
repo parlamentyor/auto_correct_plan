@@ -20,12 +20,32 @@ WorkWindow::WorkWindow(std::shared_ptr<app::App> app, QWidget *parent)
     , model_(nullptr)
     , currentContextMenuRow_(-1)
     , pos_employee_(std::nullopt)
+    , currentViewType_(ViewType::Contracts)
 {
     ui->setupUi(this);
+
+
+    // Создаем виджет с фильтрами
+    filterWidget_ = new FilterWidget(this);
+
+    // Добавляем фильтры в layout
+    if (ui->verticalLayout_3) {
+        ui->verticalLayout_3->insertWidget(0, filterWidget_);
+    }
+
+    // Подключаем сигналы фильтров
+//    connect(filterWidget_, &FilterWidget::filterCompletedChanged,
+//            this, &WorkWindow::onFilterCompletedChanged);
+//    connect(filterWidget_, &FilterWidget::filterPaidChanged,
+//            this, &WorkWindow::onFilterPaidChanged);
+//    connect(filterWidget_, &FilterWidget::filterTypeChanged,
+//            this, &WorkWindow::onFilterTypeChanged);
+
+
     ui->lb_authorization->setText(QString("Добро пожаловать, вы авторизовались как %1!").arg(QString::fromStdString(app->GetActivUserName())));
     setWindowTitle("Менеджер работ БИТ");
 
-    AddMainTable();
+    setupContractsView();
     UpdateTableEmployees();
 
 //    setupContractsTable(); // нужно проверить нужен ли он тут
@@ -50,9 +70,13 @@ WorkWindow::WorkWindow(std::shared_ptr<app::App> app, QWidget *parent)
 */
 }
 
-WorkWindow::~WorkWindow()
-{
+WorkWindow::~WorkWindow() {
     delete ui;
+}
+
+void WorkWindow::onUpdatTechnicalMainTable() {
+    // Обновляем модель, которая сейчас установлена
+    switchToView(currentViewType_);
 }
 
 void WorkWindow::on_pb_open_plan_month_clicked()
@@ -119,10 +143,11 @@ void WorkWindow::on_pb_create_plan_month_default_clicked() {
     QMessageBox::information(this, "Успех", "План на месяц создан");
 }
 
+/*
 void WorkWindow::setupContractsTable() {
 
-    AddMainTable();
-/*
+    setupContractsView();
+*//*
     // Обработка кликов для открытия окна редактирования
     connect(tableView, &QTableView::clicked, this, [this, model](const QModelIndex& index) {
         auto info = model->getItemInfo(index.row());
@@ -140,11 +165,13 @@ void WorkWindow::setupContractsTable() {
         }
     });
 */
-}
 
-void WorkWindow::AddMainTable() {
+//}
+
+void WorkWindow::setupContractsView() {
     // если в Layout есть виджит, то удаляем его
     DeleteWidgetInLayout();
+    currentViewType_ = ViewType::Contracts;
     // Создаем модель и представление
 /*
     ContractModel* model = new ContractModel(app_->GetContracts(), this);
@@ -176,20 +203,107 @@ void WorkWindow::AddMainTable() {
 // новое закончилось ------------------
 
     ui->horizontalLayout_4->addWidget(tableView_);
+
+    // Применяем текущие фильтры
+//    applyFilters();   // ПОКА НЕ РЕАЛИЗОВАНО
 }
+
+// Новое представление: только этапы
+void WorkWindow::setupStagesView() {
+    DeleteWidgetInLayout();
+    currentViewType_ = ViewType::Stages;
+
+    auto& contracts = const_cast<std::vector<std::shared_ptr<model::Contract>>&>(app_->GetContracts());
+
+// НУЖНО РЕАЛИЗОВАТЬ ЭТУ МОДЕЛЬ ПРЕДСТАВЛЕНИЯ ЧЕРЕЗ АБСТРАКТНЫЙ КЛАСС
+/*
+    // Создаем новую модель для этапов
+    model_ = new StagesOnlyModel(contracts, this);
+    tableView_ = new QTableView(this);  // Используем обычный QTableView
+    tableView_->setModel(model_);
+
+    // НЕТ контекстного меню для этого представления
+    tableView_->setContextMenuPolicy(Qt::NoContextMenu);
+
+    // Настройка внешнего вида
+    tableView_->setSelectionBehavior(QAbstractItemView::SelectRows);
+    tableView_->setSelectionMode(QAbstractItemView::SingleSelection);
+    tableView_->horizontalHeader()->setStretchLastSection(true);
+
+    ui->horizontalLayout_4->addWidget(tableView_);
+*/
+}
+
+// Новое представление: только работы
+void WorkWindow::setupWorksView() {
+    DeleteWidgetInLayout();
+    currentViewType_ = ViewType::Works;
+
+    auto& contracts = const_cast<std::vector<std::shared_ptr<model::Contract>>&>(app_->GetContracts());
+
+// НУЖНО РЕАЛИЗОВАТЬ ЭТУ МОДЕЛЬ ПРЕДСТАВЛЕНИЯ ЧЕРЕЗ АБСТРАКТНЫЙ КЛАСС
+/*
+    // Создаем новую модель для работ
+    model_ = new WorksOnlyModel(contracts, this);
+    tableView_ = new QTableView(this);
+    tableView_->setModel(model_);
+
+    // НЕТ контекстного меню
+    tableView_->setContextMenuPolicy(Qt::NoContextMenu);
+
+    // Настройка внешнего вида
+    tableView_->setSelectionBehavior(QAbstractItemView::SelectRows);
+    tableView_->setSelectionMode(QAbstractItemView::SingleSelection);
+    tableView_->horizontalHeader()->setStretchLastSection(true);
+
+    ui->horizontalLayout_4->addWidget(tableView_);
+*/
+}
+
+// Метод для переключения представлений
+void WorkWindow::switchToView(ViewType type) {
+    switch (type) {
+    case ViewType::Contracts:
+        setupContractsView();
+        break;
+    case ViewType::Stages:
+        setupStagesView();
+        break;
+    case ViewType::Works:
+        setupWorksView();
+        break;
+    }
+}
+
+// Слоты для кнопок
+void WorkWindow::on_pb_show_contracts_clicked() {
+    switchToView(ViewType::Contracts);
+}
+
+void WorkWindow::on_pb_show_stages_clicked() {
+    switchToView(ViewType::Stages);
+}
+
+void WorkWindow::on_pb_show_works_clicked() {
+    switchToView(ViewType::Works);
+}
+
 
 void WorkWindow::DeleteWidgetInLayout() {
     QLayoutItem* item;
     while ((item = ui->horizontalLayout_4->takeAt(0)) != 0) {
-            if (item->widget()) {
-                delete item->widget();
-            }
+        if (item->widget()) {
+            delete item->widget();
+        }
     }
-}
+    delete item;
 
-void WorkWindow::on_pushButton_clicked()
-{
-    setupContractsTable();
+    // Дополнительно удаляем модель
+    if (model_) {
+        delete model_;
+        model_ = nullptr;
+    }
+    tableView_ = nullptr;  // уже удален через виджет, просто обнуляем указатель
 }
 
 int WorkWindow::getCurrentContractIndex() const {

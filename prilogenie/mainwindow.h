@@ -32,6 +32,7 @@ signals:
     void EditPaymentsInContract(std::optional<std::vector<model::Payment>>& payments);
     void EditWork(std::shared_ptr<model::SeparateWork> edit_work);
     void EditStage(std::shared_ptr<model::Stage> edit_stage);
+    void UpdatTechnicalMainTable();
 
 public slots:
     void toUpdateTable();
@@ -122,6 +123,8 @@ private:
 
     mutable std::vector<VirtualRow> virtual_rows_;
     void BuildVirtualRows() const;
+
+    bool IsPaid(const model::Price &price);
 
 };
 #endif // MAINWINDOW_H

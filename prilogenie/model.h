@@ -97,12 +97,19 @@ namespace model {
     struct StatusComplet {
         bool is_complet_ = false;
         std::optional<Date> date_complet_;
+        std::string user_;
     };
 
     struct StatusActual {
         bool is_no_actual_ = false;
         std::optional<Date> date_no_aclual_;
         std::optional<std::string> info_;
+        std::string user_;
+    };
+
+    struct StatusPayment {
+        bool is_paid_ = false;
+        std::optional<Date> date_paid_;
     };
 
     struct SeparateWork {
@@ -112,19 +119,20 @@ namespace model {
         std::optional<std::string> info_;
         StatusComplet status_complet_;
         StatusActual status_actual_;
-
     };
 
     // Оплаты
     struct Payment {
         Price price_;
         Date date_;
+        std::string user_;
     };
 
     // Траты по договору
     struct Expenses {
         Price price_;
         std::string name_;
+        std::string user_;
     };
 
     struct Stage {
@@ -145,10 +153,11 @@ namespace model {
         std::optional<std::string> info_;
         StatusComplet status_complet_;
         StatusActual status_actual_;
-        bool is_paid_;
+        StatusPayment status_payment_;
+//        bool is_paid_;
         std::optional<std::vector<Payment>> payments_;
         std::optional<std::vector<Expenses>> expenses_;
-        std::optional<std::string> status_payment_;
+        std::optional<std::string> info_payment_;
     };
 
     struct Contract {
@@ -176,10 +185,11 @@ namespace model {
             std::optional<std::vector<std::shared_ptr<Stage>>> pool_stage,
             StatusComplet status_complet,
             StatusActual status_actual,
-            bool is_paid,
+            StatusPayment status_payment,
+//            bool is_paid,
             std::optional<std::vector<Payment>> payments,
             std::optional<std::vector<Expenses>> expenses,
-            std::optional<std::string> status_payment
+            std::optional<std::string> info_payment
             )
             : number_(std::move(number))
             , date_(date)
@@ -199,10 +209,11 @@ namespace model {
             , pool_stage_(std::move(pool_stage))
             , status_complet_(std::move(status_complet))
             , status_actual_(std::move(status_actual))
-            , is_paid_(is_paid)
+            , status_payment_(std::move(status_payment))
+//            , is_paid_(is_paid)
             , payments_(std::move(payments))
             , expenses_(std::move(expenses))
-            , status_payment_(std::move(status_payment)) {
+            , info_payment_(std::move(info_payment)) {
         }
 
         // Разрешаем перемещение
@@ -226,10 +237,11 @@ namespace model {
             , pool_stage_(std::move(other.pool_stage_))
             , status_complet_(std::move(other.status_complet_))
             , status_actual_(std::move(other.status_actual_))
-            , is_paid_(other.is_paid_)
+            , status_payment_(std::move(other.status_payment_))
+//            , is_paid_(other.is_paid_)
             , payments_(std::move(other.payments_))
             , expenses_(std::move(other.expenses_))
-            , status_payment_(std::move(other.status_payment_)) {
+            , info_payment_(std::move(other.info_payment_)) {
         }
 
         Contract& operator=(Contract&& other) noexcept {
@@ -253,10 +265,11 @@ namespace model {
                 pool_stage_ = std::move(other.pool_stage_);
                 status_complet_ = std::move(other.status_complet_);
                 status_actual_ = std::move(other.status_actual_);
-                is_paid_ = other.is_paid_;
+                status_payment_= std::move(other.status_payment_);
+//                is_paid_ = other.is_paid_;
                 payments_ = std::move(other.payments_);
                 expenses_ = std::move(other.expenses_);
-                status_payment_ = std::move(other.status_payment_);
+                info_payment_ = std::move(other.info_payment_);
             }
             return *this;
         }
@@ -287,10 +300,11 @@ namespace model {
         std::optional<std::vector<std::shared_ptr<Stage>>> pool_stage_;
         StatusComplet status_complet_;
         StatusActual status_actual_;
-        bool is_paid_;
+//        bool is_paid_;
+        StatusPayment status_payment_;
         std::optional<std::vector<Payment>> payments_;
         std::optional<std::vector<Expenses>> expenses_;
-        std::optional<std::string> status_payment_;
+        std::optional<std::string> info_payment_;
 
         static int id_counter_;
     };

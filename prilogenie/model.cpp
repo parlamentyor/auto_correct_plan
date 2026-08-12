@@ -1,5 +1,7 @@
 #include "model.h"
 
+#include <ctime>
+
 int model::User::id_counter_ = 0;
 int model::Contract::id_counter_ = 0;
 int model::Contractor::id_counter_ = 0;
@@ -68,8 +70,19 @@ model::Price model::operator+(const Price &lhs, const Price &rhs) {
 }
 
 void model::Stage::UpdateIsPaid() {
+    // Получаем текущее время
+    std::time_t t = std::time(nullptr);
+    // Преобразуем в локальное время
+    std::tm* now = std::localtime(&t);
+    Date date = {
+        now->tm_mday,
+        now->tm_mon + 1,
+        now->tm_year + 1900
+    };
+
     if (price_.ruble_ == 0 & price_.kop_ == 0) {
-        is_paid_ = true; // по факту тупая проверка, можно по дефолту запилить на true, но потом когда-нибудь подправим
+        status_payment_.is_paid_ = true; // по факту тупая проверка, можно по дефолту запилить на true, но потом когда-нибудь подправим
+        status_payment_.date_paid_ = date;
         return;
     }
     if (payments_.has_value()) {
@@ -78,10 +91,12 @@ void model::Stage::UpdateIsPaid() {
             total_payments += payment.price_;
         }
         if (total_payments >= price_) {
-            is_paid_ = true;
+            status_payment_.is_paid_ = true;
+            status_payment_.date_paid_ = date;
         }
     }
     else {
-        is_paid_ = false;
+        status_payment_.is_paid_ = false;
+        status_payment_.date_paid_ = date;
     }
 }

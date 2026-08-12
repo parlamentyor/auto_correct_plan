@@ -4,9 +4,10 @@
 #include <QAbstractTableModel>
 #include <QFont>
 #include <memory>
+#include "abstractcontractmodel.h"
 #include "model.h"
 
-class ContractModel : public QAbstractTableModel {
+class ContractModel : public AbstractContractModel {
     Q_OBJECT
 
 public:
@@ -22,28 +23,16 @@ public:
     Qt::ItemFlags flags(const QModelIndex& index) const override;
 
     // Методы для работы с данными
-    bool removeContract(int contractIndex);
-    bool markContractAsCompleted(int contractIndex);
+    bool removeContract(int contractIndex) override;
+    bool markContractAsCompleted(int contractIndex) override;
 
-    // Получить оригинальные данные по виртуальному индексу
-    struct ItemInfo {
-        enum class Type { ContractHeader, ContractRow, StageRow, WorkRow };
-        Type type;
-        int contractIndex;
-        int stageIndex;
-        int workIndex;
-        int virtualRow;
-    };
-
-    ItemInfo getItemInfo(int virtualRow) const;
+    ItemInfo getItemInfo(int virtualRow) const override;
 
 
     // Обновление модели
-    void refreshModel();
+    void refreshModel() override;
 
 private:
-    std::vector<std::shared_ptr<model::Contract>>& contracts_;
-
     // Структура для хранения информации о виртуальных строках
     struct VirtualRow {
         ItemInfo info;

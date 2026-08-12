@@ -69,6 +69,7 @@ namespace serialization {
         if (status_complet.date_complet_.has_value()) {
             obj["date_complet"] = SerializeDate(status_complet.date_complet_.value());
         }
+        obj["user"] = QString::fromStdString(status_complet.user_);
 
         return obj;
     }
@@ -80,6 +81,7 @@ namespace serialization {
         if (obj.contains("date_complet") && !obj["date_complet"].isNull()) {
             status_complet.date_complet_ = DeserializeDate(obj["date_complet"].toObject());
         }
+        status_complet.user_ = obj["user"].toString().toStdString();
 
         return status_complet;
     }
@@ -96,6 +98,7 @@ namespace serialization {
         if (status_actual.info_.has_value()) {
             obj["info"] = QString::fromStdString(status_actual.info_.value());
         }
+        obj["user"] = QString::fromStdString(status_actual.user_);
 
         return obj;
     }
@@ -112,10 +115,32 @@ namespace serialization {
         if (obj.contains("info") && !obj["info"].isNull()) {
             status_actual.info_ = obj["info"].toString().toStdString();
         }
+        status_actual.user_ = obj["user"].toString().toStdString();
 
         return status_actual;
     }
 
+    QJsonObject SerializeStatusPayment(const model::StatusPayment &status_payment){
+        QJsonObject obj;
+        obj["is_paid"] = status_payment.is_paid_;
+
+        if (status_payment.date_paid_.has_value()) {
+            obj["date_paid"] = SerializeDate(status_payment.date_paid_.value());
+        }
+
+        return obj;
+    }
+
+    model::StatusPayment DeserializeStatusPayment(const QJsonObject &obj) {
+        model::StatusPayment status_payment;
+        status_payment.is_paid_ = obj["is_paid"].toBool();
+
+        if (obj.contains("date_paid") && !obj["date_paid"].isNull()) {
+            status_payment.date_paid_ = DeserializeDate(obj["date_paid"].toObject());
+        }
+
+        return status_payment;
+    }
 
     // Свободные функции для сериализации SeparateWork
     QJsonObject SerializeSeparateWork(const model::SeparateWork& work) {
@@ -169,6 +194,7 @@ namespace serialization {
         QJsonObject obj;
         obj["price"] = SerializePrice(payment.price_);
         obj["date"] = SerializeDate(payment.date_);
+        obj["user"] = QString::fromStdString(payment.user_);
         return obj;
     }
 
@@ -176,6 +202,7 @@ namespace serialization {
         model::Payment payment;
         payment.price_ = DeserializePrice(obj["price"].toObject());
         payment.date_ = DeserializeDate(obj["date"].toObject());
+        payment.user_ = obj["user"].toString().toStdString();
         return payment;
     }
 
@@ -183,6 +210,7 @@ namespace serialization {
         QJsonObject obj;
         obj["price"] = SerializePrice(expenses.price_);
         obj["name"] = QString::fromStdString(expenses.name_);
+        obj["user"] = QString::fromStdString(expenses.user_);
         return obj;
 
     }
@@ -191,6 +219,7 @@ namespace serialization {
         model::Expenses expenses;
         expenses.price_ = DeserializePrice(obj["price"].toObject());
         expenses.name_ = obj["name"].toString().toStdString();
+        expenses.user_ = obj["user"].toString().toStdString();
         return expenses;
     }
 
@@ -239,7 +268,7 @@ namespace serialization {
 
         obj["status_complet"] = SerializeStatusComplet(stage.status_complet_);
         obj["status_actual"] = SerializeStatusActual(stage.status_actual_);
-        obj["is_paid"] = stage.is_paid_;
+        obj["status_payment"] = SerializeStatusPayment(stage.status_payment_);
 
         if (stage.payments_.has_value()) {
             QJsonArray payments;
@@ -259,8 +288,8 @@ namespace serialization {
             obj["expenses"] = expenses;
         }
 
-        if (stage.status_payment_.has_value()) {
-            obj["status_payment"] = QString::fromStdString(stage.status_payment_.value());
+        if (stage.info_payment_.has_value()) {
+            obj["info_payment"] = QString::fromStdString(stage.info_payment_.value());
         }
 
         return obj;
@@ -313,7 +342,7 @@ namespace serialization {
 
         stage->status_complet_ = DeserializeStatusComplet(obj["status_complet"].toObject());
         stage->status_actual_ = DeserializeStatusAntual(obj["status_actual"].toObject());
-        stage->is_paid_ = obj["is_paid"].toBool();
+        stage->status_payment_ = DeserializeStatusPayment(obj["status_payment"].toObject());
 
         if (obj.contains("payments") && !obj["payments"].isNull()) {
             QJsonArray payments = obj["payments"].toArray();
@@ -335,8 +364,8 @@ namespace serialization {
             }
         }
 
-        if (obj.contains("status_payment") && !obj["status_payment"].isNull()) {
-            stage->status_payment_ = obj["status_payment"].toString().toStdString();
+        if (obj.contains("info_payment") && !obj["info_payment"].isNull()) {
+            stage->info_payment_ = obj["info_payment"].toString().toStdString();
         }
 
         return stage;
@@ -409,7 +438,7 @@ namespace serialization {
 
         obj["status_complet"] = SerializeStatusComplet(contract->status_complet_);
         obj["status_actual"] = SerializeStatusActual(contract->status_actual_);
-        obj["is_paid"] = contract->is_paid_;
+        obj["status_payment"] = SerializeStatusPayment(contract->status_payment_);
 
         if (contract->payments_.has_value()) {
             QJsonArray payments;
@@ -428,8 +457,8 @@ namespace serialization {
 
             obj["expenses"] = expenses;
         }
-        if (contract->status_payment_.has_value()) {
-            obj["status_payment"] = QString::fromStdString(contract->status_payment_.value());
+        if (contract->info_payment_.has_value()) {
+            obj["info_payment"] = QString::fromStdString(contract->info_payment_.value());
         }
 
         return obj;
@@ -505,7 +534,7 @@ namespace serialization {
 
         contract->status_complet_ = DeserializeStatusComplet(obj["status_complet"].toObject());
         contract->status_actual_ = DeserializeStatusAntual(obj["status_actual"].toObject());
-        contract->is_paid_ = obj["is_paid"].toBool();
+        contract->status_payment_ = DeserializeStatusPayment(obj["status_payment"].toObject());
 
         if (obj.contains("payments") && !obj["payments"].isNull()) {
             QJsonArray payments = obj["payments"].toArray();
@@ -526,8 +555,8 @@ namespace serialization {
                 contract->expenses_.value().push_back(DeserializeExpenses(item.toObject()));
             }
         }
-        if (obj.contains("status_payment") && !obj["status_payment"].isNull()) {
-            contract->status_payment_ = obj["status_payment"].toString().toStdString();
+        if (obj.contains("info_payment") && !obj["info_payment"].isNull()) {
+            contract->info_payment_ = obj["info_payment"].toString().toStdString();
         }
 
         return contract;

@@ -32,6 +32,14 @@ void WindowManager::onLoginSuccess() {
     connect(work_window_, &WorkWindow::EditContract, this, &WindowManager::onEditContract);
     work_window_->show();
     authoriz_->close();
+
+    //разобраться с уничтожением окон work_window_ и authoriz_ и освобождением памяти
+    // setAttribute(Qt::WA_DeleteOnClose)
+    // Дополнительно: отслеживаем уничтожение окна, чтобы обнулить указатель
+    //connect(work_window_, &QObject::destroyed, this, [this]() {
+    //    work_window_ = nullptr;
+    //});
+    // а может всё это и не нужно.
 }
 
 void WindowManager::onAddContract() {
@@ -44,6 +52,9 @@ void WindowManager::onAddContract() {
         connect(main_window_, &MainWindow::EditPaymentsInContract, this, &WindowManager::onEditPayments);
         connect(main_window_, &MainWindow::EditWork, this, &WindowManager::onEditWork);
         connect(main_window_, &MainWindow::EditStage, this, &WindowManager::onEditStage);
+        if (work_window_) {
+            connect(main_window_, &MainWindow::UpdatTechnicalMainTable, work_window_, &WorkWindow::onUpdatTechnicalMainTable);
+        }
         // Дополнительно: отслеживаем уничтожение окна, чтобы обнулить указатель
         connect(main_window_, &QObject::destroyed, this, [this]() {
             main_window_ = nullptr;
@@ -193,7 +204,7 @@ void WindowManager::onAddExpensesInStage(std::optional<std::vector<model::Expens
 
 void WindowManager::onEditPayments(std::optional<std::vector<model::Payment>> &payments) {
     if (!payments_window_) {
-        payments_window_ = new PaymentWindow(payments);
+        payments_window_ = new PaymentWindow(payments, app_->GetActivUserName());
         payments_window_->setAttribute(Qt::WA_DeleteOnClose);
         connect(payments_window_, &QObject::destroyed, this, [this]() {
             payments_window_ = nullptr;

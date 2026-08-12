@@ -185,8 +185,8 @@ void AddWorkWindow::on_pb_add_work_clicked() {
     work_->names_responsible_employees_ = std::move(employees);
     work_->date_deadline_ = date_;
     work_->info_ = str_info;
-    work_->status_complet_ = {false, std::nullopt};
-    work_->status_actual_ = {false, std::nullopt, std::nullopt};
+    work_->status_complet_ = {false, std::nullopt, app_->GetActivUserName()};
+    work_->status_actual_ = {false, std::nullopt, std::nullopt, app_->GetActivUserName()};
 
     emit AddNewWork(work_);
 

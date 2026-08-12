@@ -239,20 +239,20 @@ void MainWindow::on_pb_add_work_att_as_clicked()
                                                                                                                 {"Пупкин С.С."},
                                                                                                                 date_razrab_PIM,
                                                                                                                 "По готовности объекта",
-                                                                                                                {false, std::nullopt},
-                                                                                                                {false, std::nullopt, std::nullopt}});
+                                                                                                                {false, std::nullopt, app_->GetActivUserName()},
+                                                                                                                {false, std::nullopt, std::nullopt, app_->GetActivUserName()}});
     std::shared_ptr<model::SeparateWork> att_as = std::make_shared<model::SeparateWork>(model::SeparateWork{"Аттестация АС",
                                                                                                             {"Суходрищев В.В."},
                                                                                                             date_att_as,
                                                                                                             "",
-                                                                                                            {false, std::nullopt},
-                                                                                                            {false, std::nullopt, std::nullopt}});
+                                                                                                            {false, std::nullopt, app_->GetActivUserName()},
+                                                                                                            {false, std::nullopt, std::nullopt, app_->GetActivUserName()}});
     std::shared_ptr<model::SeparateWork> razrab_doc = std::make_shared<model::SeparateWork>(model::SeparateWork{"Разработка документации после аттестационных испытаний с учетом погрешности, которая появляется в связи с долгой засухой",
                                                                                                                 {"Суходрищев В.В.", "Пупкин С.С.", "Касторкин А.А."},
                                                                                                                 date_razrab_doc,
                                                                                                                 "может быть выполним когда-нибудь",
-                                                                                                                {false, std::nullopt},
-                                                                                                                {false, std::nullopt, std::nullopt}});
+                                                                                                                {false, std::nullopt, app_->GetActivUserName()},
+                                                                                                                {false, std::nullopt, std::nullopt, app_->GetActivUserName()}});
 
     if (!(contract_->pool_work.has_value())) {
         contract_->pool_work = std::vector<std::shared_ptr<model::SeparateWork>>{};
@@ -283,6 +283,9 @@ void MainWindow::on_pb_add_contract_clicked() {
 
     model::Price price = MakePriceContract();
     model::Price price_other_department = MakePriceOtherDepartmentContract();
+    model::Date current_data = {QDate::currentDate().day(),
+                                QDate::currentDate().month(),
+                                QDate::currentDate().year()};
 
     contract_->number_ = ui->le_number->text().toStdString();
     contract_->date_ = contract_date_;
@@ -298,10 +301,10 @@ void MainWindow::on_pb_add_contract_clicked() {
     contract_->type_ = type;
     contract_->with_stage_ = ui->chb_stage->isChecked();
     contract_->info_ = ui->le_info->text().toStdString();
-    contract_->status_complet_ = {false, std::nullopt};
-    contract_->status_actual_ = {false, std::nullopt, std::nullopt};
-    contract_->is_paid_ = false;
-    contract_->status_payment_ = ui->le_status_payment->text().toStdString();
+    contract_->status_complet_ = {false, std::nullopt, app_->GetActivUserName()};
+    contract_->status_actual_ = {false, std::nullopt, std::nullopt, app_->GetActivUserName()};
+    contract_->info_payment_ = ui->le_info_payment->text().toStdString();
+    contract_->status_payment_ = {IsPaid(price), current_data};
 
     if (app_->HasValuePathPlanMonth()) {
         if (updateContractDocument(QString::fromStdString(app_->GetPathPlanMonth()), contract_)) {
@@ -317,6 +320,8 @@ void MainWindow::on_pb_add_contract_clicked() {
     AddOrganizationInBase();
 
     app_->AddContract(contract_);
+
+    emit UpdatTechnicalMainTable();
 
     QMessageBox::information(this, "Добавление договора", "Договор добавлен!");
 }
@@ -340,6 +345,9 @@ void MainWindow::on_pb_correct_clicked() {
 
     model::Price price = MakePriceContract();
     model::Price price_other_department = MakePriceOtherDepartmentContract();
+    model::Date current_data = {QDate::currentDate().day(),
+                                QDate::currentDate().month(),
+                                QDate::currentDate().year()};
 
     contract_->number_ = ui->le_number->text().toStdString();
     contract_->date_ = contract_date_;
@@ -355,11 +363,14 @@ void MainWindow::on_pb_correct_clicked() {
     contract_->type_ = type;
     contract_->with_stage_ = ui->chb_stage->isChecked();
     contract_->info_ = ui->le_info->text().toStdString();
-    contract_->status_payment_ = ui->le_status_payment->text().toStdString();
+    contract_->info_payment_ = ui->le_info_payment->text().toStdString();
+    contract_->status_payment_ = {IsPaid(price), current_data};
 
     AddWorkInBase();
     AddExpenseInBase();
     AddOrganizationInBase();
+
+    emit UpdatTechnicalMainTable();
 
     QMessageBox::information(this, "Изменение договора", "Договор изменен!");
 }
@@ -722,7 +733,7 @@ void MainWindow::AddOrganizationInBase() {
 QColor MainWindow::GetColorStage(const std::shared_ptr<model::Stage>& stage) {
     if (!(stage->status_actual_.is_no_actual_)) {
         if (stage->status_complet_.is_complet_) {
-            if (stage->is_paid_) {
+            if (stage->status_payment_.is_paid_) {
                 return  QColor(144, 238, 144);      //Светло-зеленый
             }
             else {
@@ -855,6 +866,32 @@ void MainWindow::BuildVirtualRows() const {
     }
 }
 
+bool MainWindow::IsPaid(const model::Price &price) {
+    if (contract_->pool_stage_.has_value()) {
+        for (const auto& stage : contract_->pool_stage_.value()) {
+            if (!stage->status_payment_.is_paid_) {
+                return false;
+            }
+        }
+        return true;
+    }
+    else {
+        if (price.ruble_ == 0 & price.kop_ == 0) {
+            return true;
+        }
+        if (contract_->payments_.has_value()) {
+            model::Price total_payments;
+            for (const model::Payment& payment : contract_->payments_.value()) {
+                total_payments += payment.price_;
+            }
+            if (total_payments >= price) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
 void MainWindow::ShowContextMenu(const QPoint &pos) {
     // pos - это координаты клика относительно виджета tableWidget.
     // Чтобы узнать, по какой именно ячейке кликнули, используем itemAt().
@@ -973,7 +1010,7 @@ void MainWindow::on_ActionCompletWork(const std::optional<std::vector<std::share
         model::Date date = {QDate::currentDate().day(),
                             QDate::currentDate().month(),
                             QDate::currentDate().year()};
-        pool_work.value()[index]->status_complet_ = {true, date};
+        pool_work.value()[index]->status_complet_ = {true, date, app_->GetActivUserName()};
         QString qstr = QString("\n\nВыполнена %1.%2.%3")
                            .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
@@ -982,7 +1019,7 @@ void MainWindow::on_ActionCompletWork(const std::optional<std::vector<std::share
         pool_work.value()[index]->info_ = pool_work.value()[index]->info_.value() + str_info;
     }
     else {
-        pool_work.value()[index]->status_complet_ = {false, std::nullopt};
+        pool_work.value()[index]->status_complet_ = {false, std::nullopt, app_->GetActivUserName()};
         QString qstr = QString("\n\nВернули в работу %1.%2.%3")
                            .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
@@ -1008,7 +1045,7 @@ void MainWindow::on_ActionActualWork(const std::optional<std::vector<std::shared
             model::Date date = {QDate::currentDate().day(),
                                 QDate::currentDate().month(),
                                 QDate::currentDate().year()};
-            pool_work.value()[index]->status_actual_ = {true, date, text.toStdString()};
+            pool_work.value()[index]->status_actual_ = {true, date, text.toStdString(), app_->GetActivUserName()};
             QString qstr = QString("\n\nНеактуальна %1.%2.%3\n%4")
                                .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                                .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
@@ -1019,7 +1056,7 @@ void MainWindow::on_ActionActualWork(const std::optional<std::vector<std::shared
         }
     }
     else {
-        pool_work.value()[index]->status_actual_ = {false, std::nullopt, std::nullopt};
+        pool_work.value()[index]->status_actual_ = {false, std::nullopt, std::nullopt, app_->GetActivUserName()};
         QString qstr = QString("\n\nВернули в работу %1.%2.%3")
                            .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
@@ -1041,7 +1078,7 @@ void MainWindow::on_ActionCompletStage(const std::optional<std::vector<std::shar
         model::Date date = {QDate::currentDate().day(),
                             QDate::currentDate().month(),
                             QDate::currentDate().year()};
-        pool_stage.value()[index]->status_complet_ = {true, date};
+        pool_stage.value()[index]->status_complet_ = {true, date, app_->GetActivUserName()};
         QString qstr = QString("\n\nВыполнен %1.%2.%3")
                            .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
@@ -1050,7 +1087,7 @@ void MainWindow::on_ActionCompletStage(const std::optional<std::vector<std::shar
         pool_stage.value()[index]->info_ = pool_stage.value()[index]->info_.value() + str_info;
     }
     else {
-        pool_stage.value()[index]->status_complet_ = {false, std::nullopt};
+        pool_stage.value()[index]->status_complet_ = {false, std::nullopt, app_->GetActivUserName()};
         QString qstr = QString("\n\nВернули в работу %1.%2.%3")
                            .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
@@ -1076,7 +1113,7 @@ void MainWindow::on_ActionActualStage(const std::optional<std::vector<std::share
             model::Date date = {QDate::currentDate().day(),
                                 QDate::currentDate().month(),
                                 QDate::currentDate().year()};
-            pool_stage.value()[index]->status_actual_ = {true, date, text.toStdString()};
+            pool_stage.value()[index]->status_actual_ = {true, date, text.toStdString(), app_->GetActivUserName()};
             QString qstr = QString("\n\nНеактуальный %1.%2.%3\n%4")
                                .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                                .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
@@ -1087,7 +1124,7 @@ void MainWindow::on_ActionActualStage(const std::optional<std::vector<std::share
         }
     }
     else {
-        pool_stage.value()[index]->status_actual_ = {false, std::nullopt, std::nullopt};
+        pool_stage.value()[index]->status_actual_ = {false, std::nullopt, std::nullopt, app_->GetActivUserName()};
         QString qstr = QString("\n\nВернули в работу %1.%2.%3")
                            .arg(QDate::currentDate().day(), 2, 10, QChar('0'))
                            .arg(QDate::currentDate().month(), 2, 10, QChar('0'))
