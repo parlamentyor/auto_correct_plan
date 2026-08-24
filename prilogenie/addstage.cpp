@@ -4,7 +4,6 @@
 #include <handler_add_work.h>
 
 #include <QMessageBox>
-#include <QCalendarWidget>
 #include <QCompleter>
 #include <QInputDialog>
 
@@ -425,56 +424,16 @@ void AddStage::SetCompleter(QLineEdit *le, const std::set<std::string> &base) {
 }
 
 void AddStage::on_pb_edit_deadline_data_clicked() {
-    // Создаём диалоговое окно
-    QDialog *dialog = new QDialog(this);
-    dialog->setWindowTitle("Выберите дату дедлайна");
-    dialog->setModal(true);
-
-    // Создаём календарь
-    QCalendarWidget *calendar = new QCalendarWidget(dialog);
-
-    // Устанавливаем текущую дату из data_ в календарь
-    QDate currentDate;
+    model::Date current_date = {QDate::currentDate().day(), QDate::currentDate().month(), QDate::currentDate().year()};
     if (date_.has_value()) {
-        currentDate = QDate(date_.value().year_, date_.value().month_, date_.value().day_);
-        if (currentDate.isValid()) {
-            calendar->setSelectedDate(currentDate);
-        } else {
-            calendar->setSelectedDate(QDate::currentDate());
-        }
-    } else {
-        calendar->setSelectedDate(QDate::currentDate());
+        current_date = date_.value();
     }
 
-    // Компоновка
-    QVBoxLayout *layout = new QVBoxLayout(dialog);
-    layout->addWidget(calendar);
-
-    // Подключаем сигнал выбора даты
-    connect(calendar, &QCalendarWidget::selectionChanged, [this, dialog, calendar]() {
-        QDate selectedDate = calendar->selectedDate();
-
-        // 1. Сохраняем дату в структуру data_
-        date_.value().day_ = selectedDate.day();
-        date_.value().month_ = selectedDate.month();
-        date_.value().year_ = selectedDate.year();
-
-        // 2. Отображаем дату в QDateEdit de_deadline_data
-        ui->de_deadline_data->setDate(selectedDate);
-
-        // 3. Закрываем диалог
-        dialog->accept();
-    });
-
-    // Позиционируем окно в месте курсора мыши
-    QPoint cursorPos = QCursor::pos();
-    dialog->move(cursorPos);
-
-    // Показываем диалог
-    dialog->exec();
-
-    // Удаляем диалог после закрытия
-    dialog->deleteLater();
+    std::optional<model::Date> selected_date = details::OpenCalendar(this, current_date);
+    if (selected_date.has_value()) {
+        date_ = selected_date.value();
+        ui->de_deadline_data->setDate(QDate(date_.value().year_, date_.value().month_, date_.value().day_));
+    }
 }
 
 void AddStage::on_de_deadline_data_dateChanged(const QDate &date)

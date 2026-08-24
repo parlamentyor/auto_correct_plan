@@ -19,6 +19,7 @@ SOURCES += \
     contractview.cpp \
     expenseswindow.cpp \
     filterwidget.cpp \
+    general_qt_functions.cpp \
     handler_odt.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -39,6 +40,7 @@ HEADERS += \
     expenseswindow.h \
     filterwidget.h \
     general_functions.h \
+    general_qt_functions.h \
     handler_add_work.h \
     app.h \
     authorization.h \

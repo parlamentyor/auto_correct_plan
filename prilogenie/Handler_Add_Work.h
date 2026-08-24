@@ -2,6 +2,7 @@
 #define HANDLER_ADD_WORK_H
 
 #include "model.h"
+#include "general_qt_functions.h"
 
 #include <QTableWidget>
 #include <QString>
@@ -13,24 +14,6 @@
 
 
 namespace details {
-    // Функция для форматирования даты
-    inline QString FormatDate(const model::Date& date) {
-        return QString("%1.%2.%3")
-            .arg(date.day_, 2, 10, QChar('0'))
-            .arg(date.month_, 2, 10, QChar('0'))
-            .arg(date.year_, 4, 10, QChar('0'));
-    }
-
-    // Альтернативный вариант с использованием stringstream
-    inline QString FormatDateAlt(const model::Date& date) {
-        std::stringstream ss;
-        ss << std::setfill('0')
-           << std::setw(2) << date.day_ << "."
-           << std::setw(2) << date.month_ << "."
-           << std::setw(4) << date.year_;
-        return QString::fromStdString(ss.str());
-    }
-
     // Функция для преобразования вектора строк в многострочный текст
     inline QString FormatResponsibleEmployees(const std::vector<std::string>& employees) {
         QString result;
@@ -79,7 +62,7 @@ namespace details {
         // Заполняем четвёртый столбец (date_deadline_)
         QString date_deadline = "";
         if (work.date_deadline_.has_value()) {
-            date_deadline = FormatDate(work.date_deadline_.value());
+            date_deadline = FormatDateToQstring(work.date_deadline_.value());
         }
         QTableWidgetItem* dateItem = new QTableWidgetItem(date_deadline);
         dateItem->setFlags(dateItem->flags() | Qt::ItemIsEditable);
@@ -108,7 +91,7 @@ namespace details {
         // Заполняем Второй столбец (date_deadline_) в формате dd.mm.yyyy
         QString date_deadline = "";
         if (stage.date_deadline_.has_value()) {
-            date_deadline = FormatDate(stage.date_deadline_.value());
+            date_deadline = FormatDateToQstring(stage.date_deadline_.value());
         }
 //        table->setItem(rowCount, 1,
 //                       new QTableWidgetItem(date_deadline));

@@ -39,7 +39,6 @@ private:
 
     void SetTableProperties();
     void UpdateTable();
-    QString FormatDate(const model::Date& date) const;
     int current_row_ = -1;
 };
 

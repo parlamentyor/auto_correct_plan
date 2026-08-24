@@ -1,4 +1,5 @@
 #include "contractmodel.h"
+#include "general_qt_functions.h"
 
 #include <QDateTime>
 #include <QBrush>
@@ -252,13 +253,13 @@ QVariant ContractModel::getContractRowData(const ItemInfo& info, int column, int
             if (contract->number_.has_value() && contract->date_.has_value()) {
                 return QString("Договор № %1 от %2")
                     .arg(QString::fromStdString(contract->number_.value()))
-                    .arg(formatDate(contract->date_.value()));
+                    .arg(details::FormatDateToQstring(contract->date_.value()));
             }
             return "";
         }
         case 3: {
             if (contract->date_deadline_.has_value()) {
-                return formatDate(contract->date_deadline_.value());
+                return details::FormatDateToQstring(contract->date_deadline_.value());
             }
             return "";
         }
@@ -306,7 +307,7 @@ QVariant ContractModel::getStageRowData(const ItemInfo& info, int column, int ro
         case 1: return stage->name_full_.has_value() ?
                        QString("Этап №%1 %2").arg(QString::fromStdString(stage->number_)).arg(QString::fromStdString(stage->name_full_.value())) : "";
         case 3: return stage->date_deadline_.has_value() ?
-                       formatDate(stage->date_deadline_.value()) : "";
+                       details::FormatDateToQstring(stage->date_deadline_.value()) : "";
         case 4: return stage->name_responsible_employee_.has_value() ?
                        QString::fromStdString(stage->name_responsible_employee_.value()) : "";
         case 6: return stage->info_.has_value() ?
@@ -371,7 +372,7 @@ QVariant ContractModel::getWorkRowData(const ItemInfo& info, int column, int rol
         case 1: return QString::fromStdString(work->name_);
         case 4: return formatResponsibleEmployees(work->names_responsible_employees_).join("\n");
         case 5: return work->date_deadline_.has_value() ?
-                       formatDate(work->date_deadline_.value()) : "";
+                       details::FormatDateToQstring(work->date_deadline_.value()) : "";
         case 6: return work->info_.has_value() ?
                        QString::fromStdString(work->info_.value()) : "";
         default: return QVariant();
@@ -390,13 +391,6 @@ QVariant ContractModel::getWorkRowData(const ItemInfo& info, int column, int rol
     }
 
     return QVariant();
-}
-
-QString ContractModel::formatDate(const model::Date& date) const {
-    return QString("%1.%2.%3")
-        .arg(date.day_, 2, 10, QChar('0'))
-        .arg(date.month_, 2, 10, QChar('0'))
-        .arg(date.year_);
 }
 
 QStringList ContractModel::formatResponsibleEmployees(const std::vector<std::string>& employees) const {

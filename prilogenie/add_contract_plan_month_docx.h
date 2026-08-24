@@ -1,14 +1,12 @@
 #ifndef ADD_CONTRACT_PLAN_MONTH_DOCX_H
 #define ADD_CONTRACT_PLAN_MONTH_DOCX_H
 
-#include <model.h>
-#include <handler_add_work.h>
-#include <my_logger.h>
+#include "model.h"
+#include "my_logger.h"
+#include "general_qt_functions.h"
 
 #include <QString>
 #include <QAxObject>
-//#include <QDebug>
-//#include <QColor>
 #include <QVariant>
 #include <optional>
 #include <vector>
@@ -236,12 +234,12 @@ private:
             case 3: // Договор
                 text = QString("Договор № %1 от %2")
                            .arg(QString::fromStdString(contract->number_.value_or("")))
-                           .arg(details::FormatDate(contract->date_.value()));
+                           .arg(details::FormatDateToQstring(contract->date_.value()));
                 alignment = 1; // center
                 break;
 
             case 4: // date_deadline_
-                text = details::FormatDate(contract->date_deadline_.value());
+                text = details::FormatDateToQstring(contract->date_deadline_.value());
                 alignment = 1; // center
                 break;
 
@@ -313,7 +311,7 @@ private:
             {
                 QString date_deadline = "";
                 if (work.date_deadline_.has_value()) {
-                    date_deadline = details::FormatDate(work.date_deadline_.value());
+                    date_deadline = details::FormatDateToQstring(work.date_deadline_.value());
                 }
                 text = date_deadline;
                 alignment = 1; // center

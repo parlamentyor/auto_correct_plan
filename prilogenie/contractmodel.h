@@ -42,7 +42,6 @@ private:
     void buildVirtualRows() const;
 
     // Вспомогательные методы для форматирования
-    QString formatDate(const model::Date& date) const;
     QString formatPrice(const model::Price& price) const;
     QStringList formatResponsibleEmployees(const std::vector<std::string>& employees) const;
 

@@ -40,13 +40,6 @@ public:
 
 protected:
     std::vector<std::shared_ptr<model::Contract>>& contracts_;
-
-    QString formatDate(const model::Date& date) const {
-        return QString("%1.%2.%3")
-            .arg(date.day_, 2, 10, QChar('0'))
-            .arg(date.month_, 2, 10, QChar('0'))
-            .arg(date.year_);
-    }
 };
 
 #endif // ABSTRACTCONTRACTMODEL_H

@@ -1,8 +1,8 @@
 #include "paymentwindow.h"
 #include "ui_paymentwindow.h"
+#include "general_qt_functions.h"
 
 #include <QDialog>
-#include <QCalendarWidget>
 #include <QMessageBox>
 
 PaymentWindow::PaymentWindow(std::optional<std::vector<model::Payment>>& payments,
@@ -39,59 +39,18 @@ void PaymentWindow::on_de_add_data_dateChanged(const QDate &date) {
 }
 
 void PaymentWindow::on_pb_edit_add_data_clicked() {
-    // Создаём диалоговое окно
-    QDialog *dialog = new QDialog(this);
-    dialog->setWindowTitle("Выберите дату дедлайна");
-    dialog->setModal(true);
-
-    // Создаём календарь
-    QCalendarWidget *calendar = new QCalendarWidget(dialog);
-
-    // Устанавливаем текущую дату из data_ в календарь
-    QDate currentDate = QDate(date_.year_, date_.month_, date_.day_);
-    if (currentDate.isValid()) {
-        calendar->setSelectedDate(currentDate);
+    auto selected_date = details::OpenCalendar(this, date_);
+    if (selected_date.has_value()) {
+        date_ = selected_date.value();
+        ui->de_add_data->setDate(QDate(date_.year_, date_.month_, date_.day_));
     }
-    else {
-        calendar->setSelectedDate(QDate::currentDate());
-    }
-
-    // Компоновка
-    QVBoxLayout *layout = new QVBoxLayout(dialog);
-    layout->addWidget(calendar);
-
-    // Подключаем сигнал выбора даты
-    connect(calendar, &QCalendarWidget::selectionChanged, [this, dialog, calendar]() {
-        QDate selectedDate = calendar->selectedDate();
-
-        // 1. Сохраняем дату в структуру data_
-        date_.day_ = selectedDate.day();
-        date_.month_ = selectedDate.month();
-        date_.year_ = selectedDate.year();
-
-        // 2. Отображаем дату в QDateEdit de_deadline_data
-        ui->de_add_data->setDate(selectedDate);
-
-        // 3. Закрываем диалог
-        dialog->accept();
-    });
-
-    // Позиционируем окно в месте курсора мыши
-    QPoint cursorPos = QCursor::pos();
-    dialog->move(cursorPos);
-
-    // Показываем диалог
-    dialog->exec();
-
-    // Удаляем диалог после закрытия
-    dialog->deleteLater();
 }
 
 void PaymentWindow::on_tw_payment_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn) {
     // Проверяем, что currentRow валидный и что payments_ содержит данные
     if (currentRow != -1 && payments_.has_value() && currentRow < static_cast<int>(payments_.value().size())) {
         QString str = QString("от %1 на сумму %2,%3")
-                        .arg(FormatDate(payments_.value().at(currentRow).date_))
+                        .arg(details::FormatDateToQstring(payments_.value().at(currentRow).date_))
                         .arg(payments_.value().at(currentRow).price_.ruble_)
                         .arg(payments_.value().at(currentRow).price_.kop_);
         ui->le_delete_payment->setText(str);
@@ -143,20 +102,12 @@ void PaymentWindow::UpdateTable() {
         ui->tw_payment->insertRow(rowCount);
         // Заполняем первый столбец (Дата)
         ui->tw_payment->setItem(rowCount, 0,
-                                new QTableWidgetItem(FormatDate(item.date_)));
+                                new QTableWidgetItem(details::FormatDateToQstring(item.date_)));
         // Заполняем второй столбец (сумма)
         ui->tw_payment->setItem(rowCount, 1,
                                 new QTableWidgetItem(QString("%1,%2 рублей").arg(item.price_.ruble_).arg(item.price_.kop_)));
     }
 }
-
-QString PaymentWindow::FormatDate(const model::Date &date) const {
-    return QString("%1.%2.%3")
-        .arg(date.day_, 2, 10, QChar('0'))
-        .arg(date.month_, 2, 10, QChar('0'))
-        .arg(date.year_);
-}
-
 
 void PaymentWindow::on_pb_add_payment_clicked() {
     if (ui->sb_price_add_ruble->value() == 0) {

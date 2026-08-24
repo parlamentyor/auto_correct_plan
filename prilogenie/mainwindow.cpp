@@ -8,7 +8,6 @@
 
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QCalendarWidget>
 #include <QCompleter>
 #include <QInputDialog>
 
@@ -596,56 +595,16 @@ void MainWindow::on_cb_with_date_stateChanged(int arg1)
 }
 
 void MainWindow::UpdateDate(std::optional<model::Date>& date, QDateEdit *de) {
-    // Создаём диалоговое окно
-    QDialog *dialog = new QDialog(this);
-    dialog->setWindowTitle("Выберите дату");
-    dialog->setModal(true);
-
-    // Создаём календарь
-    QCalendarWidget *calendar = new QCalendarWidget(dialog);
-
-    // Устанавливаем текущую дату из data_ в календарь
-    QDate currentDate;
+    model::Date current_date = {QDate::currentDate().day(), QDate::currentDate().month(), QDate::currentDate().year()};
     if (date.has_value()) {
-        currentDate = QDate(date.value().year_, date.value().month_, date.value().day_);
-        if (currentDate.isValid()) {
-            calendar->setSelectedDate(currentDate);
-        } else {
-            calendar->setSelectedDate(QDate::currentDate());
-        }
-    } else {
-        calendar->setSelectedDate(QDate::currentDate());
+        current_date = date.value();
     }
 
-    // Компоновка
-    QVBoxLayout *layout = new QVBoxLayout(dialog);
-    layout->addWidget(calendar);
-
-    // Подключаем сигнал выбора даты
-    connect(calendar, &QCalendarWidget::selectionChanged, [this, dialog, calendar, &date, &de]() {
-        QDate selectedDate = calendar->selectedDate();
-
-        // 1. Сохраняем дату в структуру data
-        date.value().day_ = selectedDate.day();
-        date.value().month_ = selectedDate.month();
-        date.value().year_ = selectedDate.year();
-
-        // 2. Отображаем дату в QDateEdit de_deadline_data
-        de->setDate(selectedDate);
-
-        // 3. Закрываем диалог
-        dialog->accept();
-    });
-
-    // Позиционируем окно в месте курсора мыши
-    QPoint cursorPos = QCursor::pos();
-    dialog->move(cursorPos);
-
-    // Показываем диалог
-    dialog->exec();
-
-    // Удаляем диалог после закрытия
-    dialog->deleteLater();
+    std::optional<model::Date> selected_date = details::OpenCalendar(this, current_date);
+    if (selected_date.has_value()) {
+        date = selected_date.value();
+        de->setDate(QDate(date.value().year_, date.value().month_, date.value().day_));
+    }
 }
 
 model::Price MainWindow::MakePriceContract() const {
