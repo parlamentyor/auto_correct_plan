@@ -3,6 +3,15 @@
 FilterWidget::FilterWidget(QWidget *parent)
     : QWidget{parent}
 {
+    // Инициализация дат
+    date_start_.day_ = 1;
+    date_start_.month_ = 1;
+    date_start_.year_ = QDate::currentDate().year();
+
+    date_end_.day_ = QDate::currentDate().day();
+    date_end_.month_ = QDate::currentDate().month();
+    date_end_.year_ = QDate::currentDate().year();
+
     QHBoxLayout* main_layout = new QHBoxLayout(this);
 
     // Группа статуса
@@ -63,6 +72,40 @@ FilterWidget::FilterWidget(QWidget *parent)
     type_layout->addWidget(check_bek_);
     type_layout->addWidget(check_si_);
 
+    // Группа период
+    QGroupBox* period_group = new QGroupBox("Период");
+    QVBoxLayout* period_layout = new QVBoxLayout(period_group);
+
+    // Первый ряд - дата начала
+    QHBoxLayout* start_layout = new QHBoxLayout();
+    QLabel* label_start = new QLabel("с");
+    QDateEdit* date_start_edit = new QDateEdit();
+    date_start_edit->setDate(QDate(date_start_.year_, date_start_.month_, date_start_.day_));
+    date_start_edit->setCalendarPopup(true);
+    // Устанавливаем формат отображения даты
+    date_start_edit->setDisplayFormat("dd.MM.yyyy");
+    // Устанавливаем минимальную ширину, чтобы дата помещалась полностью
+    date_start_edit->setMinimumWidth(120);
+    start_layout->addWidget(label_start);
+    start_layout->addWidget(date_start_edit);
+
+    // Второй ряд - дата окончания
+    QHBoxLayout* end_layout = new QHBoxLayout();
+    QLabel* label_end = new QLabel("по");
+    QDateEdit* date_end_edit = new QDateEdit();
+    date_end_edit->setDate(QDate(date_end_.year_, date_end_.month_, date_end_.day_));
+    date_end_edit->setCalendarPopup(true);
+    // Устанавливаем формат отображения даты
+    date_end_edit->setDisplayFormat("dd.MM.yyyy");
+    // Устанавливаем минимальную ширину, чтобы дата помещалась полностью
+    date_end_edit->setMinimumWidth(120);
+    end_layout->addWidget(label_end);
+    end_layout->addWidget(date_end_edit);
+
+    period_layout->addLayout(start_layout);
+    period_layout->addLayout(end_layout);
+
+    main_layout->addWidget(period_group);
     main_layout->addWidget(status_group);
     main_layout->addWidget(type_group);
     main_layout->addStretch();

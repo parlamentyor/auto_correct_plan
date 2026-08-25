@@ -7,6 +7,8 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QDateEdit>
+#include <QPushButton>
 
 #include "model.h"
 
@@ -48,6 +50,9 @@ private:
     QCheckBox* check_att_;
     QCheckBox* check_bek_;
     QCheckBox* check_si_;
+
+    model::Date date_start_;
+    model::Date date_end_;
 };
 
 #endif // FILTERWIDGET_H
